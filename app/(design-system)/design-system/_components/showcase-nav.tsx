@@ -5,6 +5,7 @@ const SECTIONS = [
   { id: 'feedback', label: 'Feedback' },
   { id: 'overlays', label: 'Overlays' },
   { id: 'misc', label: 'Misc' },
+  { id: 'chat', label: 'Chat' },
 ];
 
 export function ShowcaseNav() {

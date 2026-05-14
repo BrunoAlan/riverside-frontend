@@ -2,6 +2,7 @@
 
 import { ArrowRight, Filter, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { ChatInput } from '@/components/chat/chat-input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -419,6 +420,29 @@ export default function DesignSystemPage() {
                     <SelectItem value="c">Option C</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+          </Section>
+          <Section id="chat" title="Chat" description="Composer for chat surfaces.">
+            <div className="max-w-2xl space-y-6">
+              <div>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Empty (placeholder)</h3>
+                <ChatInput
+                  placeholder="Type here to exit voice mode..."
+                  onSubmit={(text) => toast(`Sent: ${text}`)}
+                />
+              </div>
+              <div>
+                <h3 className="text-foreground mb-3 text-sm font-medium">With text</h3>
+                <ChatInput defaultValue="Typin" onSubmit={(text) => toast(`Sent: ${text}`)} />
+              </div>
+              <div>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Disabled</h3>
+                <ChatInput
+                  placeholder="Disabled while the agent is responding..."
+                  disabled
+                  onSubmit={(text) => toast(`Sent: ${text}`)}
+                />
               </div>
             </div>
           </Section>
