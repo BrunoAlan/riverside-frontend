@@ -1,5 +1,3 @@
-'use client';
-
 import Image from 'next/image';
 import { FloatingActions } from '@/components/home/floating-actions';
 import { PrimaryNav } from '@/components/home/primary-nav';

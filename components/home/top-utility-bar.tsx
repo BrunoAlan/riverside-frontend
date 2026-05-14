@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { EnvelopeIcon, MagnifyingGlassIcon, PhoneIcon, UserIcon } from '@phosphor-icons/react';
 import { Separator } from '@/components/ui/separator';
