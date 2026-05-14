@@ -291,8 +291,14 @@ export default function DesignSystemPage() {
                   <Button variant="outline" onClick={() => toast.success('Success!')}>
                     Success
                   </Button>
+                  <Button variant="outline" onClick={() => toast.warning('Heads up')}>
+                    Warning
+                  </Button>
                   <Button variant="outline" onClick={() => toast.error('Something failed')}>
                     Error
+                  </Button>
+                  <Button variant="outline" onClick={() => toast.info('FYI')}>
+                    Info
                   </Button>
                 </div>
               </div>
