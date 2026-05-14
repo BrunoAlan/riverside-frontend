@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowRight, Filter, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -139,6 +140,57 @@ export default function DesignSystemPage() {
                 <div className="flex flex-wrap gap-3">
                   <Button>Idle</Button>
                   <Button disabled>Disabled</Button>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-foreground mb-3 text-sm font-medium">With icon</h3>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button>
+                    <Filter />
+                    Button CTA
+                  </Button>
+                  <Button variant="secondary">
+                    <Plus />
+                    Add item
+                  </Button>
+                  <Button variant="outline">
+                    Continue
+                    <ArrowRight />
+                  </Button>
+                  <Button variant="destructive">
+                    <Trash2 />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Icon only</h3>
+                <p className="text-muted-foreground mb-3 text-xs">
+                  Use a <code>size=&quot;icon*&quot;</code> variant and include an{' '}
+                  <code>aria-label</code>.
+                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button size="icon-xs" aria-label="Filter">
+                    <Filter />
+                  </Button>
+                  <Button size="icon-sm" aria-label="Filter">
+                    <Filter />
+                  </Button>
+                  <Button size="icon" aria-label="Filter">
+                    <Filter />
+                  </Button>
+                  <Button size="icon-lg" aria-label="Filter">
+                    <Filter />
+                  </Button>
+                  <Button size="icon" variant="secondary" aria-label="Filter">
+                    <Filter />
+                  </Button>
+                  <Button size="icon" variant="outline" aria-label="Filter">
+                    <Filter />
+                  </Button>
+                  <Button size="icon" variant="ghost" aria-label="Filter">
+                    <Filter />
+                  </Button>
                 </div>
               </div>
             </div>
