@@ -39,14 +39,12 @@ riverside-frontend/
 
 Business logic lives in `components/app/`. The key files:
 
-
 | File                  | Description                                                           |
 | --------------------- | --------------------------------------------------------------------- |
 | `app.tsx`             | Top-level wiring: theme, providers, session.                          |
 | `view-controller.tsx` | Switches between welcome and session views based on connection state. |
 | `session-view.tsx`    | Active call UI: chat transcript, media tiles, control bar.            |
 | `welcome-view.tsx`    | Pre-connection landing UI.                                            |
-
 
 ## Getting started
 
@@ -134,7 +132,6 @@ pnpm dlx shadcn@latest add @agents-ui/<component-name>
 
 ## Scripts
 
-
 | Script        | What it does                 |
 | ------------- | ---------------------------- |
 | `pnpm dev`    | Start dev server (Turbopack) |
@@ -142,5 +139,3 @@ pnpm dlx shadcn@latest add @agents-ui/<component-name>
 | `pnpm start`  | Run the production build     |
 | `pnpm lint`   | ESLint                       |
 | `pnpm format` | Prettier write               |
-
-
