@@ -9,8 +9,8 @@ export function Hero() {
       <TopUtilityBar />
       <PrimaryNav />
 
-      <div className="px-4 pb-4 md:px-6 md:pb-6">
-        <div className="relative h-[calc(100vh-9rem)] w-full overflow-hidden">
+      <div className="px-4 pb-4 md:px-20 md:pb-10">
+        <div className="relative h-[calc(100vh-12rem)] w-full overflow-hidden">
           <Image
             src="/hero-image.jpg"
             alt=""
@@ -28,9 +28,8 @@ export function Hero() {
               Cruises
             </h1>
           </div>
-
-          <FloatingActions />
         </div>
+        <FloatingActions />
       </div>
     </section>
   );

@@ -9,7 +9,7 @@ const itemClass =
 
 export function TopUtilityBar() {
   return (
-    <div className="w-full bg-[#EFE9DF]">
+    <div className="w-full bg-white">
       <div className="mx-auto flex h-9 max-w-[1400px] items-center justify-center gap-6 px-4">
         <Link href="#" className={itemClass}>
           US [$]

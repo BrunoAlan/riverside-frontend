@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 export function PrimaryNav() {
   return (
-    <div className="relative w-full bg-[#EFE9DF]">
+    <div className="relative w-full bg-[#F5EFE3]">
       <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-6">
         <Button variant="ghost" className="gap-2 text-xs tracking-[0.1em] uppercase">
           <ListIcon size={20} weight="regular" />
