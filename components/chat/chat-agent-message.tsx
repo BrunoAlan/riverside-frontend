@@ -12,10 +12,7 @@ function ChatAgentMessage({ children, className }: ChatAgentMessageProps) {
   return (
     <p
       data-slot="chat-agent-message"
-      className={cn(
-        'text-muted-foreground text-base leading-relaxed whitespace-pre-wrap',
-        className
-      )}
+      className={cn('text-muted-foreground text-sm leading-normal whitespace-pre-wrap', className)}
     >
       {children}
     </p>
