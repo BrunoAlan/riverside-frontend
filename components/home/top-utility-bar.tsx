@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Envelope, MagnifyingGlass, Phone, User } from '@phosphor-icons/react/dist/ssr';
+import { EnvelopeIcon, MagnifyingGlassIcon, PhoneIcon, UserIcon } from '@phosphor-icons/react';
 import { Separator } from '@/components/ui/separator';
 
 const itemClass =
@@ -14,7 +14,7 @@ export function TopUtilityBar() {
         </Link>
 
         <Link href="#" className={`${itemClass} hidden md:flex`}>
-          <Envelope size={14} weight="regular" />
+          <EnvelopeIcon size={14} weight="regular" />
           My Guests
         </Link>
 
@@ -26,17 +26,17 @@ export function TopUtilityBar() {
         </Link>
 
         <Link href="#" className={itemClass}>
-          <User size={14} weight="regular" />
+          <UserIcon size={14} weight="regular" />
           My Account
         </Link>
 
         <Link href="#" className={`${itemClass} hidden md:flex`}>
-          <MagnifyingGlass size={14} weight="regular" />
+          <MagnifyingGlassIcon size={14} weight="regular" />
           Contact
         </Link>
 
         <Link href="tel:+10833305313" className={`${itemClass} hidden md:flex`}>
-          <Phone size={14} weight="regular" />
+          <PhoneIcon size={14} weight="regular" />
           +1 (0) 833 305 3313
         </Link>
 

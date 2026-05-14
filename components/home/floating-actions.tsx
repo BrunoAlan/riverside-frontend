@@ -1,4 +1,4 @@
-import { Camera, MagnifyingGlass, User } from '@phosphor-icons/react/dist/ssr';
+import { CameraIcon, MagnifyingGlassIcon, UserIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
 export function FloatingActions() {
@@ -11,7 +11,7 @@ export function FloatingActions() {
           aria-label="Search"
           className="rounded-full text-neutral-800 hover:bg-neutral-100"
         >
-          <MagnifyingGlass size={18} weight="regular" />
+          <MagnifyingGlassIcon size={18} weight="regular" />
         </Button>
         <Button
           variant="ghost"
@@ -19,7 +19,7 @@ export function FloatingActions() {
           aria-label="Account"
           className="rounded-full text-neutral-800 hover:bg-neutral-100"
         >
-          <User size={18} weight="regular" />
+          <UserIcon size={18} weight="regular" />
         </Button>
         <Button
           variant="ghost"
@@ -27,7 +27,7 @@ export function FloatingActions() {
           aria-label="Gallery"
           className="rounded-full text-neutral-800 hover:bg-neutral-100"
         >
-          <Camera size={18} weight="regular" />
+          <CameraIcon size={18} weight="regular" />
         </Button>
       </div>
     </div>
