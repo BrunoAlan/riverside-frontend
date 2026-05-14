@@ -74,7 +74,7 @@ Mockup provided by user (Riverside Luxury Cruises hero):
 - Responsive: hide `VIRTUAL CONCIERGE` below `sm`; logo shrinks; MENU and CRUISE FINDER stay.
 
 ### `FloatingActions` (`components/home/floating-actions.tsx`)
-- Client component (will likely host hover/tooltip later; for now still server-renderable, but kept isolated so behavior can be added without touching `Hero`).
+- Server component for now. Kept isolated so a future client-side behavior (hover, tooltip, click handlers) can be added without touching `Hero`.
 - Absolutely positioned (`absolute right-4 top-1/2 -translate-y-1/2`) column of three `<Button variant="ghost" size="icon">` wrapping Phosphor `MagnifyingGlass`, `User`, `Camera`. Each rounded full, white/translucent background for contrast on the image.
 - Hidden below `md`.
 
