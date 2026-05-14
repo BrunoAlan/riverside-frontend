@@ -139,6 +139,33 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Force light tokens inside the design-system showcase, regardless of .dark on html. */
+.ds-force-light {
+  --background: var(--beige-50);
+  --foreground: var(--neutral-950);
+  --card: var(--neutral-50);
+  --card-foreground: var(--neutral-950);
+  --popover: var(--neutral-50);
+  --popover-foreground: var(--neutral-950);
+  --primary: var(--green-600);
+  --primary-foreground: var(--neutral-50);
+  --secondary: var(--beige-200);
+  --secondary-foreground: var(--neutral-900);
+  --muted: var(--neutral-100);
+  --muted-foreground: var(--neutral-600);
+  --accent: var(--beige-300);
+  --accent-foreground: var(--neutral-900);
+  --destructive: var(--error-600);
+  --destructive-foreground: var(--neutral-50);
+  --warning: var(--warning-500);
+  --warning-foreground: var(--neutral-950);
+  --success: var(--success-600);
+  --success-foreground: var(--neutral-50);
+  --border: var(--neutral-200);
+  --input: var(--neutral-200);
+  --ring: var(--green-600);
+}
+
 /* TODO(design-system): remap dark mode to new raw palette (currently uses shadcn defaults). */
 .dark {
   --background: oklch(0.145 0 0);
