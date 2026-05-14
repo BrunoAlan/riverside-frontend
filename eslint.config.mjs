@@ -17,6 +17,17 @@ const eslintConfig = [
     'prettier',
     'plugin:prettier/recommended'
   ),
+  {
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'out/**',
+      'build/**',
+      'next-env.d.ts',
+      'components/agents-ui/**',
+      'components/ai-elements/**',
+    ],
+  },
 ];
 
 export default eslintConfig;
