@@ -71,6 +71,7 @@ function ChatInput({
         disabled={!canSubmit}
         onClick={submit}
         aria-label="Send message"
+        className={disabled ? 'bg-neutral-300 text-neutral-500 disabled:opacity-100' : undefined}
       >
         <Send />
       </Button>
