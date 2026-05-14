@@ -14,6 +14,24 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function DesignSystemPage() {
   return (
@@ -203,7 +221,56 @@ export default function DesignSystemPage() {
             </div>
           </Section>
           <Section id="overlays" title="Overlays">
-            <p className="text-sm text-muted-foreground">Pending.</p>
+            <div className="space-y-6">
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Dialog</h3>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">Open dialog</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Are you sure?</DialogTitle>
+                      <DialogDescription>
+                        This action cannot be undone. It will permanently delete the resource.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button variant="ghost">Cancel</Button>
+                      <Button variant="destructive">Delete</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Dropdown menu</h3>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">Open menu</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>My account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                    <DropdownMenuItem>Log out</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Tabs</h3>
+                <Tabs defaultValue="account" className="w-full max-w-md">
+                  <TabsList>
+                    <TabsTrigger value="account">Account</TabsTrigger>
+                    <TabsTrigger value="password">Password</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="account">Account settings go here.</TabsContent>
+                  <TabsContent value="password">Password settings go here.</TabsContent>
+                </Tabs>
+              </div>
+            </div>
           </Section>
           <Section id="misc" title="Misc">
             <p className="text-sm text-muted-foreground">Pending.</p>
