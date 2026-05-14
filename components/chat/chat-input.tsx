@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { Send } from 'lucide-react';
 import { useControllableState } from '@radix-ui/react-use-controllable-state';
 import { Button } from '@/components/ui/button';
