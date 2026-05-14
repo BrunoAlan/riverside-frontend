@@ -1,5 +1,6 @@
 import { ShowcaseNav } from './_components/showcase-nav';
 import { Section } from './_components/section';
+import { ColorSwatch } from './_components/color-swatch';
 
 export default function DesignSystemPage() {
   return (
@@ -14,7 +15,51 @@ export default function DesignSystemPage() {
             </p>
           </header>
           <Section id="colors" title="Colors" description="Raw palette and semantic tokens.">
-            <p className="text-sm text-muted-foreground">Pending — added in Task 3.</p>
+            <div className="space-y-8">
+              {(['green', 'beige', 'neutral', 'error', 'warning', 'success'] as const).map((family) => (
+                <div key={family}>
+                  <h3 className="mb-3 text-sm font-medium capitalize text-foreground">{family}</h3>
+                  <div className="grid grid-cols-11 gap-2">
+                    {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((stop) => (
+                      <ColorSwatch key={stop} token={`${family}-${stop}`} label={`${family}-${stop}`} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Semantic tokens</h3>
+                <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
+                  {[
+                    'background',
+                    'foreground',
+                    'card',
+                    'card-foreground',
+                    'popover',
+                    'popover-foreground',
+                    'primary',
+                    'primary-foreground',
+                    'secondary',
+                    'secondary-foreground',
+                    'muted',
+                    'muted-foreground',
+                    'accent',
+                    'accent-foreground',
+                    'destructive',
+                    'destructive-foreground',
+                    'warning',
+                    'warning-foreground',
+                    'success',
+                    'success-foreground',
+                    'border',
+                    'input',
+                    'ring',
+                  ].map((token) => (
+                    <ColorSwatch key={token} token={token} />
+                  ))}
+                </div>
+              </div>
+            </div>
           </Section>
           <Section id="buttons" title="Buttons">
             <p className="text-sm text-muted-foreground">Pending.</p>
