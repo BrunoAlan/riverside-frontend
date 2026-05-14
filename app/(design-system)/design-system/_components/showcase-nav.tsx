@@ -10,7 +10,7 @@ const SECTIONS = [
 export function ShowcaseNav() {
   return (
     <nav className="sticky top-8 w-48 shrink-0">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
         Sections
       </p>
       <ul className="space-y-1">
@@ -18,7 +18,7 @@ export function ShowcaseNav() {
           <li key={s.id}>
             <a
               href={`#${s.id}`}
-              className="block rounded-md px-2 py-1 text-sm text-foreground/80 hover:bg-muted hover:text-foreground"
+              className="text-foreground/80 hover:bg-muted hover:text-foreground block rounded-md px-2 py-1 text-sm"
             >
               {s.label}
             </a>

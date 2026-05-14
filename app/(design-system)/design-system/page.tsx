@@ -1,19 +1,12 @@
 'use client';
 
-import { ShowcaseNav } from './_components/showcase-nav';
-import { Section } from './_components/section';
-import { ColorSwatch } from './_components/color-swatch';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Switch } from '@/components/ui/switch';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -31,41 +24,62 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { Toggle } from '@/components/ui/toggle';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ColorSwatch } from './_components/color-swatch';
+import { Section } from './_components/section';
+import { ShowcaseNav } from './_components/showcase-nav';
 
 export default function DesignSystemPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground min-h-screen">
       <div className="mx-auto flex max-w-6xl gap-12 px-6 py-12">
         <ShowcaseNav />
-        <main className="flex-1 min-w-0">
+        <main className="min-w-0 flex-1">
           <header className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground">Design System</h1>
-            <p className="mt-2 text-muted-foreground">
+            <h1 className="text-foreground text-4xl font-bold">Design System</h1>
+            <p className="text-muted-foreground mt-2">
               Tokens, components, and patterns for the riverside frontend.
             </p>
           </header>
           <Section id="colors" title="Colors" description="Raw palette and semantic tokens.">
             <div className="space-y-8">
-              {(['green', 'beige', 'neutral', 'error', 'warning', 'success'] as const).map((family) => (
-                <div key={family}>
-                  <h3 className="mb-3 text-sm font-medium capitalize text-foreground">{family}</h3>
-                  <div className="grid grid-cols-11 gap-2">
-                    {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((stop) => (
-                      <ColorSwatch key={stop} token={`${family}-${stop}`} label={`${family}-${stop}`} />
-                    ))}
+              {(['green', 'beige', 'neutral', 'error', 'warning', 'success'] as const).map(
+                (family) => (
+                  <div key={family}>
+                    <h3 className="text-foreground mb-3 text-sm font-medium capitalize">
+                      {family}
+                    </h3>
+                    <div className="grid grid-cols-11 gap-2">
+                      {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((stop) => (
+                        <ColorSwatch
+                          key={stop}
+                          token={`${family}-${stop}`}
+                          label={`${family}-${stop}`}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Semantic tokens</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Semantic tokens</h3>
                 <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
                   {[
                     'background',
@@ -101,7 +115,7 @@ export default function DesignSystemPage() {
           <Section id="buttons" title="Buttons">
             <div className="space-y-6">
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Variants</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Variants</h3>
                 <div className="flex flex-wrap gap-3">
                   <Button>Default</Button>
                   <Button variant="secondary">Secondary</Button>
@@ -112,7 +126,7 @@ export default function DesignSystemPage() {
                 </div>
               </div>
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Sizes</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Sizes</h3>
                 <div className="flex flex-wrap items-center gap-3">
                   <Button size="xs">Extra small</Button>
                   <Button size="sm">Small</Button>
@@ -121,7 +135,7 @@ export default function DesignSystemPage() {
                 </div>
               </div>
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">States</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">States</h3>
                 <div className="flex flex-wrap gap-3">
                   <Button>Idle</Button>
                   <Button disabled>Disabled</Button>
@@ -134,7 +148,7 @@ export default function DesignSystemPage() {
               <div className="space-y-2">
                 <Label htmlFor="email-demo">Email</Label>
                 <Input id="email-demo" type="email" placeholder="you@example.com" />
-                <p className="text-xs text-muted-foreground">We never share your email.</p>
+                <p className="text-muted-foreground text-xs">We never share your email.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="bio-demo">Bio</Label>
@@ -143,7 +157,7 @@ export default function DesignSystemPage() {
               <div className="space-y-2">
                 <Label htmlFor="err-demo">Field with error</Label>
                 <Input id="err-demo" aria-invalid placeholder="invalid input" />
-                <p className="text-xs text-destructive">This field is required.</p>
+                <p className="text-destructive text-xs">This field is required.</p>
               </div>
               <div className="flex items-center gap-3">
                 <Checkbox id="cb-demo" />
@@ -171,7 +185,7 @@ export default function DesignSystemPage() {
           <Section id="feedback" title="Feedback">
             <div className="space-y-6">
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Alerts</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Alerts</h3>
                 <div className="space-y-3">
                   <Alert>
                     <AlertTitle>Heads up!</AlertTitle>
@@ -193,7 +207,7 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Badges</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Badges</h3>
                 <div className="flex flex-wrap gap-2">
                   <Badge>Default</Badge>
                   <Badge variant="secondary">Secondary</Badge>
@@ -205,7 +219,7 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Tooltip</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Tooltip</h3>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -217,11 +231,17 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Toasts (sonner)</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Toasts (sonner)</h3>
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" onClick={() => toast('Default toast')}>Default</Button>
-                  <Button variant="outline" onClick={() => toast.success('Success!')}>Success</Button>
-                  <Button variant="outline" onClick={() => toast.error('Something failed')}>Error</Button>
+                  <Button variant="outline" onClick={() => toast('Default toast')}>
+                    Default
+                  </Button>
+                  <Button variant="outline" onClick={() => toast.success('Success!')}>
+                    Success
+                  </Button>
+                  <Button variant="outline" onClick={() => toast.error('Something failed')}>
+                    Error
+                  </Button>
                 </div>
               </div>
             </div>
@@ -229,7 +249,7 @@ export default function DesignSystemPage() {
           <Section id="overlays" title="Overlays">
             <div className="space-y-6">
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Dialog</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Dialog</h3>
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline">Open dialog</Button>
@@ -250,7 +270,7 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Dropdown menu</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Dropdown menu</h3>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">Open menu</Button>
@@ -266,7 +286,7 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Tabs</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Tabs</h3>
                 <Tabs defaultValue="account" className="w-full max-w-md">
                   <TabsList>
                     <TabsTrigger value="account">Account</TabsTrigger>
@@ -281,7 +301,7 @@ export default function DesignSystemPage() {
           <Section id="misc" title="Misc">
             <div className="space-y-6">
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Card</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Card</h3>
                 <Card className="max-w-md">
                   <CardHeader>
                     <CardTitle>Project</CardTitle>
@@ -294,7 +314,7 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Avatar</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Avatar</h3>
                 <div className="flex items-center gap-3">
                   <Avatar>
                     <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
@@ -307,7 +327,7 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Skeleton</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Skeleton</h3>
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-[250px]" />
                   <Skeleton className="h-4 w-[200px]" />
@@ -316,7 +336,7 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Separator</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Separator</h3>
                 <div>
                   <p className="text-sm">Above</p>
                   <Separator className="my-2" />
@@ -325,12 +345,12 @@ export default function DesignSystemPage() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Toggle</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Toggle</h3>
                 <Toggle>Press me</Toggle>
               </div>
 
               <div>
-                <h3 className="mb-3 text-sm font-medium text-foreground">Select</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Select</h3>
                 <Select>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Pick one" />

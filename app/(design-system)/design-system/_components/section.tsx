@@ -9,12 +9,10 @@ interface SectionProps {
 
 export function Section({ id, title, description, children }: SectionProps) {
   return (
-    <section id={id} className="scroll-mt-20 py-12 border-b border-border last:border-b-0">
+    <section id={id} className="border-border scroll-mt-20 border-b py-12 last:border-b-0">
       <header className="mb-6">
-        <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
-        {description ? (
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-        ) : null}
+        <h2 className="text-foreground text-2xl font-semibold">{title}</h2>
+        {description ? <p className="text-muted-foreground mt-1 text-sm">{description}</p> : null}
       </header>
       <div className="space-y-6">{children}</div>
     </section>

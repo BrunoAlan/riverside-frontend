@@ -7,7 +7,7 @@
 :root {
   /* ---------- Raw palette ---------- */
   /* Green */
-  --green-50:  #000000;
+  --green-50: #000000;
   --green-100: #000000;
   --green-200: #000000;
   --green-300: #000000;
@@ -20,7 +20,7 @@
   --green-950: #000000;
 
   /* Beige */
-  --beige-50:  #000000;
+  --beige-50: #000000;
   --beige-100: #000000;
   --beige-200: #000000;
   --beige-300: #000000;
@@ -33,7 +33,7 @@
   --beige-950: #000000;
 
   /* Neutral */
-  --neutral-50:  #000000;
+  --neutral-50: #000000;
   --neutral-100: #000000;
   --neutral-200: #000000;
   --neutral-300: #000000;
@@ -46,7 +46,7 @@
   --neutral-950: #000000;
 
   /* Error */
-  --error-50:  #000000;
+  --error-50: #000000;
   --error-100: #000000;
   --error-200: #000000;
   --error-300: #000000;
@@ -59,7 +59,7 @@
   --error-950: #000000;
 
   /* Warning */
-  --warning-50:  #000000;
+  --warning-50: #000000;
   --warning-100: #000000;
   --warning-200: #000000;
   --warning-300: #000000;
@@ -72,7 +72,7 @@
   --warning-950: #000000;
 
   /* Success */
-  --success-50:  #000000;
+  --success-50: #000000;
   --success-100: #000000;
   --success-200: #000000;
   --success-300: #000000;
@@ -208,7 +208,7 @@
   --color-success-foreground: var(--success-foreground);
 
   /* Raw palette — Green */
-  --color-green-50:  var(--green-50);
+  --color-green-50: var(--green-50);
   --color-green-100: var(--green-100);
   --color-green-200: var(--green-200);
   --color-green-300: var(--green-300);
@@ -221,7 +221,7 @@
   --color-green-950: var(--green-950);
 
   /* Raw palette — Beige */
-  --color-beige-50:  var(--beige-50);
+  --color-beige-50: var(--beige-50);
   --color-beige-100: var(--beige-100);
   --color-beige-200: var(--beige-200);
   --color-beige-300: var(--beige-300);
@@ -234,7 +234,7 @@
   --color-beige-950: var(--beige-950);
 
   /* Raw palette — Neutral (override Tailwind's built-in `neutral-*` scale) */
-  --color-neutral-50:  var(--neutral-50);
+  --color-neutral-50: var(--neutral-50);
   --color-neutral-100: var(--neutral-100);
   --color-neutral-200: var(--neutral-200);
   --color-neutral-300: var(--neutral-300);
@@ -247,7 +247,7 @@
   --color-neutral-950: var(--neutral-950);
 
   /* Raw palette — Error */
-  --color-error-50:  var(--error-50);
+  --color-error-50: var(--error-50);
   --color-error-100: var(--error-100);
   --color-error-200: var(--error-200);
   --color-error-300: var(--error-300);
@@ -260,7 +260,7 @@
   --color-error-950: var(--error-950);
 
   /* Raw palette — Warning */
-  --color-warning-50:  var(--warning-50);
+  --color-warning-50: var(--warning-50);
   --color-warning-100: var(--warning-100);
   --color-warning-200: var(--warning-200);
   --color-warning-300: var(--warning-300);
@@ -273,7 +273,7 @@
   --color-warning-950: var(--warning-950);
 
   /* Raw palette — Success */
-  --color-success-50:  var(--success-50);
+  --color-success-50: var(--success-50);
   --color-success-100: var(--success-100);
   --color-success-200: var(--success-200);
   --color-success-300: var(--success-300);
