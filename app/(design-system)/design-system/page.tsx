@@ -2,6 +2,12 @@ import { ShowcaseNav } from './_components/showcase-nav';
 import { Section } from './_components/section';
 import { ColorSwatch } from './_components/color-swatch';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Switch } from '@/components/ui/switch';
 
 export default function DesignSystemPage() {
   return (
@@ -94,7 +100,43 @@ export default function DesignSystemPage() {
             </div>
           </Section>
           <Section id="forms" title="Forms">
-            <p className="text-sm text-muted-foreground">Pending.</p>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="email-demo">Email</Label>
+                <Input id="email-demo" type="email" placeholder="you@example.com" />
+                <p className="text-xs text-muted-foreground">We never share your email.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bio-demo">Bio</Label>
+                <Textarea id="bio-demo" placeholder="Tell us a bit about yourself..." />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="err-demo">Field with error</Label>
+                <Input id="err-demo" aria-invalid placeholder="invalid input" />
+                <p className="text-xs text-destructive">This field is required.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Checkbox id="cb-demo" />
+                <Label htmlFor="cb-demo">Accept terms and conditions</Label>
+              </div>
+              <div className="space-y-3">
+                <Label>Plan</Label>
+                <RadioGroup defaultValue="pro" className="gap-2">
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem id="rg-free" value="free" />
+                    <Label htmlFor="rg-free">Free</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem id="rg-pro" value="pro" />
+                    <Label htmlFor="rg-pro">Pro</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch id="sw-demo" />
+                <Label htmlFor="sw-demo">Enable notifications</Label>
+              </div>
+            </div>
           </Section>
           <Section id="feedback" title="Feedback">
             <p className="text-sm text-muted-foreground">Pending.</p>
