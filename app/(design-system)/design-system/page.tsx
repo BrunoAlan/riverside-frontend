@@ -2,6 +2,7 @@
 
 import { ArrowRight, Filter, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Chat, type ChatMessage } from '@/components/chat/chat';
 import { ChatInput } from '@/components/chat/chat-input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -46,6 +47,31 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ColorSwatch } from './_components/color-swatch';
 import { Section } from './_components/section';
 import { ShowcaseNav } from './_components/showcase-nav';
+
+const SAMPLE_MESSAGES: ChatMessage[] = [
+  {
+    id: '1',
+    role: 'user',
+    content: "And what's a typical day like? I don't want to feel rushed.",
+  },
+  {
+    id: '2',
+    role: 'agent',
+    content:
+      'Mornings ashore, lunch back on board, and the afternoons are yours. Some guests head out again; most rest, read, or watch the valley go by. Evenings are exquisite culinary experiences, often with live music.',
+  },
+  {
+    id: '3',
+    role: 'user',
+    content: 'Sounds perfect.\n\nIs there Wi-Fi on board?',
+  },
+  {
+    id: '4',
+    role: 'agent',
+    content:
+      'Yes, complimentary Wi-Fi throughout the ship. Speeds vary by location but most guests find it sufficient for messaging and light browsing.',
+  },
+];
 
 export default function DesignSystemPage() {
   return (
@@ -423,26 +449,42 @@ export default function DesignSystemPage() {
               </div>
             </div>
           </Section>
-          <Section id="chat" title="Chat" description="Composer for chat surfaces.">
-            <div className="max-w-2xl space-y-6">
+          <Section id="chat" title="Chat" description="Composer and conversation surfaces.">
+            <div className="max-w-2xl space-y-8">
               <div>
-                <h3 className="text-foreground mb-3 text-sm font-medium">Empty (placeholder)</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">
+                  Composer — empty (placeholder)
+                </h3>
                 <ChatInput
                   placeholder="Type here to exit voice mode..."
                   onSubmit={(text) => toast(`Sent: ${text}`)}
                 />
               </div>
               <div>
-                <h3 className="text-foreground mb-3 text-sm font-medium">With text</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Composer — with text</h3>
                 <ChatInput defaultValue="Typin" onSubmit={(text) => toast(`Sent: ${text}`)} />
               </div>
               <div>
-                <h3 className="text-foreground mb-3 text-sm font-medium">Disabled</h3>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Composer — disabled</h3>
                 <ChatInput
                   placeholder="Disabled while the agent is responding..."
                   disabled
                   onSubmit={(text) => toast(`Sent: ${text}`)}
                 />
+              </div>
+              <div>
+                <h3 className="text-foreground mb-3 text-sm font-medium">Conversation</h3>
+                <div className="bg-card h-80 rounded-2xl border">
+                  <Chat messages={SAMPLE_MESSAGES} />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-foreground mb-3 text-sm font-medium">
+                  Conversation — agent thinking
+                </h3>
+                <div className="bg-card h-80 rounded-2xl border">
+                  <Chat messages={SAMPLE_MESSAGES} agentThinking />
+                </div>
               </div>
             </div>
           </Section>
