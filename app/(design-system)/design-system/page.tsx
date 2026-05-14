@@ -32,6 +32,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Toggle } from '@/components/ui/toggle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function DesignSystemPage() {
   return (
@@ -273,7 +279,70 @@ export default function DesignSystemPage() {
             </div>
           </Section>
           <Section id="misc" title="Misc">
-            <p className="text-sm text-muted-foreground">Pending.</p>
+            <div className="space-y-6">
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Card</h3>
+                <Card className="max-w-md">
+                  <CardHeader>
+                    <CardTitle>Project</CardTitle>
+                    <CardDescription>An overview of your project.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm">Card body content goes here.</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Avatar</h3>
+                <div className="flex items-center gap-3">
+                  <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                    <AvatarFallback>SC</AvatarFallback>
+                  </Avatar>
+                  <Avatar>
+                    <AvatarFallback>AB</AvatarFallback>
+                  </Avatar>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Skeleton</h3>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                  <Skeleton className="h-4 w-[300px]" />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Separator</h3>
+                <div>
+                  <p className="text-sm">Above</p>
+                  <Separator className="my-2" />
+                  <p className="text-sm">Below</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Toggle</h3>
+                <Toggle>Press me</Toggle>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Select</h3>
+                <Select>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Pick one" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="a">Option A</SelectItem>
+                    <SelectItem value="b">Option B</SelectItem>
+                    <SelectItem value="c">Option C</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </Section>
         </main>
       </div>
