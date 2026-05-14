@@ -19,7 +19,7 @@ type ImageData = {
 };
 
 // Image metadata
-export const alt = 'About Acme';
+export const alt = 'About Riverside';
 export const size = {
   width: 1200,
   height: 628,
@@ -107,8 +107,9 @@ export default async function Image() {
 
   const pageTitle = cleanPageTitle(appConfig.pageTitle);
   const logoUri = appConfig.logoDark || appConfig.logo;
-  const isLogoUriLocal = logoUri.includes('lk-logo');
-  const wordmarkUri = logoUri === APP_CONFIG_DEFAULTS.logoDark ? 'public/lk-wordmark.svg' : logoUri;
+  const isLogoUriLocal = logoUri.includes('riverside-logo');
+  const wordmarkUri =
+    logoUri === APP_CONFIG_DEFAULTS.logoDark ? 'public/riverside-logo.svg' : logoUri;
 
   // Load fonts - use file system in dev, fetch in production
   let commitMonoData: ArrayBuffer | undefined;
@@ -134,7 +135,7 @@ export default async function Image() {
   // logo
   const { base64: logoSrcBase64, dimensions: logoDimensions } = await getImageData(
     logoUri,
-    'public/lk-logo-dark.svg'
+    'public/riverside-logo.svg'
   );
   const logoSize = scaleImageSize(logoDimensions, 24);
 
