@@ -1,3 +1,5 @@
+'use client';
+
 import { ShowcaseNav } from './_components/showcase-nav';
 import { Section } from './_components/section';
 import { ColorSwatch } from './_components/color-swatch';
@@ -8,6 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
 export default function DesignSystemPage() {
   return (
@@ -139,7 +145,62 @@ export default function DesignSystemPage() {
             </div>
           </Section>
           <Section id="feedback" title="Feedback">
-            <p className="text-sm text-muted-foreground">Pending.</p>
+            <div className="space-y-6">
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Alerts</h3>
+                <div className="space-y-3">
+                  <Alert>
+                    <AlertTitle>Heads up!</AlertTitle>
+                    <AlertDescription>This is the default alert.</AlertDescription>
+                  </Alert>
+                  <Alert variant="destructive">
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>Something went wrong.</AlertDescription>
+                  </Alert>
+                  <Alert variant="warning">
+                    <AlertTitle>Warning</AlertTitle>
+                    <AlertDescription>Be careful with this action.</AlertDescription>
+                  </Alert>
+                  <Alert variant="success">
+                    <AlertTitle>Success</AlertTitle>
+                    <AlertDescription>Your changes were saved.</AlertDescription>
+                  </Alert>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Badges</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge>Default</Badge>
+                  <Badge variant="secondary">Secondary</Badge>
+                  <Badge variant="destructive">Destructive</Badge>
+                  <Badge variant="warning">Warning</Badge>
+                  <Badge variant="success">Success</Badge>
+                  <Badge variant="outline">Outline</Badge>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Tooltip</h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline">Hover me</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>This is a tooltip.</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Toasts (sonner)</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={() => toast('Default toast')}>Default</Button>
+                  <Button variant="outline" onClick={() => toast.success('Success!')}>Success</Button>
+                  <Button variant="outline" onClick={() => toast.error('Something failed')}>Error</Button>
+                </div>
+              </div>
+            </div>
           </Section>
           <Section id="overlays" title="Overlays">
             <p className="text-sm text-muted-foreground">Pending.</p>
