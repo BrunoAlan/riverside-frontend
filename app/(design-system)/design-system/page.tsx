@@ -1,6 +1,7 @@
 import { ShowcaseNav } from './_components/showcase-nav';
 import { Section } from './_components/section';
 import { ColorSwatch } from './_components/color-swatch';
+import { Button } from '@/components/ui/button';
 
 export default function DesignSystemPage() {
   return (
@@ -62,7 +63,35 @@ export default function DesignSystemPage() {
             </div>
           </Section>
           <Section id="buttons" title="Buttons">
-            <p className="text-sm text-muted-foreground">Pending.</p>
+            <div className="space-y-6">
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Variants</h3>
+                <div className="flex flex-wrap gap-3">
+                  <Button>Default</Button>
+                  <Button variant="secondary">Secondary</Button>
+                  <Button variant="outline">Outline</Button>
+                  <Button variant="ghost">Ghost</Button>
+                  <Button variant="destructive">Destructive</Button>
+                  <Button variant="link">Link</Button>
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">Sizes</h3>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button size="xs">Extra small</Button>
+                  <Button size="sm">Small</Button>
+                  <Button>Default</Button>
+                  <Button size="lg">Large</Button>
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">States</h3>
+                <div className="flex flex-wrap gap-3">
+                  <Button>Idle</Button>
+                  <Button disabled>Disabled</Button>
+                </div>
+              </div>
+            </div>
           </Section>
           <Section id="forms" title="Forms">
             <p className="text-sm text-muted-foreground">Pending.</p>
