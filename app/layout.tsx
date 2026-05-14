@@ -1,4 +1,4 @@
-import { Inter } from 'next/font/google';
+import { Inter, Source_Serif_4 } from 'next/font/google';
 import localFont from 'next/font/local';
 import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import { Toaster } from '@/components/ui/sonner';
@@ -8,6 +8,12 @@ import '@/styles/globals.css';
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
+});
+
+const sourceSerif = Source_Serif_4({
+  variable: '--font-serif',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const commitMono = localFont({
@@ -48,7 +54,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(inter.variable, commitMono.variable, 'scroll-smooth font-sans antialiased')}
+      className={cn(
+        inter.variable,
+        commitMono.variable,
+        sourceSerif.variable,
+        'scroll-smooth font-sans antialiased'
+      )}
     >
       <head>
         <title>{pageTitle}</title>
