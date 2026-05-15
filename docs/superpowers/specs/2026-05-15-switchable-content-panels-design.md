@@ -12,9 +12,10 @@ generic empty placeholders for mocking designs later.
 ## Flow
 
 - **Before start (`started = false`):** unchanged — `WelcomeView` rendered over
-  `WindowBackground` (video).
-- **After start (`started = true`):** `WindowBackground`/video is no longer
-  rendered. A `ContentView` takes its place.
+  `WindowBackground` (video, paused).
+- **After start (`started = true`):** a `ContentView` is rendered. Its default
+  panel is the video/`WindowBackground` (playing); the dropdown lets the user
+  switch to other content panels. The video is one content type, not removed.
 
 ## Components
 
@@ -25,14 +26,16 @@ renders the dropdown selector and the active panel.
 
 ### `components/app/content-panels/`
 
-One file per placeholder panel:
+One file per panel:
 
+- `panel-window.tsx` — renders `WindowBackground` (video + window overlay),
+  playing. This is the default panel after start.
 - `panel-a.tsx`
 - `panel-b.tsx`
 - `panel-c.tsx`
 
-Each is a neutral, empty placeholder (e.g. centered label "Contenido A") ready
-to receive real design later.
+`panel-a/b/c` are neutral, empty placeholders (e.g. centered label
+"Contenido A") ready to receive real design later.
 
 ### Panel registry
 
