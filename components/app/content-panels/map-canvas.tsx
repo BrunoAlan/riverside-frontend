@@ -5,8 +5,10 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { parchmentStyle } from '@/lib/map/parchment-style';
 
-const GRAIN_DATA_URI =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+// Paper-grain texture for the parchment look. The seamless feTurbulence tile
+// lives in public/map/grain.svg (edit it there to tune the grain). Applied as a
+// repeating background on an overlay div with mix-blend-multiply.
+const GRAIN_IMAGE = "url('/map/grain.svg')";
 
 export function MapCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,7 +35,7 @@ export function MapCanvas() {
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_DATA_URI, backgroundRepeat: 'repeat' }}
+        style={{ backgroundImage: GRAIN_IMAGE, backgroundRepeat: 'repeat' }}
       />
     </div>
   );
