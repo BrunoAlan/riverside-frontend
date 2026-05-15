@@ -46,7 +46,7 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
   accent: '#7B907E',
   logoDark: '/riverside-logo.svg',
   accentDark: '#7B907E',
-  startButtonText: 'Start call',
+  startButtonText: 'Start the experience',
 
   // optional: audio visualization configuration
   // audioVisualizerType: 'bar',
