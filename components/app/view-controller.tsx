@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useSessionContext } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
@@ -31,18 +32,24 @@ interface ViewControllerProps {
 }
 
 export function ViewController({ appConfig }: ViewControllerProps) {
-  const { isConnected, start } = useSessionContext();
+  const { start } = useSessionContext();
+  const [started, setStarted] = useState(false);
+
+  const handleStart = () => {
+    setStarted(true);
+    start();
+  };
 
   return (
     <>
-      <WindowBackground isPlaying={isConnected} />
+      <WindowBackground isPlaying={started} />
       <AnimatePresence mode="wait">
-        {!isConnected && (
+        {!started && (
           <MotionWelcomeView
             key="welcome"
             {...VIEW_MOTION_PROPS}
             startButtonText={appConfig.startButtonText}
-            onStartCall={start}
+            onStartCall={handleStart}
           />
         )}
       </AnimatePresence>
