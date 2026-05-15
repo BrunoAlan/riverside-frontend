@@ -14,7 +14,7 @@ interface DreamImage {
 
 const DREAM_IMAGES: DreamImage[] = [
   {
-    src: '/dream/1.png',
+    src: '/dream/1.jpg',
     mask: '/dream/masks/blob-1.svg',
     tag: '1 – Image Tag',
     top: '9%',
@@ -32,7 +32,7 @@ const DREAM_IMAGES: DreamImage[] = [
     height: '32%',
   },
   {
-    src: '/dream/3.png',
+    src: '/dream/3.jpg',
     mask: '/dream/masks/blob-3.svg',
     tag: '1 – Image Tag',
     top: '12%',
@@ -41,7 +41,7 @@ const DREAM_IMAGES: DreamImage[] = [
     height: '25%',
   },
   {
-    src: '/dream/4.png',
+    src: '/dream/4.jpg',
     mask: '/dream/masks/blob-4.svg',
     tag: '1 – Image Tag',
     top: '50%',
