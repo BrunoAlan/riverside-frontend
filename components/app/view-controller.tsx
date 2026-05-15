@@ -10,6 +10,7 @@ import { WindowBackground } from '@/components/app/window-background';
 
 const MotionWelcomeView = motion.create(WelcomeView);
 const MotionSessionView = motion.create(AgentSessionView_01);
+const MotionWindowBackground = motion.create(WindowBackground);
 
 const VIEW_MOTION_PROPS = {
   variants: {
@@ -40,7 +41,7 @@ export function ViewController({ appConfig }: ViewControllerProps) {
   return (
     <AnimatePresence mode="wait">
       {/* Welcome view */}
-      {!isConnected && <WindowBackground key="window-background" />}
+      {!isConnected && <MotionWindowBackground key="window-background" {...VIEW_MOTION_PROPS} />}
       {!isConnected && (
         <MotionWelcomeView
           key="welcome"
