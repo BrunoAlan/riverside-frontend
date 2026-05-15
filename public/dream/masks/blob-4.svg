@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160">
+  <filter id="f" x="-25%" y="-25%" width="150%" height="150%">
+    <feGaussianBlur stdDeviation="9" />
+  </filter>
+  <path filter="url(#f)" fill="#000000" d="M44,40 Q100,14 158,34 Q196,52 184,100 Q172,146 106,142 Q44,144 26,98 Q12,58 44,40 Z" />
+</svg>
