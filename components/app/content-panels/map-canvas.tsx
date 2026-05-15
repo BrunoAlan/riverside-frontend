@@ -17,8 +17,8 @@ export function MapCanvas() {
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: parchmentStyle,
-      center: [15.6, 48.15],
-      zoom: 6.6,
+      center: [17.5, 48.0],
+      zoom: 6.8,
       attributionControl: { compact: true },
     });
 
@@ -29,7 +29,7 @@ export function MapCanvas() {
 
   return (
     <div className="bg-beige-200 relative h-full w-full">
-      <div ref={containerRef} className="absolute inset-0" />
+      <div ref={containerRef} className="h-full w-full" />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply"
