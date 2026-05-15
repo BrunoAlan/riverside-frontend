@@ -18,11 +18,11 @@ export function PrimaryNav() {
           <Button
             asChild
             variant="outline"
-            className="hidden rounded-full border-neutral-700 px-5 text-[11px] tracking-[0.1em] text-neutral-900 uppercase sm:inline-flex"
+            className="rounded-full border-neutral-700 px-5 text-[11px] tracking-[0.1em] text-neutral-900 uppercase"
           >
             <Link href="/agent">Virtual Concierge</Link>
           </Button>
-          <Button className="rounded-full bg-[#5C6E5C] px-5 text-[11px] tracking-[0.1em] text-white uppercase hover:bg-[#4E5E4E]">
+          <Button className="hidden rounded-full bg-[#5C6E5C] px-5 text-[11px] tracking-[0.1em] text-white uppercase hover:bg-[#4E5E4E] sm:inline-flex">
             Cruise Finder
           </Button>
         </div>
