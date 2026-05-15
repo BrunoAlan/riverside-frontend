@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useSessionContext } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
+import { ContentView } from '@/components/app/content-view';
 import { WelcomeView } from '@/components/app/welcome-view';
 import { WindowBackground } from '@/components/app/window-background';
 
 const MotionWelcomeView = motion.create(WelcomeView);
+const MotionContentView = motion.create(ContentView);
 
 const VIEW_MOTION_PROPS = {
   variants: {
@@ -42,15 +44,17 @@ export function ViewController({ appConfig }: ViewControllerProps) {
 
   return (
     <>
-      <WindowBackground isPlaying={started} />
+      {!started && <WindowBackground isPlaying={false} />}
       <AnimatePresence mode="wait">
-        {!started && (
+        {!started ? (
           <MotionWelcomeView
             key="welcome"
             {...VIEW_MOTION_PROPS}
             startButtonText={appConfig.startButtonText}
             onStartCall={handleStart}
           />
+        ) : (
+          <MotionContentView key="content" {...VIEW_MOTION_PROPS} />
         )}
       </AnimatePresence>
     </>
