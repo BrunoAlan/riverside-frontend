@@ -97,7 +97,7 @@ export function PanelDream() {
                   className="object-cover"
                 />
               </div>
-              <span className="bg-beige-900/85 absolute bottom-[18%] left-[14%] rounded-full px-3 py-1 text-xs text-white">
+              <span className="bg-beige-900/85 absolute bottom-[28%] left-[24%] rounded-full px-3 py-1 text-xs text-white">
                 {image.tag}
               </span>
             </div>
