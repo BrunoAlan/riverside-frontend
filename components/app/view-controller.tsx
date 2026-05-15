@@ -6,6 +6,7 @@ import { useSessionContext } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
 import { AgentSessionView_01 } from '@/components/agents-ui/blocks/agent-session-view-01';
 import { WelcomeView } from '@/components/app/welcome-view';
+import { WindowBackground } from '@/components/app/window-background';
 
 const MotionWelcomeView = motion.create(WelcomeView);
 const MotionSessionView = motion.create(AgentSessionView_01);
@@ -39,6 +40,7 @@ export function ViewController({ appConfig }: ViewControllerProps) {
   return (
     <AnimatePresence mode="wait">
       {/* Welcome view */}
+      {!isConnected && <WindowBackground key="window-background" />}
       {!isConnected && (
         <MotionWelcomeView
           key="welcome"
