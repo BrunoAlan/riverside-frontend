@@ -12,7 +12,7 @@ export const WelcomeView = ({
   ref,
 }: React.ComponentProps<'div'> & WelcomeViewProps) => {
   return (
-    <div ref={ref} className="relative z-10 p-6">
+    <div ref={ref} className="relative z-10 flex items-center justify-center p-6">
       <section className="bg-beige-50 flex w-full max-w-md flex-col items-center rounded-2xl px-8 py-10 text-center shadow-xl">
         <div className="text-foreground mb-6 flex items-center gap-4">
           <MicrophoneIcon size={22} weight="regular" />
