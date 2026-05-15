@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export function WindowBackground({ ref, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div ref={ref} aria-hidden {...props} className="pointer-events-none fixed inset-0 -z-10">
+    <div ref={ref} aria-hidden {...props} className="pointer-events-none fixed inset-0 z-0">
       <video
         autoPlay
         muted
