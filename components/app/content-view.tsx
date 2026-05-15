@@ -18,7 +18,7 @@ export const ContentView = ({ ref }: React.ComponentProps<'div'>) => {
 
   return (
     <div ref={ref} className="relative z-10 flex h-svh flex-col">
-      <div className="flex justify-end p-4">
+      <div className="relative z-20 flex justify-end p-4">
         <Select value={activeId} onValueChange={setActiveId}>
           <SelectTrigger className="w-48">
             <SelectValue />
