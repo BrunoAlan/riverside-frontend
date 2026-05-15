@@ -65,10 +65,10 @@ export function PanelDream() {
     <div className="bg-beige-200 relative flex h-full w-full flex-col gap-8 overflow-y-auto py-10 md:block md:gap-0 md:overflow-hidden md:py-0">
       {DREAM_IMAGES.map((image, index) => {
         const positionVars = {
-          '--dt': image.top,
-          '--dl': image.left,
-          '--dw': image.width,
-          '--dh': image.height,
+          '--dream-top': image.top,
+          '--dream-left': image.left,
+          '--dream-width': image.width,
+          '--dream-height': image.height,
         } as CSSProperties;
 
         const maskStyle: CSSProperties = {
@@ -84,7 +84,7 @@ export function PanelDream() {
           <div
             key={image.src}
             style={positionVars}
-            className="relative mx-auto h-64 w-[85%] shrink-0 md:absolute md:top-[var(--dt)] md:left-[var(--dl)] md:mx-0 md:h-[var(--dh)] md:w-[var(--dw)]"
+            className="relative mx-auto h-64 w-[85%] shrink-0 md:absolute md:top-[var(--dream-top)] md:left-[var(--dream-left)] md:mx-0 md:h-[var(--dream-height)] md:w-[var(--dream-width)]"
           >
             <div className="absolute inset-0" style={maskStyle}>
               <Image
@@ -96,7 +96,7 @@ export function PanelDream() {
                 className="object-cover"
               />
             </div>
-            <span className="absolute bottom-[18%] left-[14%] rounded-full bg-[#28241e]/85 px-3 py-1 text-xs text-white">
+            <span className="bg-beige-900/85 absolute bottom-[18%] left-[14%] rounded-full px-3 py-1 text-xs text-white">
               {image.tag}
             </span>
           </div>
