@@ -1,15 +1,35 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 
-export function WindowBackground({ ref, ...props }: React.ComponentProps<'div'>) {
+interface WindowBackgroundProps {
+  isPlaying: boolean;
+}
+
+export function WindowBackground({ isPlaying }: WindowBackgroundProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [isPlaying]);
+
   return (
-    <div ref={ref} aria-hidden {...props} className="pointer-events-none fixed inset-0 z-0">
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
       <video
-        autoPlay
+        ref={videoRef}
         muted
         loop
         playsInline
+        preload="auto"
         className="absolute inset-0 h-full w-full object-cover"
       >
         <source src="/window-video.mp4" type="video/mp4" />
