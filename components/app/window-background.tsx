@@ -16,14 +16,14 @@ export function WindowBackground({ isPlaying }: WindowBackgroundProps) {
 
     if (isPlaying) {
       video.play().catch(() => {});
-    } else {
+    } else if (!video.paused) {
       video.pause();
       video.currentTime = 0;
     }
   }, [isPlaying]);
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
       <video
         ref={videoRef}
         muted
