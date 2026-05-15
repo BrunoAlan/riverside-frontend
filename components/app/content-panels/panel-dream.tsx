@@ -62,46 +62,48 @@ const DREAM_IMAGES: DreamImage[] = [
 
 export function PanelDream() {
   return (
-    <div className="bg-beige-200 relative flex h-full w-full flex-col gap-8 overflow-y-auto py-10 md:block md:gap-0 md:overflow-hidden md:py-0">
-      {DREAM_IMAGES.map((image, index) => {
-        const positionVars = {
-          '--dream-top': image.top,
-          '--dream-left': image.left,
-          '--dream-width': image.width,
-          '--dream-height': image.height,
-        } as CSSProperties;
+    <div className="bg-beige-200 h-full w-full overflow-y-auto md:flex md:items-center md:justify-center md:overflow-hidden">
+      <div className="flex flex-col gap-8 py-10 md:relative md:block md:h-full md:max-h-[960px] md:w-full md:max-w-[1400px] md:py-0">
+        {DREAM_IMAGES.map((image, index) => {
+          const positionVars = {
+            '--dream-top': image.top,
+            '--dream-left': image.left,
+            '--dream-width': image.width,
+            '--dream-height': image.height,
+          } as CSSProperties;
 
-        const maskStyle: CSSProperties = {
-          maskImage: `url(${image.mask})`,
-          WebkitMaskImage: `url(${image.mask})`,
-          maskSize: '100% 100%',
-          WebkitMaskSize: '100% 100%',
-          maskRepeat: 'no-repeat',
-          WebkitMaskRepeat: 'no-repeat',
-        };
+          const maskStyle: CSSProperties = {
+            maskImage: `url(${image.mask})`,
+            WebkitMaskImage: `url(${image.mask})`,
+            maskSize: '100% 100%',
+            WebkitMaskSize: '100% 100%',
+            maskRepeat: 'no-repeat',
+            WebkitMaskRepeat: 'no-repeat',
+          };
 
-        return (
-          <div
-            key={image.src}
-            style={positionVars}
-            className="relative mx-auto h-64 w-[85%] shrink-0 md:absolute md:top-[var(--dream-top)] md:left-[var(--dream-left)] md:mx-0 md:h-[var(--dream-height)] md:w-[var(--dream-width)]"
-          >
-            <div className="absolute inset-0" style={maskStyle}>
-              <Image
-                src={image.src}
-                alt=""
-                fill
-                priority={index === 0}
-                sizes="(max-width: 768px) 85vw, 35vw"
-                className="object-cover"
-              />
+          return (
+            <div
+              key={image.src}
+              style={positionVars}
+              className="relative mx-auto h-64 w-[85%] shrink-0 md:absolute md:top-[var(--dream-top)] md:left-[var(--dream-left)] md:mx-0 md:h-[var(--dream-height)] md:w-[var(--dream-width)]"
+            >
+              <div className="absolute inset-0" style={maskStyle}>
+                <Image
+                  src={image.src}
+                  alt=""
+                  fill
+                  priority={index === 0}
+                  sizes="(max-width: 768px) 85vw, 35vw"
+                  className="object-cover"
+                />
+              </div>
+              <span className="bg-beige-900/85 absolute bottom-[18%] left-[14%] rounded-full px-3 py-1 text-xs text-white">
+                {image.tag}
+              </span>
             </div>
-            <span className="bg-beige-900/85 absolute bottom-[18%] left-[14%] rounded-full px-3 py-1 text-xs text-white">
-              {image.tag}
-            </span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
