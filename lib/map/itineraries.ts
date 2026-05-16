@@ -38,7 +38,7 @@ const wachauValley: City = {
   lat: 48.3797,
 };
 
-export const itineraries: Itinerary[] = [
+export const itineraries: [Itinerary, Itinerary, ...Itinerary[]] = [
   {
     id: 'danube-serenade',
     label: 'Danube Serenade',
