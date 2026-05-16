@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
+import { AgentHeader } from '@/components/agent/agent-header';
 import type { City } from '@/lib/map/cities';
 import { itineraries } from '@/lib/map/itineraries';
 
@@ -42,17 +42,10 @@ export function CompareItinerary() {
       </div>
 
       {/* Central divider */}
-      <div className="pointer-events-none absolute inset-y-0 left-1/2 flex -translate-x-1/2 flex-col items-center">
-        <div className="bg-border h-full w-px" />
+      <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center">
+        <div className="h-full w-1.5 bg-green-800" />
         <div className="bg-beige-200 absolute top-0 rounded-b-lg px-3 py-2 shadow-sm">
-          <Image
-            src="/riverside-logo.svg"
-            alt="Riverside Luxury Cruises"
-            width={100}
-            height={110}
-            priority
-            className="h-[90px] w-auto"
-          />
+          <AgentHeader />
         </div>
       </div>
     </div>
