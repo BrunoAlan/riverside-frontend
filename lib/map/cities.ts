@@ -31,7 +31,7 @@ export const cities: City[] = [
     id: 'wachau-valley',
     name: 'Wachau Valley',
     country: 'Austria',
-    image: '/map/Wachau Valley.png',
+    image: '/map/wachau-valley.png',
     days: 'Days 5, 6 & 7',
     lon: 15.4214,
     lat: 48.3797,

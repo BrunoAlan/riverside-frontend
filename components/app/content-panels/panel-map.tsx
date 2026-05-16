@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { AgentHeader } from '@/components/agent/agent-header';
 import type { City } from '@/lib/map/cities';
@@ -13,10 +14,10 @@ const MapCanvas = dynamic(
 );
 
 export function PanelMap() {
-  const handleCityExpand = (city: City) => {
+  const handleCityExpand = useCallback((city: City) => {
     // TODO: wire up expand behavior (e.g. open detail panel for `city`).
     console.log('expand city', city.id);
-  };
+  }, []);
 
   return (
     <div className="fixed inset-0">

@@ -47,8 +47,8 @@ export function MapCanvas({ onCityExpand }: MapCanvasProps) {
     }
 
     return () => {
-      markers.forEach((marker) => marker.remove());
       roots.forEach((root) => root.unmount());
+      markers.forEach((marker) => marker.remove());
       map.remove();
     };
   }, [onCityExpand]);
