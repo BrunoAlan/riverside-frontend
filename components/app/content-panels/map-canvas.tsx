@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { type Root, createRoot } from 'react-dom/client';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { CityCard } from '@/components/app/content-panels/city-card';
+import { type City, cities } from '@/lib/map/cities';
 import { parchmentStyle } from '@/lib/map/parchment-style';
 
 // Paper-grain texture for the parchment look. The seamless feTurbulence tile
@@ -10,7 +13,11 @@ import { parchmentStyle } from '@/lib/map/parchment-style';
 // repeating background on an overlay div with mix-blend-multiply.
 const GRAIN_IMAGE = "url('/map/grain.svg')";
 
-export function MapCanvas() {
+type MapCanvasProps = {
+  onCityExpand?: (city: City) => void;
+};
+
+export function MapCanvas({ onCityExpand }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,10 +31,27 @@ export function MapCanvas() {
       attributionControl: { compact: true },
     });
 
+    const markers: maplibregl.Marker[] = [];
+    const roots: Root[] = [];
+
+    for (const city of cities) {
+      const el = document.createElement('div');
+      const root = createRoot(el);
+      root.render(<CityCard city={city} onExpand={onCityExpand} />);
+      roots.push(root);
+
+      const marker = new maplibregl.Marker({ element: el })
+        .setLngLat([city.lon, city.lat])
+        .addTo(map);
+      markers.push(marker);
+    }
+
     return () => {
+      markers.forEach((marker) => marker.remove());
+      roots.forEach((root) => root.unmount());
       map.remove();
     };
-  }, []);
+  }, [onCityExpand]);
 
   return (
     <div className="bg-beige-200 relative h-full w-full">
