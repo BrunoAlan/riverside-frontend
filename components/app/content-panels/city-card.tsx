@@ -11,7 +11,7 @@ type CityCardProps = {
 
 export function CityCard({ city, onExpand }: CityCardProps) {
   return (
-    <Card className="w-[220px] gap-0 overflow-hidden p-2.5">
+    <Card className="bg-beige-50 w-[220px] gap-0 overflow-hidden p-2.5">
       <div className="relative">
         <Image
           src={city.image}
