@@ -43,7 +43,7 @@ export function CompareItinerary() {
 
       {/* Central divider */}
       <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center">
-        <div className="h-full w-1.5 bg-green-800" />
+        <div className="h-full w-0.5 bg-green-800" />
         <div className="bg-beige-200 absolute top-0 rounded-b-lg px-3 py-2 shadow-sm">
           <AgentHeader />
         </div>
