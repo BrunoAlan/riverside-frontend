@@ -14,10 +14,18 @@ import { parchmentStyle } from '@/lib/map/parchment-style';
 const GRAIN_IMAGE = "url('/map/grain.svg')";
 
 type MapCanvasProps = {
+  cities?: City[];
+  center?: [number, number];
+  zoom?: number;
   onCityExpand?: (city: City) => void;
 };
 
-export function MapCanvas({ onCityExpand }: MapCanvasProps) {
+export function MapCanvas({
+  cities: cityList = cities,
+  center = [17.5, 48.0],
+  zoom = 6.8,
+  onCityExpand,
+}: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,15 +34,15 @@ export function MapCanvas({ onCityExpand }: MapCanvasProps) {
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: parchmentStyle,
-      center: [17.5, 48.0],
-      zoom: 6.8,
+      center,
+      zoom,
       attributionControl: { compact: true },
     });
 
     const markers: maplibregl.Marker[] = [];
     const roots: Root[] = [];
 
-    for (const city of cities) {
+    for (const city of cityList) {
       const el = document.createElement('div');
       const root = createRoot(el);
       root.render(<CityCard city={city} onExpand={onCityExpand} />);
@@ -51,7 +59,7 @@ export function MapCanvas({ onCityExpand }: MapCanvasProps) {
       markers.forEach((marker) => marker.remove());
       map.remove();
     };
-  }, [onCityExpand]);
+  }, [cityList, center, zoom, onCityExpand]);
 
   return (
     <div className="bg-beige-200 relative h-full w-full">
