@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ArrowsOutSimple } from '@phosphor-icons/react/dist/ssr';
+import { ArrowsOutSimpleIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { City } from '@/lib/map/cities';
@@ -36,7 +36,7 @@ export function CityCard({ city, onExpand }: CityCardProps) {
           aria-label={`Expand ${city.name}`}
           onClick={() => onExpand?.(city)}
         >
-          <ArrowsOutSimple weight="bold" />
+          <ArrowsOutSimpleIcon weight="bold" />
         </Button>
       </div>
     </Card>
