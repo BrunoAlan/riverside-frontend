@@ -4,14 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { City } from '@/lib/map/cities';
 
+// Fixed card width in px. Shared with the cluster layer so its grouping
+// threshold stays in sync with the actual rendered card size.
+export const CITY_CARD_WIDTH = 220;
+
 type CityCardProps = {
   city: City;
+  interactive?: boolean;
   onExpand?: (city: City) => void;
 };
 
-export function CityCard({ city, onExpand }: CityCardProps) {
+export function CityCard({ city, interactive = true, onExpand }: CityCardProps) {
   return (
-    <Card className="bg-beige-50 w-[220px] gap-0 overflow-hidden p-2.5">
+    <Card className="bg-beige-50 gap-0 overflow-hidden p-2.5" style={{ width: CITY_CARD_WIDTH }}>
       <div className="relative">
         <Image
           src={city.image}
@@ -29,15 +34,17 @@ export function CityCard({ city, onExpand }: CityCardProps) {
           <p className="text-lg leading-tight font-semibold">{city.name}</p>
           <p className="text-muted-foreground text-sm">{city.country}</p>
         </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          aria-label={`Expand ${city.name}`}
-          onClick={() => onExpand?.(city)}
-        >
-          <ArrowsOutSimpleIcon weight="bold" />
-        </Button>
+        {interactive && (
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon"
+            aria-label={`Expand ${city.name}`}
+            onClick={() => onExpand?.(city)}
+          >
+            <ArrowsOutSimpleIcon weight="bold" />
+          </Button>
+        )}
       </div>
     </Card>
   );
