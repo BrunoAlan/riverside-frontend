@@ -61,11 +61,7 @@ export function MapCanvas({
         className="pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply"
         style={{ backgroundImage: GRAIN_IMAGE, backgroundRepeat: 'repeat' }}
       />
-      {map && (
-        <div className="pointer-events-none absolute inset-0">
-          <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />
-        </div>
-      )}
+      {map && <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />}
     </div>
   );
 }

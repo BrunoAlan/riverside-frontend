@@ -1,7 +1,8 @@
 'use client';
 
-import { Fragment, useEffect, useState } from 'react';
-import type maplibregl from 'maplibre-gl';
+import { useEffect } from 'react';
+import { type Root, createRoot } from 'react-dom/client';
+import maplibregl from 'maplibre-gl';
 import { CityCard } from '@/components/app/content-panels/city-card';
 import type { City } from '@/lib/map/cities';
 import { type ProjectedCity, clusterCities } from '@/lib/map/cluster-cities';
@@ -11,8 +12,6 @@ const CLUSTER_THRESHOLD = 120;
 // Fixed diagonal offset between stacked cards in a cascade.
 const OFFSET_X = 30;
 const OFFSET_Y = 58;
-// Z-index headroom per cluster so stacks never bleed across clusters.
-const Z_PER_CLUSTER = 100;
 
 type CityCardLayerProps = {
   map: maplibregl.Map;
@@ -20,57 +19,98 @@ type CityCardLayerProps = {
   onCityExpand?: (city: City) => void;
 };
 
+/**
+ * Renders one MapLibre Marker per cluster of cities. MapLibre keeps each marker
+ * locked to the map synchronously on every frame, so cards never lag behind a
+ * pan — and because markers live inside the map container they are clipped to
+ * it. Cluster membership depends only on zoom (panning translates every city
+ * uniformly), so clustering is recomputed on `zoom`, never on `move`.
+ */
 export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps) {
-  // Re-render on every map move so projected positions stay in sync.
-  const [, forceUpdate] = useState(0);
-
   useEffect(() => {
-    // move fires at up to 60fps; acceptable for small city counts (<~20).
-    const onMove = () => forceUpdate((n) => n + 1);
-    map.on('move', onMove);
-    map.on('resize', onMove);
-    return () => {
-      map.off('move', onMove);
-      map.off('resize', onMove);
+    type Entry = { key: string; marker: maplibregl.Marker; root: Root };
+    let entries: Entry[] = [];
+
+    // Project every city to screen pixels, group nearby ones, and sort each
+    // cluster north-to-south so the southernmost city is the interactive front.
+    const buildClusters = (): ProjectedCity[][] => {
+      const projected: ProjectedCity[] = cities.map((city) => {
+        const p = map.project([city.lon, city.lat]);
+        return { city, x: p.x, y: p.y };
+      });
+      return clusterCities(projected, CLUSTER_THRESHOLD).map((group) =>
+        [...group].sort((a, b) => b.city.lat - a.city.lat)
+      );
     };
-  }, [map]);
 
-  const projected: ProjectedCity[] = cities.map((city) => {
-    const p = map.project([city.lon, city.lat]);
-    return { city, x: p.x, y: p.y };
-  });
-  const clusters = clusterCities(projected, CLUSTER_THRESHOLD);
+    const syncMarkers = () => {
+      const clusters = buildClusters();
+      const nextKeys = clusters.map((g) => g.map((pc) => pc.city.id).join('-'));
 
+      // Clusters only change on zoom. If the set is unchanged the existing
+      // markers already track the map on their own — nothing to rebuild.
+      const unchanged =
+        entries.length === nextKeys.length && entries.every((e, i) => e.key === nextKeys[i]);
+      if (unchanged && entries.length > 0) return;
+
+      entries.forEach((e) => {
+        e.root.unmount();
+        e.marker.remove();
+      });
+
+      entries = clusters.map((sorted, i) => {
+        const front = sorted[sorted.length - 1].city;
+        const el = document.createElement('div');
+        const marker = new maplibregl.Marker({ element: el })
+          .setLngLat([front.lon, front.lat])
+          .addTo(map);
+        const root = createRoot(el);
+        root.render(<Cascade sorted={sorted} onCityExpand={onCityExpand} />);
+        return { key: nextKeys[i], marker, root };
+      });
+    };
+
+    syncMarkers();
+    map.on('zoom', syncMarkers);
+
+    return () => {
+      map.off('zoom', syncMarkers);
+      entries.forEach((e) => {
+        e.root.unmount();
+        e.marker.remove();
+      });
+    };
+  }, [map, cities, onCityExpand]);
+
+  return null;
+}
+
+type CascadeProps = {
+  sorted: ProjectedCity[];
+  onCityExpand?: (city: City) => void;
+};
+
+/**
+ * The stacked cascade rendered inside a single cluster marker. The front
+ * (southernmost) card sits at the marker anchor; the rest trail up-left with a
+ * fixed diagonal offset and are non-interactive.
+ */
+function Cascade({ sorted, onCityExpand }: CascadeProps) {
   return (
     <>
-      {clusters.map((cluster, clusterIndex) => {
-        // North-to-south: southernmost card ends up at the front (on top).
-        const sorted = [...cluster].sort((a, b) => b.city.lat - a.city.lat);
-        const front = sorted[sorted.length - 1];
-
-        const clusterKey = sorted.map((pc) => pc.city.id).join('-');
-
+      {sorted.map((pc, i) => {
+        const fromBack = sorted.length - 1 - i; // 0 = front card
+        const isFront = i === sorted.length - 1;
         return (
-          <Fragment key={clusterKey}>
-            {sorted.map((pc, i) => {
-              const fromBack = sorted.length - 1 - i; // 0 = front card
-              const left = front.x - fromBack * OFFSET_X;
-              const top = front.y - fromBack * OFFSET_Y;
-              const isFront = i === sorted.length - 1;
-
-              return (
-                <div
-                  key={pc.city.id}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 ${
-                    isFront ? 'pointer-events-auto' : 'pointer-events-none'
-                  }`}
-                  style={{ left, top, zIndex: clusterIndex * Z_PER_CLUSTER + i }}
-                >
-                  <CityCard city={pc.city} interactive={isFront} onExpand={onCityExpand} />
-                </div>
-              );
-            })}
-          </Fragment>
+          <div
+            key={pc.city.id}
+            className={`absolute -translate-x-1/2 -translate-y-1/2 ${
+              isFront ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+            style={{ left: -fromBack * OFFSET_X, top: -fromBack * OFFSET_Y, zIndex: i }}
+          >
+            <CityCard city={pc.city} interactive={isFront} onExpand={onCityExpand} />
+          </div>
         );
       })}
     </>
