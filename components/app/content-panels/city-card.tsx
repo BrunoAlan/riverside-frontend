@@ -6,10 +6,11 @@ import type { City } from '@/lib/map/cities';
 
 type CityCardProps = {
   city: City;
+  interactive?: boolean;
   onExpand?: (city: City) => void;
 };
 
-export function CityCard({ city, onExpand }: CityCardProps) {
+export function CityCard({ city, interactive = true, onExpand }: CityCardProps) {
   return (
     <Card className="bg-beige-50 w-[220px] gap-0 overflow-hidden p-2.5">
       <div className="relative">
@@ -29,15 +30,17 @@ export function CityCard({ city, onExpand }: CityCardProps) {
           <p className="text-lg leading-tight font-semibold">{city.name}</p>
           <p className="text-muted-foreground text-sm">{city.country}</p>
         </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          aria-label={`Expand ${city.name}`}
-          onClick={() => onExpand?.(city)}
-        >
-          <ArrowsOutSimpleIcon weight="bold" />
-        </Button>
+        {interactive && (
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon"
+            aria-label={`Expand ${city.name}`}
+            onClick={() => onExpand?.(city)}
+          >
+            <ArrowsOutSimpleIcon weight="bold" />
+          </Button>
+        )}
       </div>
     </Card>
   );
