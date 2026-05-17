@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import type maplibregl from 'maplibre-gl';
 import { CityCard } from '@/components/app/content-panels/city-card';
 import type { City } from '@/lib/map/cities';
@@ -23,6 +23,7 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
   const [, forceUpdate] = useState(0);
 
   useEffect(() => {
+    // move fires at up to 60fps; acceptable for small city counts (<~20).
     const onMove = () => forceUpdate((n) => n + 1);
     map.on('move', onMove);
     return () => {
@@ -43,24 +44,30 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
         const sorted = [...cluster].sort((a, b) => b.city.lat - a.city.lat);
         const front = sorted[sorted.length - 1];
 
-        return sorted.map((pc, i) => {
-          const fromBack = sorted.length - 1 - i; // 0 = front card
-          const left = front.x - fromBack * OFFSET_X;
-          const top = front.y - fromBack * OFFSET_Y;
-          const isFront = i === sorted.length - 1;
+        const clusterKey = sorted.map((pc) => pc.city.id).join('-');
 
-          return (
-            <div
-              key={pc.city.id}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 ${
-                isFront ? 'pointer-events-auto' : 'pointer-events-none'
-              }`}
-              style={{ left, top, zIndex: i }}
-            >
-              <CityCard city={pc.city} interactive={isFront} onExpand={onCityExpand} />
-            </div>
-          );
-        });
+        return (
+          <Fragment key={clusterKey}>
+            {sorted.map((pc, i) => {
+              const fromBack = sorted.length - 1 - i; // 0 = front card
+              const left = front.x - fromBack * OFFSET_X;
+              const top = front.y - fromBack * OFFSET_Y;
+              const isFront = i === sorted.length - 1;
+
+              return (
+                <div
+                  key={pc.city.id}
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 ${
+                    isFront ? 'pointer-events-auto' : 'pointer-events-none'
+                  }`}
+                  style={{ left, top, zIndex: i }}
+                >
+                  <CityCard city={pc.city} interactive={isFront} onExpand={onCityExpand} />
+                </div>
+              );
+            })}
+          </Fragment>
+        );
       })}
     </>
   );
