@@ -12,6 +12,12 @@ import { parchmentStyle } from '@/lib/map/parchment-style';
 // repeating background on an overlay div with mix-blend-multiply.
 const GRAIN_IMAGE = "url('/map/grain.svg')";
 
+// Stable module-level defaults so the map-creation useEffect is not re-triggered
+// on every render when the parent omits these props (array literals would create
+// a new reference each render, causing the map to be torn down and recreated).
+const DEFAULT_CENTER: [number, number] = [17.5, 48.0];
+const DEFAULT_ZOOM = 6.8;
+
 type MapCanvasProps = {
   cities?: City[];
   center?: [number, number];
@@ -21,8 +27,8 @@ type MapCanvasProps = {
 
 export function MapCanvas({
   cities: cityList = cities,
-  center = [17.5, 48.0],
-  zoom = 6.8,
+  center = DEFAULT_CENTER,
+  zoom = DEFAULT_ZOOM,
   onCityExpand,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
