@@ -11,6 +11,8 @@ const CLUSTER_THRESHOLD = 120;
 // Fixed diagonal offset between stacked cards in a cascade.
 const OFFSET_X = 30;
 const OFFSET_Y = 58;
+// Z-index headroom per cluster so stacks never bleed across clusters.
+const Z_PER_CLUSTER = 100;
 
 type CityCardLayerProps = {
   map: maplibregl.Map;
@@ -26,8 +28,10 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
     // move fires at up to 60fps; acceptable for small city counts (<~20).
     const onMove = () => forceUpdate((n) => n + 1);
     map.on('move', onMove);
+    map.on('resize', onMove);
     return () => {
       map.off('move', onMove);
+      map.off('resize', onMove);
     };
   }, [map]);
 
@@ -39,7 +43,7 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
 
   return (
     <>
-      {clusters.map((cluster) => {
+      {clusters.map((cluster, clusterIndex) => {
         // North-to-south: southernmost card ends up at the front (on top).
         const sorted = [...cluster].sort((a, b) => b.city.lat - a.city.lat);
         const front = sorted[sorted.length - 1];
@@ -60,7 +64,7 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
                   className={`absolute -translate-x-1/2 -translate-y-1/2 ${
                     isFront ? 'pointer-events-auto' : 'pointer-events-none'
                   }`}
-                  style={{ left, top, zIndex: i }}
+                  style={{ left, top, zIndex: clusterIndex * Z_PER_CLUSTER + i }}
                 >
                   <CityCard city={pc.city} interactive={isFront} onExpand={onCityExpand} />
                 </div>
