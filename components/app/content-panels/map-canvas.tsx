@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { type Root, createRoot } from 'react-dom/client';
+import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { CityCard } from '@/components/app/content-panels/city-card';
+import { CityCardLayer } from '@/components/app/content-panels/city-card-layer';
 import { type City, cities } from '@/lib/map/cities';
 import { parchmentStyle } from '@/lib/map/parchment-style';
 
@@ -27,11 +26,12 @@ export function MapCanvas({
   onCityExpand,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<maplibregl.Map | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const map = new maplibregl.Map({
+    const mapInstance = new maplibregl.Map({
       container: containerRef.current,
       style: parchmentStyle,
       center,
@@ -39,27 +39,13 @@ export function MapCanvas({
       attributionControl: { compact: true },
     });
 
-    const markers: maplibregl.Marker[] = [];
-    const roots: Root[] = [];
-
-    for (const city of cityList) {
-      const el = document.createElement('div');
-      const root = createRoot(el);
-      root.render(<CityCard city={city} onExpand={onCityExpand} />);
-      roots.push(root);
-
-      const marker = new maplibregl.Marker({ element: el })
-        .setLngLat([city.lon, city.lat])
-        .addTo(map);
-      markers.push(marker);
-    }
+    mapInstance.on('load', () => setMap(mapInstance));
 
     return () => {
-      roots.forEach((root) => root.unmount());
-      markers.forEach((marker) => marker.remove());
-      map.remove();
+      setMap(null);
+      mapInstance.remove();
     };
-  }, [cityList, center, zoom, onCityExpand]);
+  }, [center, zoom]);
 
   return (
     <div className="bg-beige-200 relative h-full w-full">
@@ -69,6 +55,11 @@ export function MapCanvas({
         className="pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply"
         style={{ backgroundImage: GRAIN_IMAGE, backgroundRepeat: 'repeat' }}
       />
+      {map && (
+        <div className="pointer-events-none absolute inset-0">
+          <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />
+        </div>
+      )}
     </div>
   );
 }
