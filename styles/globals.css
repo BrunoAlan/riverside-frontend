@@ -347,6 +347,24 @@
   }
 }
 
+/* MapLibre navigation control — matched to the CityCard look */
+.maplibregl-ctrl-group {
+  background: var(--beige-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button {
+  background-color: transparent;
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border);
+}
+.maplibregl-ctrl-group button:hover {
+  background-color: var(--beige-200);
+}
+
 /* Sonner: colored icon, neutral text */
 [data-sonner-toast][data-type='success'] [data-icon] {
   color: var(--success-600);

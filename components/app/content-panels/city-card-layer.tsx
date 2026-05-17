@@ -3,12 +3,13 @@
 import { useEffect } from 'react';
 import { type Root, createRoot } from 'react-dom/client';
 import maplibregl from 'maplibre-gl';
-import { CityCard } from '@/components/app/content-panels/city-card';
+import { CITY_CARD_WIDTH, CityCard } from '@/components/app/content-panels/city-card';
 import type { City } from '@/lib/map/cities';
 import { type ProjectedCity, clusterCities } from '@/lib/map/cluster-cities';
 
-// Cards are 220px wide; group when anchor screen distance is within this.
-const CLUSTER_THRESHOLD = 120;
+// Group cities whose anchors fall within a card-width-minus-margin of each
+// other, so cards that would visibly overlap end up in the same cascade.
+const CLUSTER_THRESHOLD = CITY_CARD_WIDTH - 100;
 // Fixed diagonal offset between stacked cards in a cascade.
 const OFFSET_X = 30;
 const OFFSET_Y = 58;
