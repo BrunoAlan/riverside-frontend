@@ -17,10 +17,10 @@ export const ContentView = ({ ref }: React.ComponentProps<'div'>) => {
   const ActivePanel = activePanel.component;
 
   return (
-    <div ref={ref} className="relative z-10 flex h-svh flex-col">
-      <div className="relative z-20 flex justify-end p-4">
+    <div ref={ref} className="relative z-10 h-svh">
+      <div className="absolute top-4 right-4 z-20">
         <Select value={activeId} onValueChange={setActiveId}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="bg-background/80 w-48 backdrop-blur">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -32,7 +32,7 @@ export const ContentView = ({ ref }: React.ComponentProps<'div'>) => {
           </SelectContent>
         </Select>
       </div>
-      <div className="flex-1">
+      <div className="h-full">
         <ActivePanel />
       </div>
     </div>

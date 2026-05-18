@@ -28,7 +28,7 @@ export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProp
         className="h-[200px] w-full rounded-lg object-cover"
       />
       <div className="flex items-start justify-between gap-2 px-1 pt-3">
-        <p className="text-2xl leading-tight font-semibold">{cabin.name}</p>
+        <p className="font-display text-2xl leading-tight font-semibold">{cabin.name}</p>
         {interactive && (
           <Button
             type="button"

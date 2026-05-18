@@ -12,7 +12,7 @@ export function PanelCabinSelection() {
 
   return (
     <div className="bg-beige-200 h-full w-full overflow-y-auto">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 px-6 pt-16 pb-6 sm:grid-cols-2 lg:grid-cols-3">
         {cabins.map((cabin) => (
           <CabinCard key={cabin.id} cabin={cabin} onExpand={handleExpand} />
         ))}
