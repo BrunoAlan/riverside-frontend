@@ -12,7 +12,7 @@ export const cabins: Cabin[] = [
   {
     id: 'owners-suite',
     name: "Owner's Suite",
-    image: '/cabins/owners-suite.jpg',
+    image: '/cabin/1.png',
     guests: 2,
     area: 80,
     priceFrom: 12229,
@@ -21,7 +21,7 @@ export const cabins: Cabin[] = [
   {
     id: 'mozart-suite',
     name: 'Mozart Suite',
-    image: '/cabins/mozart-suite.jpg',
+    image: '/cabin/2.png',
     guests: 2,
     area: 80,
     priceFrom: 12229,
@@ -30,7 +30,7 @@ export const cabins: Cabin[] = [
   {
     id: 'penthouse-suite',
     name: 'Penthouse Suite',
-    image: '/cabins/penthouse-suite.jpg',
+    image: '/cabin/3.png',
     guests: 2,
     area: 80,
     priceFrom: 12229,
@@ -39,7 +39,7 @@ export const cabins: Cabin[] = [
   {
     id: 'riverside-suite',
     name: 'Riverside Suite',
-    image: '/cabins/riverside-suite.jpg',
+    image: '/cabin/4.png',
     guests: 2,
     area: 80,
     priceFrom: 12229,
@@ -48,7 +48,7 @@ export const cabins: Cabin[] = [
   {
     id: 'symphony-suite',
     name: 'Symphony Suite',
-    image: '/cabins/symphony-suite.jpg',
+    image: '/cabin/5.png',
     guests: 2,
     area: 80,
     priceFrom: 12229,
@@ -57,7 +57,7 @@ export const cabins: Cabin[] = [
   {
     id: 'harmony-suite',
     name: 'Harmony Suite',
-    image: '/cabins/harmony-suite.jpg',
+    image: '/cabin/6.png',
     guests: 2,
     area: 80,
     priceFrom: 12229,
@@ -67,5 +67,5 @@ export const cabins: Cabin[] = [
 
 /** Formats a EUR amount with thousands separators, e.g. 12229 -> "12,229". */
 export function formatCabinPrice(price: number): string {
-  return price.toLocaleString('en-US');
+  return new Intl.NumberFormat('en-US').format(price);
 }

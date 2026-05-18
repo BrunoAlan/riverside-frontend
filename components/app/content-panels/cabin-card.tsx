@@ -43,7 +43,7 @@ export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProp
       </div>
       <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 px-1 pt-2 text-sm">
         {info.map((item, index) => (
-          <span key={item} className="flex items-center gap-3">
+          <span key={index} className="flex items-center gap-3">
             {index > 0 && <span className="bg-border h-3 w-px" aria-hidden />}
             {item}
           </span>
