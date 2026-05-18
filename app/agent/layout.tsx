@@ -10,7 +10,7 @@ export default function AgentLayout({ children }: AgentLayoutProps) {
   return (
     <PanelSelectionProvider>
       <div className="bg-beige-200 flex h-screen flex-col">
-        <div className="relative">
+        <div className="relative z-40">
           <AgentHeader />
           <div className="absolute top-1/2 right-4 -translate-y-1/2">
             <PanelSelector />
