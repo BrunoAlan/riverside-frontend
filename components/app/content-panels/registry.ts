@@ -1,7 +1,5 @@
 import type { ComponentType } from 'react';
 import { CompareItinerary } from '@/components/app/content-panels/compare-itinerary';
-import { PanelB } from '@/components/app/content-panels/panel-b';
-import { PanelC } from '@/components/app/content-panels/panel-c';
 import { PanelCabinSelection } from '@/components/app/content-panels/panel-cabin-selection';
 import { PanelDream } from '@/components/app/content-panels/panel-dream';
 import { PanelMap } from '@/components/app/content-panels/panel-map';
@@ -17,8 +15,6 @@ export const CONTENT_PANELS: ContentPanel[] = [
   { id: 'window', label: 'Ventana', component: PanelWindow },
   { id: 'dream', label: 'Dream', component: PanelDream },
   { id: 'map', label: 'Mapa', component: PanelMap },
-  { id: 'panel-b', label: 'Contenido B', component: PanelB },
-  { id: 'panel-c', label: 'Contenido C', component: PanelC },
   { id: 'compare', label: 'Comparar itinerarios', component: CompareItinerary },
   { id: 'cabins', label: 'Cabinas', component: PanelCabinSelection },
 ];
