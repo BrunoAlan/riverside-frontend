@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { TokenSource } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
+import { DevPanel } from '@/components/app/agent-ui/dev/dev-panel';
 import { ViewController } from '@/components/app/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
@@ -44,6 +45,7 @@ export function App({ appConfig }: AppProps) {
         <ViewController appConfig={appConfig} />
       </div>
       <StartAudioButton label="Start Audio" />
+      {process.env.NODE_ENV !== 'production' && <DevPanel />}
     </AgentSessionProvider>
   );
 }
