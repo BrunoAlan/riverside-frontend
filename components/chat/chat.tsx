@@ -1,7 +1,6 @@
 'use client';
 
 import { AnimatePresence } from 'motion/react';
-import { AgentChatIndicator } from '@/components/agents-ui/agent-chat-indicator';
 import {
   Conversation,
   ConversationContent,
@@ -9,6 +8,7 @@ import {
 } from '@/components/ai-elements/conversation';
 import { ChatAgentMessage } from '@/components/chat/chat-agent-message';
 import { ChatUserMessage } from '@/components/chat/chat-user-message';
+import { AgentChatIndicator } from '@/components/livekit/agent-chat-indicator';
 
 export type ChatMessage = {
   id: string;
