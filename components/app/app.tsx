@@ -9,6 +9,7 @@ import { AgentSessionProvider } from '@/components/livekit/agent-session-provide
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
 import { useAgentErrors } from '@/hooks/useAgentErrors';
 import { useDebugMode } from '@/hooks/useDebug';
+import { useUiCommandTransport } from '@/lib/agent-ui/transport';
 import { getSandboxTokenSource } from '@/lib/utils';
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
@@ -16,7 +17,7 @@ const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 function AppSetup() {
   useDebugMode({ enabled: IN_DEVELOPMENT });
   useAgentErrors();
-
+  useUiCommandTransport();
   return null;
 }
 

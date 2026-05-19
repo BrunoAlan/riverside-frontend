@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useSessionContext } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
-import { ContentView } from '@/components/app/content-view';
+import { ContentView } from '@/components/app/agent-ui/content-view';
 import { WelcomeView } from '@/components/app/welcome-view';
 import { WindowBackground } from '@/components/app/window-background';
 
