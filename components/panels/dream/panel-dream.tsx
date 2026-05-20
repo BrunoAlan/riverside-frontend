@@ -187,7 +187,7 @@ export function PanelDream({ images }: PanelDreamProps) {
   const visible = images.slice(0, DREAM_SLOTS.length);
 
   return (
-    <div className="bg-beige-200 h-full w-full overflow-y-auto pt-20 md:flex md:items-center md:justify-center md:overflow-hidden md:pt-6">
+    <div className="bg-beige-200 h-full w-full overflow-y-auto pt-20 md:flex md:items-center md:justify-center md:overflow-hidden">
       <div className="flex flex-col gap-8 py-10 md:relative md:block md:h-full md:max-h-[960px] md:w-full md:max-w-[1400px] md:py-0">
         {visible.map((image, index) => {
           const slot = DREAM_SLOTS[index];
