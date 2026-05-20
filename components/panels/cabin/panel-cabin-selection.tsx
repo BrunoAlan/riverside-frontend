@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { CabinCard } from '@/components/panels/cabin-card';
+import { CabinCard } from '@/components/panels/cabin/cabin-card';
 import { type Cabin, cabins } from '@/lib/cabins';
 
 export function PanelCabinSelection() {
