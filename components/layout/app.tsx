@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { TokenSource } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
+import { BookingSummaryContainer } from '@/components/agent-ui/booking-summary';
 import { AppConfigProvider } from '@/components/layout/app-config-context';
 import { ViewController } from '@/components/layout/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
@@ -46,6 +47,7 @@ export function App({ appConfig }: AppProps) {
         <div className="grid h-full grid-cols-1 grid-rows-1">
           <ViewController />
         </div>
+        <BookingSummaryContainer />
         <StartAudioButton label="Start Audio" />
         {IN_DEVELOPMENT && <DevPanel />}
       </AgentSessionProvider>

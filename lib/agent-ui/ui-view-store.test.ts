@@ -150,4 +150,98 @@ describe('ui-view-store', () => {
     expect(s.lastError).toEqual({ message: 'bad payload' });
     expect(s.view).toEqual({ type: 'start' });
   });
+
+  describe('booking summary', () => {
+    const snapshot = {
+      people: { label: '2 People' },
+      month: { label: 'March' },
+      embarkation: { label: 'Budapest' },
+      stops: { primary: 'Bratislava', extra: 3 },
+      duration: { label: '5 days' },
+      price: { label: 'from 2,368 pp.' },
+      slots: [
+        { label: 'Draft itinerary', state: 'active' as const },
+        { label: 'Empty slot', state: 'empty' as const },
+        { label: 'Empty slot', state: 'empty' as const },
+      ],
+      cta: { label: 'Continue to booking', enabled: true },
+    };
+
+    it('initializes with bookingSummary null', () => {
+      expect(store.getState().bookingSummary).toBeNull();
+    });
+
+    it('applyCommand(set_booking_summary) stores the snapshot and tags source agent', () => {
+      store.getState().applyCommand({
+        type: 'set_booking_summary',
+        correlation_id: 'b1',
+        payload: snapshot,
+      });
+      const s = store.getState();
+      expect(s.bookingSummary).toEqual(snapshot);
+      expect(s.source).toBe('agent');
+      expect(s.lastCorrelationId).toBe('b1');
+    });
+
+    it('set_booking_summary does not change view or hint', () => {
+      store.getState().applyCommand({ type: 'show_discovery_canvas', correlation_id: 'c1' });
+      store.getState().applyCommand({
+        type: 'set_booking_summary',
+        correlation_id: 'b1',
+        payload: snapshot,
+      });
+      const s = store.getState();
+      expect(s.view).toEqual({ type: 'presentation' });
+      expect(s.hint).toBeNull();
+    });
+
+    it('other commands do not clear bookingSummary', () => {
+      store.getState().applyCommand({
+        type: 'set_booking_summary',
+        correlation_id: 'b1',
+        payload: snapshot,
+      });
+      store.getState().applyCommand({ type: 'show_discovery_canvas', correlation_id: 'c2' });
+      expect(store.getState().bookingSummary).toEqual(snapshot);
+    });
+
+    it('setViewFromDev does not clear bookingSummary', () => {
+      store.getState().applyCommand({
+        type: 'set_booking_summary',
+        correlation_id: 'b1',
+        payload: snapshot,
+      });
+      store.getState().setViewFromDev({ type: 'itinerary' });
+      expect(store.getState().bookingSummary).toEqual(snapshot);
+    });
+
+    it('setViewFromUser does not clear bookingSummary', () => {
+      store.getState().applyCommand({
+        type: 'set_booking_summary',
+        correlation_id: 'b1',
+        payload: snapshot,
+      });
+      store.getState().setViewFromUser({ type: 'presentation' });
+      expect(store.getState().bookingSummary).toEqual(snapshot);
+    });
+
+    it('setBookingSummaryFromDev(null) clears the summary and tags source dev', () => {
+      store.getState().applyCommand({
+        type: 'set_booking_summary',
+        correlation_id: 'b1',
+        payload: snapshot,
+      });
+      store.getState().setBookingSummaryFromDev(null);
+      const s = store.getState();
+      expect(s.bookingSummary).toBeNull();
+      expect(s.source).toBe('dev');
+    });
+
+    it('setBookingSummaryFromDev(snapshot) sets the summary and tags source dev', () => {
+      store.getState().setBookingSummaryFromDev(snapshot);
+      const s = store.getState();
+      expect(s.bookingSummary).toEqual(snapshot);
+      expect(s.source).toBe('dev');
+    });
+  });
 });

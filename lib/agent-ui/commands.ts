@@ -43,10 +43,35 @@ const ShowDreamStage = Base.extend({
   payload: z.object({ images: z.array(DreamImage).min(1).max(5) }),
 });
 
+export const BookingSummarySnapshot = z.object({
+  people: z.object({ label: z.string() }).nullable(),
+  month: z.object({ label: z.string() }).nullable(),
+  embarkation: z.object({ label: z.string() }).nullable(),
+  stops: z.object({ primary: z.string(), extra: z.number().int().min(0) }).nullable(),
+  duration: z.object({ label: z.string() }).nullable(),
+  price: z.object({ label: z.string() }).nullable(),
+  slots: z
+    .array(
+      z.object({
+        label: z.string(),
+        state: z.enum(['active', 'filled', 'empty']),
+      })
+    )
+    .max(6),
+  cta: z.object({ label: z.string(), enabled: z.boolean() }),
+});
+export type BookingSummarySnapshot = z.infer<typeof BookingSummarySnapshot>;
+
+const SetBookingSummary = Base.extend({
+  type: z.literal('set_booking_summary'),
+  payload: BookingSummarySnapshot,
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
   ShowItineraryOptions,
   ShowDreamStage,
+  SetBookingSummary,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;

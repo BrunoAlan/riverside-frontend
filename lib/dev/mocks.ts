@@ -1,4 +1,4 @@
-import type { UiView } from '@/lib/agent-ui/ui-view-types';
+import type { BookingSummary, UiView } from '@/lib/agent-ui/ui-view-types';
 
 export interface ViewMock {
   id: string;
@@ -65,3 +65,63 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
   ],
   cabin_selection: [{ id: 'default', label: 'All cabins', view: { type: 'cabin_selection' } }],
 };
+
+export interface BookingSummaryMock {
+  id: string;
+  label: string;
+  summary: BookingSummary | null;
+}
+
+export const BOOKING_SUMMARY_MOCKS: readonly BookingSummaryMock[] = [
+  {
+    id: 'clear',
+    label: 'Hidden (null)',
+    summary: null,
+  },
+  {
+    id: 'empty',
+    label: 'All placeholders',
+    summary: {
+      people: null,
+      month: null,
+      embarkation: null,
+      stops: null,
+      duration: null,
+      price: null,
+      slots: [],
+      cta: { label: 'Continue to booking', enabled: false },
+    },
+  },
+  {
+    id: 'partial',
+    label: 'Partial (people/month/port)',
+    summary: {
+      people: { label: '2 People' },
+      month: { label: 'March' },
+      embarkation: { label: 'Budapest' },
+      stops: null,
+      duration: null,
+      price: null,
+      slots: [{ label: 'Draft itinerary', state: 'active' }],
+      cta: { label: 'Continue to booking', enabled: false },
+    },
+  },
+  {
+    id: 'full',
+    label: 'Full (matches Figma)',
+    summary: {
+      people: { label: '2 People' },
+      month: { label: 'March' },
+      embarkation: { label: 'Budapest' },
+      stops: { primary: 'Bratislava', extra: 3 },
+      duration: { label: '5 days' },
+      price: { label: 'from 2,368 pp.' },
+      slots: [
+        { label: 'Draft itinerary', state: 'active' },
+        { label: 'Empty slot', state: 'empty' },
+        { label: 'Empty slot', state: 'empty' },
+      ],
+      cta: { label: 'Continue to booking', enabled: true },
+    },
+  },
+];

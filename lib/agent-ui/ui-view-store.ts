@@ -1,7 +1,7 @@
 import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 import type { UiCommand } from './commands';
-import type { UiHint, UiSource, UiView } from './ui-view-types';
+import type { BookingSummary, UiHint, UiSource, UiView } from './ui-view-types';
 
 interface UiViewState {
   view: UiView;
@@ -9,10 +9,12 @@ interface UiViewState {
   source: UiSource;
   lastCorrelationId: string | null;
   lastError: { correlationId?: string; message: string } | null;
+  bookingSummary: BookingSummary | null;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
   setViewFromUser: (view: UiView) => void;
+  setBookingSummaryFromDev: (summary: BookingSummary | null) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
 }
 
@@ -25,6 +27,7 @@ export function createUiViewStore() {
     source: 'initial',
     lastCorrelationId: null,
     lastError: null,
+    bookingSummary: null,
 
     applyCommand: (cmd) =>
       set(() => {
@@ -60,6 +63,12 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
             };
+          case 'set_booking_summary':
+            return {
+              bookingSummary: cmd.payload,
+              source: 'agent',
+              lastCorrelationId: cmd.correlation_id,
+            };
           default: {
             const _exhaustive: never = cmd;
             void _exhaustive;
@@ -71,6 +80,9 @@ export function createUiViewStore() {
     setViewFromDev: (view) => set({ view, hint: null, source: 'dev', lastCorrelationId: null }),
 
     setViewFromUser: (view) => set({ view, hint: null, source: 'user', lastCorrelationId: null }),
+
+    setBookingSummaryFromDev: (summary) =>
+      set({ bookingSummary: summary, source: 'dev', lastCorrelationId: null }),
 
     recordParseError: (err) => set({ lastError: err }),
   }));
