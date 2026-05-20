@@ -77,9 +77,18 @@ export function DevPanel() {
               ))}
             </select>
           </label>
-          <button type="button" onClick={apply} className="w-full rounded bg-white text-black">
-            Apply
-          </button>
+          <div className="flex gap-2">
+            <button type="button" onClick={apply} className="flex-1 rounded bg-white text-black">
+              Apply
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewFromDev({ type: 'start' })}
+              className="rounded bg-white/20 px-2 text-white"
+            >
+              Reset
+            </button>
+          </div>
           {lastError && (
             <div className="rounded bg-red-900/60 p-1">last error: {lastError.message}</div>
           )}
