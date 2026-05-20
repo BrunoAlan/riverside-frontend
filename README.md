@@ -8,7 +8,7 @@ Next.js frontend for the Riverside voice agent. Built on top of [LiveKit Agents]
 - **React 19**
 - **Tailwind CSS** + **shadcn/ui**
 - **LiveKit JavaScript SDK** for real-time voice / video transport
-- **Agents UI** components (installed via shadcn registry into `components/agents-ui/`)
+- **Agents UI** components from the LiveKit shadcn registry
 
 ## Features
 
@@ -16,7 +16,6 @@ Next.js frontend for the Riverside voice agent. Built on top of [LiveKit Agents]
 - Camera + screen-share support
 - Multiple audio visualizer styles (`bar`, `grid`, `radial`, `wave`, `aura`)
 - Chat transcript with text input
-- Light/dark theme with system preference detection
 - Branding, colors, and copy configurable from a single file (`app-config.ts`)
 
 ## Project structure
@@ -24,26 +23,37 @@ Next.js frontend for the Riverside voice agent. Built on top of [LiveKit Agents]
 ```
 riverside-frontend/
 ├── app/                  - Next.js App Router (routes, layout, OG image, API)
+│   ├── (design-system)/  - /design-system route: shadcn primitives showcase
+│   ├── agent/            - /agent route: the voice session UI
 │   └── api/token/        - Mints LiveKit access tokens server-side
 ├── components/
-│   ├── ai-elements/      - AI Elements components
-│   ├── app/              - App-level composition and business logic
+│   ├── layout/           - App shell: root composition, providers, view controller
+│   ├── agent-ui/         - Agent-driven views the backend can switch between
+│   ├── panels/           - Reusable content panels (map, cabin cards, etc.)
+│   ├── chat/             - Chat transcript + input
+│   ├── home/             - Welcome/landing UI
+│   ├── livekit/          - Thin wrappers over @livekit/components-react
+│   ├── ai-elements/      - AI Elements components (chat conversation)
 │   └── ui/               - shadcn/ui primitives
-├── hooks/
+├── hooks/                - Cross-cutting React hooks (kebab-case)
 ├── lib/
+│   ├── agent-ui/         - Logic for agent-driven UI (transport, store, types)
+│   ├── dev/              - Dev-only UI (DevPanel + view mocks)
+│   ├── map/              - Map data + clustering helpers
+│   └── shadcn/           - shadcn helpers
 ├── public/               - Static assets (logos, fonts, OG background)
 ├── styles/
 └── app-config.ts         - Branding + feature flags (single source of truth)
 ```
 
-Business logic lives in `components/app/`. The key files:
+The shell lives in `components/layout/`. Key files:
 
-| File                  | Description                                                           |
-| --------------------- | --------------------------------------------------------------------- |
-| `app.tsx`             | Top-level wiring: theme, providers, session.                          |
-| `view-controller.tsx` | Switches between welcome and session views based on connection state. |
-| `session-view.tsx`    | Active call UI: chat transcript, media tiles, control bar.            |
-| `welcome-view.tsx`    | Pre-connection landing UI.                                            |
+| File                    | Description                                                           |
+| ----------------------- | --------------------------------------------------------------------- |
+| `app.tsx`               | Top-level wiring: providers, LiveKit session, dev panel.              |
+| `view-controller.tsx`   | Switches between welcome and session views based on connection state. |
+| `welcome-view.tsx`      | Pre-connection landing UI.                                            |
+| `window-background.tsx` | Backdrop layer behind agent-driven views.                             |
 
 ## Getting started
 
