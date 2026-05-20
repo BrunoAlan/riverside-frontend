@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { type Root, createRoot } from 'react-dom/client';
 import maplibregl from 'maplibre-gl';
 import { CITY_CARD_WIDTH, CityCard } from '@/components/app/content-panels/city-card';
@@ -28,6 +28,13 @@ type CityCardLayerProps = {
  * uniformly), so clustering is recomputed on `zoom`, never on `move`.
  */
 export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps) {
+  // Keep onCityExpand in a ref so unstable callers don't tear down all markers
+  // on every render.
+  const onCityExpandRef = useRef(onCityExpand);
+  useEffect(() => {
+    onCityExpandRef.current = onCityExpand;
+  }, [onCityExpand]);
+
   useEffect(() => {
     type Entry = { key: string; marker: maplibregl.Marker; root: Root };
     let entries: Entry[] = [];
@@ -66,7 +73,9 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
           .setLngLat([front.lon, front.lat])
           .addTo(map);
         const root = createRoot(el);
-        root.render(<Cascade sorted={sorted} onCityExpand={onCityExpand} />);
+        root.render(
+          <Cascade sorted={sorted} onCityExpand={(city) => onCityExpandRef.current?.(city)} />
+        );
         return { key: nextKeys[i], marker, root };
       });
     };
@@ -81,7 +90,7 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
         e.marker.remove();
       });
     };
-  }, [map, cities, onCityExpand]);
+  }, [map, cities]);
 
   return null;
 }

@@ -53,6 +53,11 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
             };
+          default: {
+            const _exhaustive: never = cmd;
+            void _exhaustive;
+            return {};
+          }
         }
       }),
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import type { TextStreamHandler } from 'livekit-client';
 import { useMaybeRoomContext } from '@livekit/components-react';
 import { UiCommand } from './commands';
 import { uiViewStore } from './ui-view-store';
@@ -43,14 +44,13 @@ export function useUiCommandTransport(): void {
   const room = useMaybeRoomContext();
   useEffect(() => {
     if (!room) return;
-    const handler = (reader: ReaderLike) => {
+    const handler: TextStreamHandler = (reader) => {
       const { applyCommand, recordParseError } = uiViewStore.getState();
       handleUiCommandStream(reader, applyCommand, recordParseError).catch((e) => {
         recordParseError({ message: `transport error: ${(e as Error).message}` });
       });
     };
-    // `registerTextStreamHandler` expects a callback with (reader, participantInfo).
-    room.registerTextStreamHandler(TOPIC, handler as never);
+    room.registerTextStreamHandler(TOPIC, handler);
     return () => {
       room.unregisterTextStreamHandler(TOPIC);
     };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSetViewFromDev, useUiLastError, useUiSource, useUiView } from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import { VIEW_MOCKS } from './mocks';
@@ -17,6 +17,12 @@ export function DevPanel() {
   const [type, setType] = useState<UiView['type']>(view.type);
   const mocks = VIEW_MOCKS[type];
   const [mockId, setMockId] = useState(mocks[0]?.id ?? '');
+
+  // Keep the selector in sync when the store view changes from outside (agent or Reset).
+  useEffect(() => {
+    setType(view.type);
+    setMockId(VIEW_MOCKS[view.type][0]?.id ?? '');
+  }, [view.type]);
 
   const apply = () => {
     const chosen = mocks.find((m) => m.id === mockId) ?? mocks[0];

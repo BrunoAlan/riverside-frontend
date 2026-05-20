@@ -18,6 +18,13 @@ const VIEW_MOTION_PROPS = {
   transition: { duration: 0.5, ease: 'linear' },
 };
 
+function viewKey(view: ReturnType<typeof useUiView>): string {
+  if (view.type === 'compare_itinerary') {
+    return `compare_itinerary:${view.options.map((o) => o.id).join(',')}`;
+  }
+  return view.type;
+}
+
 export function ViewController() {
   const view = useUiView();
   const isPresentationActive = view.type === 'presentation';
@@ -27,7 +34,7 @@ export function ViewController() {
     <>
       {showBackground && <WindowBackground isPlaying={isPresentationActive} />}
       <AnimatePresence mode="wait">
-        <MotionContentView key={view.type} {...VIEW_MOTION_PROPS} />
+        <MotionContentView key={viewKey(view)} {...VIEW_MOTION_PROPS} />
       </AnimatePresence>
     </>
   );
