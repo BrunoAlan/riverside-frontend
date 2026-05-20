@@ -5,3 +5,4 @@ export const useUiHint = () => useUiViewStore((s) => s.hint);
 export const useUiSource = () => useUiViewStore((s) => s.source);
 export const useUiLastError = () => useUiViewStore((s) => s.lastError);
 export const useSetViewFromDev = () => useUiViewStore((s) => s.setViewFromDev);
+export const useSetViewFromUser = () => useUiViewStore((s) => s.setViewFromUser);
