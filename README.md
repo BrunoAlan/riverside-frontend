@@ -31,7 +31,7 @@ riverside-frontend/
 ├── components/
 │   ├── layout/           - App shell: root composition, providers, view controller
 │   ├── agent-ui/         - Agent-driven views the backend can switch between
-│   ├── panels/           - Reusable content panels (map, cabin cards, etc.)
+│   ├── panels/           - Reusable content panels grouped by domain (map/, cabin/, dream/)
 │   ├── chat/             - Chat transcript + input
 │   ├── home/             - Welcome/landing UI
 │   ├── livekit/          - Thin wrappers over @livekit/components-react
