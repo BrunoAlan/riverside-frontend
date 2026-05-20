@@ -26,7 +26,6 @@ riverside-frontend/
 ├── app/                  - Next.js App Router (routes, layout, OG image, API)
 │   └── api/token/        - Mints LiveKit access tokens server-side
 ├── components/
-│   ├── agents-ui/        - LiveKit Agents UI components (do not rename)
 │   ├── ai-elements/      - AI Elements components
 │   ├── app/              - App-level composition and business logic
 │   └── ui/               - shadcn/ui primitives
