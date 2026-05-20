@@ -205,16 +205,13 @@ export function PanelDream({ images }: PanelDreamProps) {
               style={positionVars}
               className="relative mx-auto h-64 w-[85%] shrink-0 overflow-visible md:absolute md:top-[var(--dream-top)] md:left-[var(--dream-left)] md:mx-0 md:h-[var(--dream-height)] md:w-[var(--dream-width)]"
             >
-              {/* Ambient atmospheric fog */}
-              <div className="pointer-events-none absolute inset-[-18%] z-0 rounded-full bg-white/25 opacity-90 blur-[120px]" />
-
               {/* Animated dream mask */}
               <div className="absolute inset-0 z-10">
                 <DreamMask image={image} index={index} />
               </div>
 
               {/* Floating tag */}
-              <span className="bg-beige-900/85 absolute bottom-[28%] left-[24%] z-20 rounded-full px-3 py-1 text-xs text-white backdrop-blur-md">
+              <span className="bg-beige-900/60 absolute bottom-[20%] left-[20%] z-20 rounded-full px-4 py-2 text-xs text-white backdrop-blur-md">
                 {image.tag}
               </span>
             </div>

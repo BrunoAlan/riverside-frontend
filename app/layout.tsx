@@ -25,7 +25,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(inter.variable, hostGrotesk.variable, 'scroll-smooth font-sans antialiased')}
+      className={cn(hostGrotesk.variable, inter.variable, 'scroll-smooth font-sans antialiased')}
     >
       <head>
         <title>{pageTitle}</title>
