@@ -129,12 +129,12 @@ function DreamMask({ image, index }: { image: DreamImage; index: number }) {
     >
       <defs>
         {/* Soft edge blur */}
-        <filter id={blurId} x="-40%" y="-40%" width="180%" height="180%">
+        <filter id={blurId} x="-150%" y="-150%" width="400%" height="400%">
           <feGaussianBlur stdDeviation="7" />
         </filter>
 
         {/* Atmospheric dream glow */}
-        <filter id={glowId} x="-60%" y="-60%" width="220%" height="220%">
+        <filter id={glowId} x="-200%" y="-200%" width="500%" height="500%">
           <feGaussianBlur stdDeviation="42" result="blur" />
 
           <feColorMatrix

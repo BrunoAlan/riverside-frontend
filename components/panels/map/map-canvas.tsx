@@ -70,6 +70,14 @@ export function MapCanvas({
         className="pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply"
         style={{ backgroundImage: GRAIN_IMAGE, backgroundRepeat: 'repeat' }}
       />
+      <div
+        aria-hidden
+        className="from-beige-200 pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b to-transparent"
+      />
+      <div
+        aria-hidden
+        className="from-beige-200 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent"
+      />
       {map && <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />}
     </div>
   );

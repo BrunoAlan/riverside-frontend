@@ -2,7 +2,6 @@
 
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { AgentHeader } from '@/components/agent-ui/agent-header';
 import type { City } from '@/lib/map/cities';
 
 const MapCanvas = dynamic(
@@ -20,11 +19,8 @@ export function PanelMap() {
   }, []);
 
   return (
-    <div className="fixed inset-0">
+    <div className="absolute inset-0">
       <MapCanvas onCityExpand={handleCityExpand} />
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center">
-        <AgentHeader />
-      </div>
     </div>
   );
 }

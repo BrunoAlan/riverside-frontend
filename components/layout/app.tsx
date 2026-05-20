@@ -44,10 +44,12 @@ export function App({ appConfig }: AppProps) {
     <AppConfigProvider config={appConfig}>
       <AgentSessionProvider session={session}>
         <AppSetup />
-        <div className="grid h-full grid-cols-1 grid-rows-1">
-          <ViewController />
+        <div className="flex h-full flex-col">
+          <div className="relative min-h-0 flex-1">
+            <ViewController />
+          </div>
+          <BookingSummaryContainer />
         </div>
-        <BookingSummaryContainer />
         <StartAudioButton label="Start Audio" />
         {IN_DEVELOPMENT && <DevPanel />}
       </AgentSessionProvider>

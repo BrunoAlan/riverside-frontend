@@ -143,7 +143,7 @@ export function BookingSummaryContainer() {
   if (summary === null) return null;
 
   return (
-    <div className="pointer-events-none fixed right-6 bottom-6 z-40 flex justify-end rounded-lg">
+    <div className="flex justify-end px-6 pb-6">
       <BookingSummary summary={summary} />
     </div>
   );

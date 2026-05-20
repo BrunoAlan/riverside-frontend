@@ -2,7 +2,6 @@
 
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { AgentHeader } from '@/components/agent-ui/agent-header';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import type { City } from '@/lib/map/cities';
 import { itineraries } from '@/lib/map/itineraries';
@@ -39,7 +38,7 @@ export function CompareItineraryView({
   const right = second ? resolveItinerary(second.id, 1) : undefined;
 
   return (
-    <div className="fixed inset-0 flex">
+    <div className="absolute inset-0 flex">
       {left && (
         <div className={`relative h-full ${right ? 'w-1/2' : 'w-full'}`}>
           <MapCanvas
@@ -63,9 +62,6 @@ export function CompareItineraryView({
       {left && right && (
         <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center">
           <div className="h-full w-0.5 bg-green-700" />
-          <div className="absolute top-0 left-1/2 w-32 -translate-x-1/2">
-            <AgentHeader />
-          </div>
         </div>
       )}
     </div>
