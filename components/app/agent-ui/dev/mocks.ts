@@ -7,19 +7,16 @@ export interface ViewMock {
 }
 
 export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
-  discovery_canvas: [
-    {
-      id: 'default',
-      label: 'Default (window background)',
-      view: { type: 'discovery_canvas' },
-    },
-  ],
-  itinerary_options: [
+  start: [{ id: 'default', label: 'Default', view: { type: 'start' } }],
+  presentation: [{ id: 'default', label: 'Video playing', view: { type: 'presentation' } }],
+  dream_stage: [{ id: 'default', label: 'Dream collage', view: { type: 'dream_stage' } }],
+  itinerary: [{ id: 'default', label: 'Map', view: { type: 'itinerary' } }],
+  compare_itinerary: [
     {
       id: 'two_danube_options',
       label: 'Two Danube options',
       view: {
-        type: 'itinerary_options',
+        type: 'compare_itinerary',
         options: [
           {
             id: 'majesty_of_the_danube',
@@ -39,4 +36,5 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
       },
     },
   ],
+  cabin_selection: [{ id: 'default', label: 'All cabins', view: { type: 'cabin_selection' } }],
 };
