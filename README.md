@@ -2,6 +2,8 @@
 
 Next.js frontend for the Riverside voice agent. Built on top of [LiveKit Agents](https://docs.livekit.io/agents) and the [Agents UI](https://livekit.io/ui) component library, with Riverside branding and product layer on top.
 
+> Contributing — including AI agents — start with [`AGENTS.md`](./AGENTS.md) and the [`conventions/`](./conventions/) folder.
+
 ## Stack
 
 - **Next.js 15** (App Router, Turbopack)
@@ -123,6 +125,72 @@ Set `audioVisualizerType` to switch styles:
 - `aura` — shader-based aura (`audioVisualizerAuraColorShift`)
 
 Use `audioVisualizerColor` / `audioVisualizerColorDark` for a shared accent across modes.
+
+## Agent-driven UI
+
+The agent doesn't render anything — it sends **UI commands** over LiveKit and the frontend translates them into **views**.
+
+```
+LiveKit text stream
+        │
+        ▼
+lib/agent-ui/transport.ts ──► Zod parse (UiCommand)
+        │
+        ▼
+lib/agent-ui/ui-view-store.ts ──► applyCommand reducer ──► UiView
+        │
+        ▼
+components/agent-ui/content-view.tsx ──► VIEW_REGISTRY[view.type] renders
+```
+
+Key files:
+
+| File                                   | Role                                                        |
+| -------------------------------------- | ----------------------------------------------------------- |
+| `lib/agent-ui/commands.ts`             | Zod schemas for the wire protocol (`UiCommand` union).      |
+| `lib/agent-ui/ui-view-types.ts`        | The `UiView` union — what the UI can be showing.            |
+| `lib/agent-ui/ui-view-store.ts`        | Zustand store + reducer. Tracks view, hint, source, errors. |
+| `lib/agent-ui/transport.ts`            | Reads the LiveKit `ui-commands` stream, validates, applies. |
+| `components/agent-ui/view-registry.ts` | Maps `UiView['type']` to a React component.                 |
+| `components/agent-ui/content-view.tsx` | Reads the store, renders the registered view.               |
+| `lib/dev/mocks.ts`                     | Mock `UiView`s exposed in the dev panel.                    |
+
+Full walkthrough: [`conventions/agent-ui.md`](./conventions/agent-ui.md).
+
+### Adding a new command
+
+1. Define a Zod schema in `lib/agent-ui/commands.ts` and add it to the `UiCommand` discriminated union.
+2. Handle it in `applyCommand` inside `lib/agent-ui/ui-view-store.ts` — the build fails until you do (exhaustive `switch`).
+3. If it introduces a new view, follow the next section.
+4. Add a schema test in `lib/agent-ui/commands.test.ts` and, if you changed the reducer, a test in `ui-view-store.test.ts`.
+
+Details: [`conventions/adding-a-command.md`](./conventions/adding-a-command.md).
+
+### Adding a new view
+
+1. Add the variant to `UiView` in `lib/agent-ui/ui-view-types.ts` (snake_case `type`).
+2. Create `components/agent-ui/views/<name>-view.tsx`.
+3. Register it in `components/agent-ui/view-registry.ts` (the registry type is exhaustive).
+4. Add at least one mock in `lib/dev/mocks.ts`.
+
+Details: [`conventions/adding-a-view.md`](./conventions/adding-a-view.md).
+
+### Adding a new mock
+
+Mocks live in `lib/dev/mocks.ts` as `Record<UiView['type'], ViewMock[]>`. Every view type needs at least one entry.
+
+```ts
+my_new_view: [
+  { id: 'default', label: 'Default', view: { type: 'my_new_view' } },
+  { id: 'empty', label: 'Empty list', view: { type: 'my_new_view' /* ... */ } },
+],
+```
+
+- `id` is `snake_case` and unique within the view; the dev panel uses it as the `<select>` value.
+- `label` is the human label shown in the dropdown.
+- Put a `default` entry first — the dev panel selects `mocks[0]` when you switch types.
+
+Open the dev panel from the `dev` button in the bottom-right corner (`pnpm dev`), pick a view + mock, **Apply**.
 
 ## Scripts
 
