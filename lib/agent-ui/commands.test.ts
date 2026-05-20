@@ -104,3 +104,89 @@ describe('UiCommand schema', () => {
     expect(out.success).toBe(false);
   });
 });
+
+describe('set_booking_summary', () => {
+  const validPayload = {
+    people: { label: '2 People' },
+    month: { label: 'March' },
+    embarkation: { label: 'Budapest' },
+    stops: { primary: 'Bratislava', extra: 3 },
+    duration: { label: '5 days' },
+    price: { label: 'from 2,368 pp.' },
+    slots: [
+      { label: 'Draft itinerary', state: 'active' as const },
+      { label: 'Empty slot', state: 'empty' as const },
+      { label: 'Empty slot', state: 'empty' as const },
+    ],
+    cta: { label: 'Continue to booking', enabled: true },
+  };
+
+  it('parses a fully populated snapshot', () => {
+    const out = UiCommand.parse({
+      type: 'set_booking_summary',
+      correlation_id: 'b1',
+      payload: validPayload,
+    });
+    if (out.type !== 'set_booking_summary') throw new Error('discriminator failed');
+    expect(out.payload.people).toEqual({ label: '2 People' });
+    expect(out.payload.slots).toHaveLength(3);
+    expect(out.payload.cta.enabled).toBe(true);
+  });
+
+  it('accepts null for all nullable fields', () => {
+    const out = UiCommand.safeParse({
+      type: 'set_booking_summary',
+      correlation_id: 'b1',
+      payload: {
+        ...validPayload,
+        people: null,
+        month: null,
+        embarkation: null,
+        stops: null,
+        duration: null,
+        price: null,
+      },
+    });
+    expect(out.success).toBe(true);
+  });
+
+  it('accepts an empty slots array', () => {
+    const out = UiCommand.safeParse({
+      type: 'set_booking_summary',
+      correlation_id: 'b1',
+      payload: { ...validPayload, slots: [] },
+    });
+    expect(out.success).toBe(true);
+  });
+
+  it('rejects more than 6 slots', () => {
+    const tooMany = Array.from({ length: 7 }, () => ({ label: 'x', state: 'empty' as const }));
+    const out = UiCommand.safeParse({
+      type: 'set_booking_summary',
+      correlation_id: 'b1',
+      payload: { ...validPayload, slots: tooMany },
+    });
+    expect(out.success).toBe(false);
+  });
+
+  it('rejects unknown slot state', () => {
+    const out = UiCommand.safeParse({
+      type: 'set_booking_summary',
+      correlation_id: 'b1',
+      payload: {
+        ...validPayload,
+        slots: [{ label: 'x', state: 'pending' as unknown as 'active' }],
+      },
+    });
+    expect(out.success).toBe(false);
+  });
+
+  it('rejects negative stops.extra', () => {
+    const out = UiCommand.safeParse({
+      type: 'set_booking_summary',
+      correlation_id: 'b1',
+      payload: { ...validPayload, stops: { primary: 'X', extra: -1 } },
+    });
+    expect(out.success).toBe(false);
+  });
+});
