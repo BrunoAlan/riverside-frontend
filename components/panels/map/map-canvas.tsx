@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { CityCardLayer } from '@/components/panels/city-card-layer';
+import { CityCardLayer } from '@/components/panels/map/city-card-layer';
 import { type City, cities } from '@/lib/map/cities';
 import { parchmentStyle } from '@/lib/map/parchment-style';
 
