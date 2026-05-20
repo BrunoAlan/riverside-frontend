@@ -1,8 +1,8 @@
 'use client';
 
 import { useSessionContext } from '@livekit/components-react';
-import { useAppConfig } from '@/components/app/app-config-context';
-import { WelcomeView } from '@/components/app/welcome-view';
+import { useAppConfig } from '@/components/layout/app-config-context';
+import { WelcomeView } from '@/components/layout/welcome-view';
 import { useSetViewFromUser } from '@/lib/agent-ui/hooks';
 
 export function StartView() {

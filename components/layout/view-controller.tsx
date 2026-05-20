@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import { ContentView } from '@/components/agent-ui/content-view';
-import { WindowBackground } from '@/components/app/window-background';
+import { WindowBackground } from '@/components/layout/window-background';
 import { useUiView } from '@/lib/agent-ui/hooks';
 
 const MotionContentView = motion.create(ContentView);
