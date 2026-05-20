@@ -60,6 +60,12 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
             };
+          case 'set_booking_summary':
+            // TODO: Handle booking summary state in Task 3
+            return {
+              source: 'agent',
+              lastCorrelationId: cmd.correlation_id,
+            };
           default: {
             const _exhaustive: never = cmd;
             void _exhaustive;
