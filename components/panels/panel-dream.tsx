@@ -49,7 +49,7 @@ export function PanelDream({ images }: PanelDreamProps) {
 
           return (
             <div
-              key={image.src}
+              key={`${index}-${image.src}`}
               style={positionVars}
               className="relative mx-auto h-64 w-[85%] shrink-0 md:absolute md:top-[var(--dream-top)] md:left-[var(--dream-left)] md:mx-0 md:h-[var(--dream-height)] md:w-[var(--dream-width)]"
             >
