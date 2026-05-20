@@ -9,8 +9,8 @@ import { AppConfigProvider } from '@/components/app/app-config-context';
 import { ViewController } from '@/components/app/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
-import { useAgentErrors } from '@/hooks/useAgentErrors';
-import { useDebugMode } from '@/hooks/useDebug';
+import { useAgentErrors } from '@/hooks/use-agent-errors';
+import { useDebugMode } from '@/hooks/use-debug';
 import { useUiCommandTransport } from '@/lib/agent-ui/transport';
 import { getSandboxTokenSource } from '@/lib/utils';
 
