@@ -8,28 +8,28 @@ describe('ui-view-store', () => {
     store = createUiViewStore();
   });
 
-  it('initializes with discovery_canvas view and initial source', () => {
+  it('initializes with start view and initial source', () => {
     const s = store.getState();
-    expect(s.view).toEqual({ type: 'discovery_canvas' });
+    expect(s.view).toEqual({ type: 'start' });
     expect(s.hint).toBeNull();
     expect(s.source).toBe('initial');
     expect(s.lastCorrelationId).toBeNull();
     expect(s.lastError).toBeNull();
   });
 
-  it('applyCommand(show_discovery_canvas) sets view + agent source + correlation', () => {
+  it('applyCommand(show_discovery_canvas) maps to presentation view', () => {
     store.getState().applyCommand({
       type: 'show_discovery_canvas',
       correlation_id: 'c1',
     });
     const s = store.getState();
-    expect(s.view).toEqual({ type: 'discovery_canvas' });
+    expect(s.view).toEqual({ type: 'presentation' });
     expect(s.source).toBe('agent');
     expect(s.lastCorrelationId).toBe('c1');
     expect(s.hint).toBeNull();
   });
 
-  it('applyCommand(show_itinerary_options) replaces view with options', () => {
+  it('applyCommand(show_itinerary_options) maps to compare_itinerary view', () => {
     store.getState().applyCommand({
       type: 'show_itinerary_options',
       correlation_id: 'c2',
@@ -47,7 +47,7 @@ describe('ui-view-store', () => {
     });
     const s = store.getState();
     expect(s.view).toEqual({
-      type: 'itinerary_options',
+      type: 'compare_itinerary',
       options: [
         {
           id: 'a',
@@ -72,7 +72,7 @@ describe('ui-view-store', () => {
       payload: { reason_code: 'MISSING_DATE', missing: ['dates'] },
     });
     const s = store.getState();
-    expect(s.view).toEqual({ type: 'discovery_canvas' });
+    expect(s.view).toEqual({ type: 'presentation' });
     expect(s.hint).toEqual({
       type: 'soft_redirect',
       reasonCode: 'MISSING_DATE',
@@ -99,9 +99,19 @@ describe('ui-view-store', () => {
       type: 'show_discovery_canvas',
       correlation_id: 'c1',
     });
-    store.getState().setViewFromDev({ type: 'discovery_canvas' });
+    store.getState().setViewFromDev({ type: 'dream_stage' });
     const s = store.getState();
+    expect(s.view).toEqual({ type: 'dream_stage' });
     expect(s.source).toBe('dev');
+    expect(s.lastCorrelationId).toBeNull();
+  });
+
+  it('setViewFromUser sets view + user source and clears lastCorrelationId', () => {
+    store.getState().setViewFromUser({ type: 'presentation' });
+    const s = store.getState();
+    expect(s.view).toEqual({ type: 'presentation' });
+    expect(s.source).toBe('user');
+    expect(s.hint).toBeNull();
     expect(s.lastCorrelationId).toBeNull();
   });
 
@@ -109,6 +119,6 @@ describe('ui-view-store', () => {
     store.getState().recordParseError({ message: 'bad payload' });
     const s = store.getState();
     expect(s.lastError).toEqual({ message: 'bad payload' });
-    expect(s.view).toEqual({ type: 'discovery_canvas' });
+    expect(s.view).toEqual({ type: 'start' });
   });
 });

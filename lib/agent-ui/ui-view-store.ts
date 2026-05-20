@@ -12,10 +12,11 @@ interface UiViewState {
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
+  setViewFromUser: (view: UiView) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
 }
 
-const INITIAL_VIEW: UiView = { type: 'discovery_canvas' };
+const INITIAL_VIEW: UiView = { type: 'start' };
 
 export function createUiViewStore() {
   return createStore<UiViewState>()((set) => ({
@@ -30,14 +31,14 @@ export function createUiViewStore() {
         switch (cmd.type) {
           case 'show_discovery_canvas':
             return {
-              view: { type: 'discovery_canvas' },
+              view: { type: 'presentation' },
               hint: null,
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
             };
           case 'show_itinerary_options':
             return {
-              view: { type: 'itinerary_options', options: cmd.payload.options },
+              view: { type: 'compare_itinerary', options: cmd.payload.options },
               hint: null,
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
@@ -56,6 +57,8 @@ export function createUiViewStore() {
       }),
 
     setViewFromDev: (view) => set({ view, hint: null, source: 'dev', lastCorrelationId: null }),
+
+    setViewFromUser: (view) => set({ view, hint: null, source: 'user', lastCorrelationId: null }),
 
     recordParseError: (err) => set({ lastError: err }),
   }));
