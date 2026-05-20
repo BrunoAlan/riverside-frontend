@@ -10,7 +10,7 @@ riverside-frontend/
 │   ├── layout/           App shell: root composition, providers, view controller
 │   ├── agent-ui/         Agent-driven views the backend can switch between
 │   │   └── views/        One file per view, registered in view-registry.ts
-│   ├── panels/           Reusable content panels (map, cabin cards, etc.)
+│   ├── panels/           Reusable content panels grouped by domain (map/, cabin/, dream/)
 │   ├── chat/             Chat transcript + input
 │   ├── home/             Welcome/landing UI
 │   ├── livekit/          Thin wrappers over @livekit/components-react
@@ -29,18 +29,18 @@ riverside-frontend/
 
 ## Where to put a new file
 
-| You're adding…                               | Goes in…                                                      |
-| -------------------------------------------- | ------------------------------------------------------------- |
-| A new shadcn primitive                       | `components/ui/` (via the shadcn CLI, never by hand)          |
-| A reusable visual block (card, panel, chart) | `components/panels/` or a new folder under `components/`      |
-| A view the agent can switch to               | `components/agent-ui/views/` + register in `view-registry.ts` |
-| App-shell / layout glue                      | `components/layout/`                                          |
-| A pure helper, type, or store                | `lib/<domain>/`                                               |
-| A cross-cutting React hook                   | `hooks/`                                                      |
-| A hook that only one component uses          | Co-locate with the component                                  |
-| A new route                                  | `app/<segment>/page.tsx`                                      |
-| Branding / feature flag                      | `app-config.ts`                                               |
-| Dev-only tooling                             | `lib/dev/`                                                    |
+| You're adding…                               | Goes in…                                                                   |
+| -------------------------------------------- | -------------------------------------------------------------------------- |
+| A new shadcn primitive                       | `components/ui/` (via the shadcn CLI, never by hand)                       |
+| A reusable visual block (card, panel, chart) | `components/panels/<domain>/` (create a new domain subfolder if none fits) |
+| A view the agent can switch to               | `components/agent-ui/views/` + register in `view-registry.ts`              |
+| App-shell / layout glue                      | `components/layout/`                                                       |
+| A pure helper, type, or store                | `lib/<domain>/`                                                            |
+| A cross-cutting React hook                   | `hooks/`                                                                   |
+| A hook that only one component uses          | Co-locate with the component                                               |
+| A new route                                  | `app/<segment>/page.tsx`                                                   |
+| Branding / feature flag                      | `app-config.ts`                                                            |
+| Dev-only tooling                             | `lib/dev/`                                                                 |
 
 ## Boundary rules
 
