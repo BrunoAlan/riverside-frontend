@@ -113,22 +113,6 @@ Set `audioVisualizerType` to switch styles:
 
 Use `audioVisualizerColor` / `audioVisualizerColorDark` for a shared accent across modes.
 
-## Working with Agents UI components
-
-The `components/agents-ui/` directory contains components installed from the [Agents UI shadcn registry](https://livekit.io/ui). They are local source — edit them like any other component. Style overrides are best done via Tailwind classes passed as props; most components accept the full set of native HTML attributes.
-
-To update them to the latest published version:
-
-```bash
-pnpm shadcn:install
-```
-
-To add a new one:
-
-```bash
-pnpm dlx shadcn@latest add @agents-ui/<component-name>
-```
-
 ## Scripts
 
 | Script        | What it does                 |
