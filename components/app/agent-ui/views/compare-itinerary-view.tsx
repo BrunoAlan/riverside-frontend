@@ -11,12 +11,14 @@ const MapCanvas = dynamic(
   { ssr: false, loading: () => <div className="bg-beige-200 h-full w-full" /> }
 );
 
-function resolveItinerary(optionId: string) {
+function resolveItinerary(optionId: string, fallbackIndex: number) {
   const match = itineraries.find((i) => i.id === optionId);
   if (!match) {
-    console.warn(`[compare_itinerary] unknown option id "${optionId}"`);
+    console.warn(
+      `[compare_itinerary] unknown option id "${optionId}", falling back to itineraries[${fallbackIndex}]`
+    );
   }
-  return match;
+  return match ?? itineraries[fallbackIndex];
 }
 
 export function CompareItineraryView({
@@ -29,21 +31,21 @@ export function CompareItineraryView({
   }, []);
 
   const [first, second] = view.options;
-  const left = first ? resolveItinerary(first.id) : undefined;
-  const right = second ? resolveItinerary(second.id) : undefined;
+  const left = first ? resolveItinerary(first.id, 0) : undefined;
+  const right = second ? resolveItinerary(second.id, 1) : undefined;
 
   return (
     <div className="fixed inset-0 flex">
-      <div className={`relative h-full ${right ? 'w-1/2' : 'w-full'}`}>
-        {left && (
+      {left && (
+        <div className={`relative h-full ${right ? 'w-1/2' : 'w-full'}`}>
           <MapCanvas
             cities={left.cities}
             center={left.center}
             zoom={left.zoom}
             onCityExpand={handleCityExpand}
           />
-        )}
-      </div>
+        </div>
+      )}
       {right && (
         <div className="relative h-full w-1/2">
           <MapCanvas
