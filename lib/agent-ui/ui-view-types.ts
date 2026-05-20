@@ -1,9 +1,9 @@
-import type { ItineraryOption } from './commands';
+import type { DreamImage, ItineraryOption } from './commands';
 
 export type UiView =
   | { type: 'start' }
   | { type: 'presentation' }
-  | { type: 'dream_stage' }
+  | { type: 'dream_stage'; images: DreamImage[] }
   | { type: 'itinerary' }
   | { type: 'compare_itinerary'; options: ItineraryOption[] }
   | { type: 'cabin_selection' };

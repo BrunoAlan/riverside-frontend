@@ -32,9 +32,21 @@ const ShowItineraryOptions = Base.extend({
   payload: z.object({ options: z.array(ItineraryOption).min(1) }),
 });
 
+export const DreamImage = z.object({
+  src: z.string().url(),
+  tag: z.string(),
+});
+export type DreamImage = z.infer<typeof DreamImage>;
+
+const ShowDreamStage = Base.extend({
+  type: z.literal('show_dream_stage'),
+  payload: z.object({ images: z.array(DreamImage).min(1).max(5) }),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
   ShowItineraryOptions,
+  ShowDreamStage,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;

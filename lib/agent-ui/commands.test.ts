@@ -43,6 +43,45 @@ describe('UiCommand schema', () => {
     expect(result.payload.options[0].id).toBe('majesty_of_the_danube');
   });
 
+  it('parses show_dream_stage with 1-5 images', () => {
+    const result = UiCommand.parse({
+      type: 'show_dream_stage',
+      correlation_id: 'd1',
+      payload: {
+        images: [
+          { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+        ],
+      },
+    });
+    if (result.type !== 'show_dream_stage') throw new Error('discriminator failed');
+    expect(result.payload.images).toHaveLength(2);
+    expect(result.payload.images[0].src).toMatch(/^https:\/\//);
+  });
+
+  it('rejects show_dream_stage with non-url src', () => {
+    const out = UiCommand.safeParse({
+      type: 'show_dream_stage',
+      correlation_id: 'd1',
+      payload: { images: [{ src: '/dream/1.jpg', tag: 'Venice' }] },
+    });
+    expect(out.success).toBe(false);
+  });
+
+  it('rejects show_dream_stage with more than 5 images', () => {
+    const out = UiCommand.safeParse({
+      type: 'show_dream_stage',
+      correlation_id: 'd1',
+      payload: {
+        images: Array.from({ length: 6 }, (_, i) => ({
+          src: `https://res.cloudinary.com/demo/image/upload/${i}.jpg`,
+          tag: String(i),
+        })),
+      },
+    });
+    expect(out.success).toBe(false);
+  });
+
   it('rejects show_itinerary_options with zero options', () => {
     const out = UiCommand.safeParse({
       type: 'show_itinerary_options',

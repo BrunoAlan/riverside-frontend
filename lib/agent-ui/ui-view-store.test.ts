@@ -61,6 +61,29 @@ describe('ui-view-store', () => {
     expect(s.source).toBe('agent');
   });
 
+  it('applyCommand(show_dream_stage) maps payload images into view', () => {
+    store.getState().applyCommand({
+      type: 'show_dream_stage',
+      correlation_id: 'd1',
+      payload: {
+        images: [
+          { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+        ],
+      },
+    });
+    const s = store.getState();
+    expect(s.view).toEqual({
+      type: 'dream_stage',
+      images: [
+        { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
+        { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+      ],
+    });
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('d1');
+  });
+
   it('applyCommand(soft_redirect) sets hint without changing view', () => {
     store.getState().applyCommand({
       type: 'show_discovery_canvas',
@@ -99,9 +122,15 @@ describe('ui-view-store', () => {
       type: 'show_discovery_canvas',
       correlation_id: 'c1',
     });
-    store.getState().setViewFromDev({ type: 'dream_stage' });
+    store.getState().setViewFromDev({
+      type: 'dream_stage',
+      images: [{ src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'A' }],
+    });
     const s = store.getState();
-    expect(s.view).toEqual({ type: 'dream_stage' });
+    expect(s.view).toEqual({
+      type: 'dream_stage',
+      images: [{ src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'A' }],
+    });
     expect(s.source).toBe('dev');
     expect(s.lastCorrelationId).toBeNull();
   });

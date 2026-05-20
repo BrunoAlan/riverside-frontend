@@ -9,7 +9,34 @@ export interface ViewMock {
 export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
   start: [{ id: 'default', label: 'Default', view: { type: 'start' } }],
   presentation: [{ id: 'default', label: 'Video playing', view: { type: 'presentation' } }],
-  dream_stage: [{ id: 'default', label: 'Dream collage', view: { type: 'dream_stage' } }],
+  dream_stage: [
+    {
+      id: 'default',
+      label: 'Dream collage (5 images)',
+      view: {
+        type: 'dream_stage',
+        images: [
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '1 – Image Tag' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '2 – Image Tag' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '3 – Image Tag' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '4 – Image Tag' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '5 – Image Tag' },
+        ],
+      },
+    },
+    {
+      id: 'three_images',
+      label: 'Partial collage (3 images)',
+      view: {
+        type: 'dream_stage',
+        images: [
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: 'Venice' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: 'Budapest' },
+          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: 'Vienna' },
+        ],
+      },
+    },
+  ],
   itinerary: [{ id: 'default', label: 'Map', view: { type: 'itinerary' } }],
   compare_itinerary: [
     {

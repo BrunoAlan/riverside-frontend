@@ -43,6 +43,13 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
             };
+          case 'show_dream_stage':
+            return {
+              view: { type: 'dream_stage', images: cmd.payload.images },
+              hint: null,
+              source: 'agent',
+              lastCorrelationId: cmd.correlation_id,
+            };
           case 'soft_redirect':
             return {
               hint: {
