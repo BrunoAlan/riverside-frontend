@@ -15,13 +15,12 @@ function resolveItinerary(optionId: string, fallbackIndex: number) {
   return itineraries.find((i) => i.id === optionId) ?? itineraries[fallbackIndex];
 }
 
-export function ItineraryOptionsView({
+export function CompareItineraryView({
   view,
 }: {
-  view: Extract<UiView, { type: 'itinerary_options' }>;
+  view: Extract<UiView, { type: 'compare_itinerary' }>;
 }) {
   const handleCityExpand = useCallback((city: City) => {
-    // Wiring of expand action is a follow-up; logging keeps parity with previous panel.
     console.log('expand city', city.id);
   }, []);
 
