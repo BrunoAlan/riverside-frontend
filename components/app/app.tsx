@@ -4,11 +4,14 @@ import { useMemo } from 'react';
 import { TokenSource } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
-import { AgentSessionProvider } from '@/components/agents-ui/agent-session-provider';
-import { StartAudioButton } from '@/components/agents-ui/start-audio-button';
+import { DevPanel } from '@/components/app/agent-ui/dev/dev-panel';
+import { AppConfigProvider } from '@/components/app/app-config-context';
 import { ViewController } from '@/components/app/view-controller';
+import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
+import { StartAudioButton } from '@/components/livekit/start-audio-button';
 import { useAgentErrors } from '@/hooks/useAgentErrors';
 import { useDebugMode } from '@/hooks/useDebug';
+import { useUiCommandTransport } from '@/lib/agent-ui/transport';
 import { getSandboxTokenSource } from '@/lib/utils';
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
@@ -16,7 +19,7 @@ const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 function AppSetup() {
   useDebugMode({ enabled: IN_DEVELOPMENT });
   useAgentErrors();
-
+  useUiCommandTransport();
   return null;
 }
 
@@ -37,12 +40,15 @@ export function App({ appConfig }: AppProps) {
   );
 
   return (
-    <AgentSessionProvider session={session}>
-      <AppSetup />
-      <div className="grid h-full grid-cols-1 grid-rows-1">
-        <ViewController appConfig={appConfig} />
-      </div>
-      <StartAudioButton label="Start Audio" />
-    </AgentSessionProvider>
+    <AppConfigProvider config={appConfig}>
+      <AgentSessionProvider session={session}>
+        <AppSetup />
+        <div className="grid h-full grid-cols-1 grid-rows-1">
+          <ViewController />
+        </div>
+        <StartAudioButton label="Start Audio" />
+        {IN_DEVELOPMENT && <DevPanel />}
+      </AgentSessionProvider>
+    </AppConfigProvider>
   );
 }

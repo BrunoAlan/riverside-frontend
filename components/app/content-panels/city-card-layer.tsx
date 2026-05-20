@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { type Root, createRoot } from 'react-dom/client';
 import maplibregl from 'maplibre-gl';
 import { CITY_CARD_WIDTH, CityCard } from '@/components/app/content-panels/city-card';
@@ -28,6 +28,13 @@ type CityCardLayerProps = {
  * uniformly), so clustering is recomputed on `zoom`, never on `move`.
  */
 export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps) {
+  // Keep onCityExpand in a ref so unstable callers don't tear down all markers
+  // on every render.
+  const onCityExpandRef = useRef(onCityExpand);
+  useEffect(() => {
+    onCityExpandRef.current = onCityExpand;
+  }, [onCityExpand]);
+
   useEffect(() => {
     type Entry = { key: string; marker: maplibregl.Marker; root: Root };
     let entries: Entry[] = [];
@@ -54,9 +61,13 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
         entries.length === nextKeys.length && entries.every((e, i) => e.key === nextKeys[i]);
       if (unchanged && entries.length > 0) return;
 
-      entries.forEach((e) => {
-        e.root.unmount();
-        e.marker.remove();
+      const stale = entries;
+      // Defer root.unmount so we never call it while React is rendering this layer.
+      queueMicrotask(() => {
+        stale.forEach((e) => {
+          e.root.unmount();
+          e.marker.remove();
+        });
       });
 
       entries = clusters.map((sorted, i) => {
@@ -66,7 +77,9 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
           .setLngLat([front.lon, front.lat])
           .addTo(map);
         const root = createRoot(el);
-        root.render(<Cascade sorted={sorted} onCityExpand={onCityExpand} />);
+        root.render(
+          <Cascade sorted={sorted} onCityExpand={(city) => onCityExpandRef.current?.(city)} />
+        );
         return { key: nextKeys[i], marker, root };
       });
     };
@@ -76,12 +89,16 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
 
     return () => {
       map.off('zoom', syncMarkers);
-      entries.forEach((e) => {
-        e.root.unmount();
-        e.marker.remove();
+      const stale = entries;
+      entries = [];
+      queueMicrotask(() => {
+        stale.forEach((e) => {
+          e.root.unmount();
+          e.marker.remove();
+        });
       });
     };
-  }, [map, cities, onCityExpand]);
+  }, [map, cities]);
 
   return null;
 }
