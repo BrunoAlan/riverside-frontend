@@ -102,12 +102,13 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
   isPreConnectBufferEnabled: true,
 
   logo: '/riverside-logo.svg',
-  logoDark: '/riverside-logo.svg',
   accent: '#7B907E',
+  logoDark: '/riverside-logo.svg',
   accentDark: '#7B907E',
-  startButtonText: 'Start call',
+  startButtonText: 'Start the experience',
 
   agentName: process.env.AGENT_NAME ?? undefined,
+  sandboxId: undefined,
 };
 ```
 
@@ -125,10 +126,12 @@ Use `audioVisualizerColor` / `audioVisualizerColorDark` for a shared accent acro
 
 ## Scripts
 
-| Script        | What it does                 |
-| ------------- | ---------------------------- |
-| `pnpm dev`    | Start dev server (Turbopack) |
-| `pnpm build`  | Production build             |
-| `pnpm start`  | Run the production build     |
-| `pnpm lint`   | ESLint                       |
-| `pnpm format` | Prettier write               |
+| Script              | What it does                 |
+| ------------------- | ---------------------------- |
+| `pnpm dev`          | Start dev server (Turbopack) |
+| `pnpm build`        | Production build             |
+| `pnpm start`        | Run the production build     |
+| `pnpm lint`         | ESLint                       |
+| `pnpm test`         | Run vitest suite             |
+| `pnpm format`       | Prettier write               |
+| `pnpm format:check` | Prettier check (no writes)   |
