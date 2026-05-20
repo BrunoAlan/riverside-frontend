@@ -20,13 +20,13 @@ interface BookingSummaryProps {
   summary: BookingSummaryType;
 }
 
-interface ChipProps {
+interface SummaryFieldProps {
   icon: React.ReactNode;
   label: string;
   muted?: boolean;
 }
 
-function Chip({ icon, label, muted = false }: ChipProps) {
+function SummaryField({ icon, label, muted = false }: SummaryFieldProps) {
   return (
     <span
       className={cn(
@@ -76,32 +76,32 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
     >
       <div className="flex items-center justify-between gap-6">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
-          <Chip
+          <SummaryField
             icon={<Users className="size-4" />}
             label={summary.people?.label ?? 'People'}
             muted={!summary.people}
           />
-          <Chip
+          <SummaryField
             icon={<CalendarDays className="size-4" />}
             label={summary.month?.label ?? 'Month'}
             muted={!summary.month}
           />
-          <Chip
+          <SummaryField
             icon={<MapPin className="size-4" />}
             label={summary.embarkation?.label ?? 'Embark'}
             muted={!summary.embarkation}
           />
-          <Chip
+          <SummaryField
             icon={<BookOpen className="size-4" />}
             label={stopsLabel ?? 'Stops'}
             muted={!stopsLabel}
           />
-          <Chip
+          <SummaryField
             icon={<Clock className="size-4" />}
             label={summary.duration?.label ?? 'Days'}
             muted={!summary.duration}
           />
-          <Chip
+          <SummaryField
             icon={<Euro className="size-4" />}
             label={summary.price?.label ?? 'Price'}
             muted={!summary.price}
