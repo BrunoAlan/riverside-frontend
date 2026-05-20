@@ -1,4 +1,4 @@
-import { AgentHeader } from '@/components/agent/agent-header';
+import { AgentHeader } from '@/components/agent-ui/agent-header';
 
 interface AgentLayoutProps {
   children: React.ReactNode;

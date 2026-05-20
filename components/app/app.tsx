@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { TokenSource } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
-import { DevPanel } from '@/components/app/agent-ui/dev/dev-panel';
 import { AppConfigProvider } from '@/components/app/app-config-context';
 import { ViewController } from '@/components/app/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
@@ -12,6 +11,7 @@ import { StartAudioButton } from '@/components/livekit/start-audio-button';
 import { useAgentErrors } from '@/hooks/use-agent-errors';
 import { useDebugMode } from '@/hooks/use-debug';
 import { useUiCommandTransport } from '@/lib/agent-ui/transport';
+import { DevPanel } from '@/lib/dev/dev-panel';
 import { getSandboxTokenSource } from '@/lib/utils';
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';

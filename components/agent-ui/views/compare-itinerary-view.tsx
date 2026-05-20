@@ -2,15 +2,15 @@
 
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { AgentHeader } from '@/components/agent/agent-header';
+import { AgentHeader } from '@/components/agent-ui/agent-header';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import type { City } from '@/lib/map/cities';
 import { itineraries } from '@/lib/map/itineraries';
 
-const MapCanvas = dynamic(
-  () => import('@/components/app/content-panels/map-canvas').then((m) => m.MapCanvas),
-  { ssr: false, loading: () => <div className="bg-beige-200 h-full w-full" /> }
-);
+const MapCanvas = dynamic(() => import('@/components/panels/map-canvas').then((m) => m.MapCanvas), {
+  ssr: false,
+  loading: () => <div className="bg-beige-200 h-full w-full" />,
+});
 
 function resolveItinerary(optionId: string, fallbackIndex: number) {
   const match = itineraries.find((i) => i.id === optionId);

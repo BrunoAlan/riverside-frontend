@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { type Root, createRoot } from 'react-dom/client';
 import maplibregl from 'maplibre-gl';
-import { CITY_CARD_WIDTH, CityCard } from '@/components/app/content-panels/city-card';
+import { CITY_CARD_WIDTH, CityCard } from '@/components/panels/city-card';
 import type { City } from '@/lib/map/cities';
 import { type ProjectedCity, clusterCities } from '@/lib/map/cluster-cities';
 

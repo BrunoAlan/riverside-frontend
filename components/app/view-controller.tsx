@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { ContentView } from '@/components/app/agent-ui/content-view';
+import { ContentView } from '@/components/agent-ui/content-view';
 import { WindowBackground } from '@/components/app/window-background';
 import { useUiView } from '@/lib/agent-ui/hooks';
 

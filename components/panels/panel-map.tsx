@@ -2,16 +2,13 @@
 
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { AgentHeader } from '@/components/agent/agent-header';
+import { AgentHeader } from '@/components/agent-ui/agent-header';
 import type { City } from '@/lib/map/cities';
 
-const MapCanvas = dynamic(
-  () => import('@/components/app/content-panels/map-canvas').then((m) => m.MapCanvas),
-  {
-    ssr: false,
-    loading: () => <div className="bg-beige-200 h-full w-full" />,
-  }
-);
+const MapCanvas = dynamic(() => import('@/components/panels/map-canvas').then((m) => m.MapCanvas), {
+  ssr: false,
+  loading: () => <div className="bg-beige-200 h-full w-full" />,
+});
 
 export function PanelMap() {
   const handleCityExpand = useCallback((city: City) => {
