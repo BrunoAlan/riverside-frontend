@@ -61,9 +61,13 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
         entries.length === nextKeys.length && entries.every((e, i) => e.key === nextKeys[i]);
       if (unchanged && entries.length > 0) return;
 
-      entries.forEach((e) => {
-        e.root.unmount();
-        e.marker.remove();
+      const stale = entries;
+      // Defer root.unmount so we never call it while React is rendering this layer.
+      queueMicrotask(() => {
+        stale.forEach((e) => {
+          e.root.unmount();
+          e.marker.remove();
+        });
       });
 
       entries = clusters.map((sorted, i) => {
@@ -85,9 +89,13 @@ export function CityCardLayer({ map, cities, onCityExpand }: CityCardLayerProps)
 
     return () => {
       map.off('zoom', syncMarkers);
-      entries.forEach((e) => {
-        e.root.unmount();
-        e.marker.remove();
+      const stale = entries;
+      entries = [];
+      queueMicrotask(() => {
+        stale.forEach((e) => {
+          e.root.unmount();
+          e.marker.remove();
+        });
       });
     };
   }, [map, cities]);
