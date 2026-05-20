@@ -1,9 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSetViewFromDev, useUiLastError, useUiSource, useUiView } from '@/lib/agent-ui/hooks';
+import {
+  useSetBookingSummaryFromDev,
+  useSetViewFromDev,
+  useUiLastError,
+  useUiSource,
+  useUiView,
+} from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
-import { VIEW_MOCKS } from './mocks';
+import { BOOKING_SUMMARY_MOCKS, VIEW_MOCKS } from './mocks';
 
 const VIEW_TYPES = Object.keys(VIEW_MOCKS) as UiView['type'][];
 
@@ -13,20 +19,28 @@ export function DevPanel() {
   const source = useUiSource();
   const lastError = useUiLastError();
   const setViewFromDev = useSetViewFromDev();
+  const setBookingSummaryFromDev = useSetBookingSummaryFromDev();
 
   const [type, setType] = useState<UiView['type']>(view.type);
   const mocks = VIEW_MOCKS[type];
   const [mockId, setMockId] = useState(mocks[0]?.id ?? '');
 
-  // Keep the selector in sync when the store view changes from outside (agent or Reset).
+  const [summaryMockId, setSummaryMockId] = useState(BOOKING_SUMMARY_MOCKS[0]?.id ?? '');
+
   useEffect(() => {
     setType(view.type);
     setMockId(VIEW_MOCKS[view.type][0]?.id ?? '');
   }, [view.type]);
 
-  const apply = () => {
+  const applyView = () => {
     const chosen = mocks.find((m) => m.id === mockId) ?? mocks[0];
     if (chosen) setViewFromDev(chosen.view);
+  };
+
+  const applySummary = () => {
+    const chosen =
+      BOOKING_SUMMARY_MOCKS.find((m) => m.id === summaryMockId) ?? BOOKING_SUMMARY_MOCKS[0];
+    if (chosen) setBookingSummaryFromDev(chosen.summary);
   };
 
   return (
@@ -84,8 +98,12 @@ export function DevPanel() {
             </select>
           </label>
           <div className="flex gap-2">
-            <button type="button" onClick={apply} className="flex-1 rounded bg-white text-black">
-              Apply
+            <button
+              type="button"
+              onClick={applyView}
+              className="flex-1 rounded bg-white text-black"
+            >
+              Apply view
             </button>
             <button
               type="button"
@@ -95,6 +113,30 @@ export function DevPanel() {
               Reset
             </button>
           </div>
+
+          <div className="mt-2 border-t border-white/20 pt-2">booking summary</div>
+          <label className="block">
+            mock
+            <select
+              className="mt-1 w-full bg-white/10 px-1 py-0.5"
+              value={summaryMockId}
+              onChange={(e) => setSummaryMockId(e.target.value)}
+            >
+              {BOOKING_SUMMARY_MOCKS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            onClick={applySummary}
+            className="w-full rounded bg-white text-black"
+          >
+            Apply summary
+          </button>
+
           {lastError && (
             <div className="rounded bg-red-900/60 p-1">last error: {lastError.message}</div>
           )}
