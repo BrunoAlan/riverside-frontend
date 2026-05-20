@@ -19,13 +19,13 @@ export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProp
   ];
 
   return (
-    <Card className="bg-beige-50 gap-0 overflow-hidden p-2.5">
+    <Card className="bg-beige-50 h-full min-h-0 gap-3 overflow-hidden p-2.5">
       <Image
         src={cabin.image}
         alt={cabin.name}
         width={420}
         height={260}
-        className="h-[200px] w-full rounded-lg object-cover"
+        className="h-[200px] min-h-0 w-full flex-1 rounded-lg object-cover lg:h-auto"
       />
       <div className="flex items-start justify-between gap-2 px-1 pt-3">
         <p className="font-display text-2xl leading-tight font-semibold">{cabin.name}</p>

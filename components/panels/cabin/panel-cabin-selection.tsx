@@ -11,8 +11,8 @@ export function PanelCabinSelection() {
   }, []);
 
   return (
-    <div className="bg-beige-200 h-full w-full overflow-y-auto">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="bg-beige-200 h-full w-full overflow-y-auto lg:overflow-hidden">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:h-full lg:auto-rows-fr lg:grid-cols-3">
         {cabins.map((cabin) => (
           <CabinCard key={cabin.id} cabin={cabin} onExpand={handleExpand} />
         ))}

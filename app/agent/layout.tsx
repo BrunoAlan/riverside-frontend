@@ -6,11 +6,11 @@ interface AgentLayoutProps {
 
 export default function AgentLayout({ children }: AgentLayoutProps) {
   return (
-    <div className="bg-beige-200 flex h-screen flex-col">
-      <div className="relative z-40">
+    <div className="bg-beige-200 relative h-screen overflow-hidden">
+      <main className="h-full">{children}</main>
+      <div className="pointer-events-none absolute top-0 left-1/2 z-40 -translate-x-1/2">
         <AgentHeader />
       </div>
-      <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
     </div>
   );
 }
