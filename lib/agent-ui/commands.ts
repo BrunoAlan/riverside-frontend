@@ -67,11 +67,17 @@ const SetBookingSummary = Base.extend({
   payload: BookingSummarySnapshot,
 });
 
+const SetCabinDetail = Base.extend({
+  type: z.literal('set_cabin_detail'),
+  payload: z.object({ cabin_id: z.string().nullable() }),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
   ShowItineraryOptions,
   ShowDreamStage,
   SetBookingSummary,
+  SetCabinDetail,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
