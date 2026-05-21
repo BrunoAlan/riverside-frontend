@@ -43,7 +43,7 @@ export function MapCanvas({
       style: parchmentStyle,
       center,
       zoom,
-      attributionControl: { compact: true },
+      attributionControl: false,
     });
 
     mapInstance.addControl(new maplibregl.NavigationControl(), 'bottom-right');
