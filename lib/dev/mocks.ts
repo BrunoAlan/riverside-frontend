@@ -16,11 +16,11 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
       view: {
         type: 'dream_stage',
         images: [
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '1 – Image Tag' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '2 – Image Tag' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '3 – Image Tag' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '4 – Image Tag' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: '5 – Image Tag' },
+          { src: '/dream/1.jpg', tag: '1 – Image Tag' },
+          { src: '/dream/2.jpg', tag: '2 – Image Tag' },
+          { src: '/dream/3.jpg', tag: '3 – Image Tag' },
+          { src: '/dream/4.jpg', tag: '4 – Image Tag' },
+          { src: '/dream/5.jpg', tag: '5 – Image Tag' },
         ],
       },
     },
@@ -30,9 +30,9 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
       view: {
         type: 'dream_stage',
         images: [
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: 'Venice' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: 'Budapest' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', tag: 'Vienna' },
+          { src: '/dream/1.jpg', tag: '1 – Image Tag' },
+          { src: '/dream/2.jpg', tag: '2 – Image Tag' },
+          { src: '/dream/3.jpg', tag: '3 – Image Tag' },
         ],
       },
     },
