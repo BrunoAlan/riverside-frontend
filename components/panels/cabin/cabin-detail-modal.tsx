@@ -2,7 +2,7 @@
 
 import { ArmchairIcon, BathtubIcon, BedIcon } from '@phosphor-icons/react';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { CABIN_DETAIL, type Cabin, formatCabinPrice } from '@/lib/cabins';
 
 type CabinDetailModalProps = {
@@ -48,6 +48,7 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
             <DialogTitle className="font-display text-3xl leading-tight font-semibold text-neutral-700">
               {cabin.name}
             </DialogTitle>
+            <DialogDescription className="sr-only">{cabin.name} cabin details</DialogDescription>
             <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
               {[
                 `${cabin.guests} guests`,
@@ -55,7 +56,7 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
                 `from ${formatCabinPrice(cabin.priceFrom)} EUR`,
                 cabin.view,
               ].map((item, index) => (
-                <span key={item} className="flex items-center gap-3">
+                <span key={index} className="flex items-center gap-3">
                   {index > 0 && <span className="bg-border h-3 w-px" aria-hidden />}
                   {item}
                 </span>

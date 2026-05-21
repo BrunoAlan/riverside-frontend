@@ -31,7 +31,7 @@ export function CabinDetailGallery({ images, alt }: CabinDetailGalleryProps) {
               key={src}
               type="button"
               aria-label={`Show image ${index + 1}`}
-              aria-current={index === activeIndex}
+              aria-pressed={index === activeIndex}
               onClick={() => setActiveIndex(index)}
               className={cn(
                 'relative h-16 w-24 shrink-0 overflow-hidden rounded-lg transition',
