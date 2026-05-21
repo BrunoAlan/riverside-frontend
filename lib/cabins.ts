@@ -69,3 +69,35 @@ export const cabins: Cabin[] = [
 export function formatCabinPrice(price: number): string {
   return new Intl.NumberFormat('en-US').format(price);
 }
+
+/**
+ * Shared placeholder detail content shown in the cabin detail modal.
+ * Reused by every cabin until per-cabin content exists.
+ */
+export const CABIN_DETAIL = {
+  gallery: ['/cabin-modal/1.png', '/cabin-modal/2.png', '/cabin-modal/3.png', '/cabin-modal/4.png'],
+  bedroom: [
+    'King-size bed (convertible to two twin beds)',
+    'King-size pillows and Superior Cotton linens',
+    'Beds face forward',
+  ],
+  bathroom: [
+    'Single vanity',
+    'Glass-enclosed shower with overhead and handheld showerhead',
+    'Luxurious terry robes, slippers and upscale amenities',
+    '220V power',
+    'Hairdryer',
+  ],
+  amenities: [
+    'Bedside table with convenient iPad',
+    'Closet with shelving and full-height hanging',
+    'In-suite safe',
+    'Writing desk/vanity area',
+    '40" wall-mounted flat-screen HD TV',
+    'Refrigerator',
+    'Nespresso coffee machine',
+    'Adjustable height/extendable coffee/dining table',
+    'Sofa',
+    'French Balcony',
+  ],
+} as const;
