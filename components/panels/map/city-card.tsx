@@ -16,7 +16,10 @@ type CityCardProps = {
 
 export function CityCard({ city, interactive = true, onExpand }: CityCardProps) {
   return (
-    <Card className="bg-beige-50 gap-0 overflow-hidden p-2.5" style={{ width: CITY_CARD_WIDTH }}>
+    <Card
+      className="bg-beige-50 border-beige-400/50 gap-0 overflow-hidden rounded-2xl p-2.5 shadow-none"
+      style={{ width: CITY_CARD_WIDTH }}
+    >
       <div className="relative">
         <Image
           src={city.image}
@@ -25,13 +28,13 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
           height={130}
           className="h-[130px] w-full rounded-lg object-cover"
         />
-        <span className="bg-background/90 absolute top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap shadow-sm">
+        <span className="bg-beige-200 text-primary absolute top-2 left-2 rounded-full px-3 py-1 text-sm whitespace-nowrap">
           {city.days}
         </span>
       </div>
       <div className="flex items-start justify-between gap-2 px-1 pt-3">
         <div>
-          <p className="text-lg leading-tight font-semibold">{city.name}</p>
+          <p className="text-base leading-tight">{city.name}</p>
           <p className="text-muted-foreground text-sm">{city.country}</p>
         </div>
         {interactive && (
