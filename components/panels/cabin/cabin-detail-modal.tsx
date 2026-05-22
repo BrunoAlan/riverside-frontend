@@ -1,5 +1,3 @@
-'use client';
-
 import { ArmchairIcon, BathtubIcon, BedIcon, XIcon } from '@phosphor-icons/react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
