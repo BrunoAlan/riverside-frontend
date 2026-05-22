@@ -1,8 +1,8 @@
 'use client';
 
-import { ArmchairIcon, BathtubIcon, BedIcon } from '@phosphor-icons/react';
+import { ArmchairIcon, BathtubIcon, BedIcon, XIcon } from '@phosphor-icons/react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { CABIN_DETAIL, type Cabin, formatCabinPrice } from '@/lib/cabins';
 
 type CabinDetailModalProps = {
@@ -38,17 +38,34 @@ function DetailSection({
 
 export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
   return (
-    <Dialog open={cabin != null} onOpenChange={(open) => !open && onClose()}>
+    <DialogPrimitive.Root
+      open={cabin != null}
+      onOpenChange={(open) => !open && onClose()}
+      modal={false}
+    >
       {cabin && (
-        <DialogContent className="flex max-h-[90vh] w-[95vw] max-w-5xl flex-col gap-0 overflow-hidden p-0 lg:h-[90vh] lg:flex-row">
-          <div className="h-72 shrink-0 sm:h-80 lg:h-auto lg:w-1/2">
+        <DialogPrimitive.Content
+          onInteractOutside={(event) => event.preventDefault()}
+          className="bg-beige-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 absolute inset-0 flex flex-col overflow-y-auto outline-none lg:flex-row lg:overflow-hidden"
+        >
+          <div className="h-72 shrink-0 sm:h-80 lg:h-auto lg:flex-1">
             <CabinDetailGallery images={[...CABIN_DETAIL.gallery]} alt={cabin.name} />
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-6 lg:w-1/2">
-            <DialogTitle className="font-display text-3xl leading-tight font-semibold text-neutral-700">
-              {cabin.name}
-            </DialogTitle>
-            <DialogDescription className="sr-only">{cabin.name} cabin details</DialogDescription>
+          <div className="p-6 lg:w-[400px] lg:shrink-0 lg:overflow-y-auto">
+            <div className="flex items-start justify-between gap-4">
+              <DialogPrimitive.Title className="font-display text-3xl leading-tight font-semibold text-neutral-700">
+                {cabin.name}
+              </DialogPrimitive.Title>
+              <DialogPrimitive.Close
+                aria-label="Close"
+                className="text-muted-foreground hover:bg-beige-300 focus-visible:ring-ring/50 -mt-1 -mr-1 flex size-8 shrink-0 items-center justify-center rounded-full transition-colors outline-none hover:text-neutral-700 focus-visible:ring-[3px]"
+              >
+                <XIcon size={18} />
+              </DialogPrimitive.Close>
+            </div>
+            <DialogPrimitive.Description className="sr-only">
+              {cabin.name} cabin details
+            </DialogPrimitive.Description>
             <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
               {[
                 `${cabin.guests} guests`,
@@ -68,8 +85,8 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
               <DetailSection icon={ArmchairIcon} title="Amenities" items={CABIN_DETAIL.amenities} />
             </div>
           </div>
-        </DialogContent>
+        </DialogPrimitive.Content>
       )}
-    </Dialog>
+    </DialogPrimitive.Root>
   );
 }
