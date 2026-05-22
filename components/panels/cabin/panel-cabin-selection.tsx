@@ -30,11 +30,13 @@ export function PanelCabinSelection({ view }: PanelCabinSelectionProps) {
     : null;
 
   return (
-    <div className="bg-beige-200 h-full w-full overflow-y-auto lg:overflow-hidden">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-6 gap-y-10 p-6 sm:grid-cols-2 lg:h-full lg:auto-rows-fr lg:grid-cols-3">
-        {cabins.map((cabin) => (
-          <CabinCard key={cabin.id} cabin={cabin} onExpand={handleExpand} />
-        ))}
+    <div className="bg-beige-200 relative h-full w-full overflow-hidden">
+      <div className="h-full overflow-y-auto" inert={detailCabin != null}>
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-6 gap-y-10 p-6 sm:grid-cols-2 lg:h-full lg:auto-rows-fr lg:grid-cols-3">
+          {cabins.map((cabin) => (
+            <CabinCard key={cabin.id} cabin={cabin} onExpand={handleExpand} />
+          ))}
+        </div>
       </div>
       <CabinDetailModal cabin={detailCabin} onClose={handleClose} />
     </div>
