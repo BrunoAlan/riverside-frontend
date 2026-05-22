@@ -1,4 +1,8 @@
 import { ArmchairIcon, BathtubIcon, BedIcon, XIcon } from '@phosphor-icons/react';
+// Radix dialog primitives directly, not the shadcn Dialog wrapper: that wrapper
+// hardcodes a fixed, body-portaled, viewport-wide overlay. This detail view must
+// stay confined to the cabin panel, so it renders inline (no Portal) with
+// modal={false} — keeping the bottom bar and voice input interactive.
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
 import { CABIN_DETAIL, type Cabin, formatCabinPrice } from '@/lib/cabins';
