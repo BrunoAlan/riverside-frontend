@@ -63,7 +63,14 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
       },
     },
   ],
-  cabin_selection: [{ id: 'default', label: 'All cabins', view: { type: 'cabin_selection' } }],
+  cabin_selection: [
+    { id: 'default', label: 'All cabins', view: { type: 'cabin_selection' } },
+    {
+      id: 'with_detail',
+      label: "Detail open (Owner's Suite)",
+      view: { type: 'cabin_selection', detailCabinId: 'owners-suite' },
+    },
+  ],
 };
 
 export interface BookingSummaryMock {

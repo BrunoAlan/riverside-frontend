@@ -190,3 +190,43 @@ describe('set_booking_summary', () => {
     expect(out.success).toBe(false);
   });
 });
+
+describe('set_cabin_detail', () => {
+  it('parses with a string cabin_id', () => {
+    const out = UiCommand.parse({
+      type: 'set_cabin_detail',
+      correlation_id: 'cd1',
+      payload: { cabin_id: 'owners-suite' },
+    });
+    if (out.type !== 'set_cabin_detail') throw new Error('discriminator failed');
+    expect(out.payload.cabin_id).toBe('owners-suite');
+  });
+
+  it('parses with a null cabin_id', () => {
+    const out = UiCommand.parse({
+      type: 'set_cabin_detail',
+      correlation_id: 'cd1',
+      payload: { cabin_id: null },
+    });
+    if (out.type !== 'set_cabin_detail') throw new Error('discriminator failed');
+    expect(out.payload.cabin_id).toBeNull();
+  });
+
+  it('rejects a missing cabin_id', () => {
+    const out = UiCommand.safeParse({
+      type: 'set_cabin_detail',
+      correlation_id: 'cd1',
+      payload: {},
+    });
+    expect(out.success).toBe(false);
+  });
+
+  it('rejects a numeric cabin_id', () => {
+    const out = UiCommand.safeParse({
+      type: 'set_cabin_detail',
+      correlation_id: 'cd1',
+      payload: { cabin_id: 42 },
+    });
+    expect(out.success).toBe(false);
+  });
+});

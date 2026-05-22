@@ -244,4 +244,41 @@ describe('ui-view-store', () => {
       expect(s.source).toBe('dev');
     });
   });
+
+  describe('cabin detail', () => {
+    it('applyCommand(set_cabin_detail) with a cabin_id opens the detail on cabin_selection', () => {
+      store.getState().applyCommand({
+        type: 'set_cabin_detail',
+        correlation_id: 'cd1',
+        payload: { cabin_id: 'owners-suite' },
+      });
+      const s = store.getState();
+      expect(s.view).toEqual({ type: 'cabin_selection', detailCabinId: 'owners-suite' });
+      expect(s.source).toBe('agent');
+      expect(s.lastCorrelationId).toBe('cd1');
+      expect(s.hint).toBeNull();
+    });
+
+    it('applyCommand(set_cabin_detail) with null closes the detail', () => {
+      store.getState().applyCommand({
+        type: 'set_cabin_detail',
+        correlation_id: 'cd2',
+        payload: { cabin_id: null },
+      });
+      expect(store.getState().view).toEqual({ type: 'cabin_selection' });
+    });
+
+    it('set_cabin_detail switches to cabin_selection from another view', () => {
+      store.getState().applyCommand({ type: 'show_discovery_canvas', correlation_id: 'c1' });
+      store.getState().applyCommand({
+        type: 'set_cabin_detail',
+        correlation_id: 'cd3',
+        payload: { cabin_id: 'mozart-suite' },
+      });
+      expect(store.getState().view).toEqual({
+        type: 'cabin_selection',
+        detailCabinId: 'mozart-suite',
+      });
+    });
+  });
 });

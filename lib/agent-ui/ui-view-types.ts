@@ -6,7 +6,7 @@ export type UiView =
   | { type: 'dream_stage'; images: DreamImage[] }
   | { type: 'itinerary' }
   | { type: 'compare_itinerary'; options: ItineraryOption[] }
-  | { type: 'cabin_selection' };
+  | { type: 'cabin_selection'; detailCabinId?: string };
 
 export type UiHint = { type: 'soft_redirect'; reasonCode: string; missing?: string[] };
 

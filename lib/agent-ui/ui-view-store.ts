@@ -69,6 +69,16 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
             };
+          case 'set_cabin_detail':
+            return {
+              view: {
+                type: 'cabin_selection',
+                detailCabinId: cmd.payload.cabin_id ?? undefined,
+              },
+              hint: null,
+              source: 'agent',
+              lastCorrelationId: cmd.correlation_id,
+            };
           default: {
             const _exhaustive: never = cmd;
             void _exhaustive;
