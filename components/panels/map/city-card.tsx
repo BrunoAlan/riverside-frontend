@@ -2,7 +2,9 @@ import Image from 'next/image';
 import { ArrowsOutSimpleIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import type { City } from '@/lib/map/cities';
+import { useUiViewStore } from '@/lib/agent-ui/ui-view-store';
+import type { AddOnDecision } from '@/lib/agent-ui/ui-view-types';
+import type { AddOn, City } from '@/lib/map/cities';
 
 // Fixed card width in px. Shared with the cluster layer so its grouping
 // threshold stays in sync with the actual rendered card size.
@@ -49,6 +51,68 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
           </Button>
         )}
       </div>
+      {city.addOns && city.addOns.length > 0 && (
+        <div className="mt-3 flex flex-col gap-2">
+          {city.addOns.map((addOn) => (
+            <AddOnBlock key={addOn.id} addOn={addOn} interactive={interactive} />
+          ))}
+        </div>
+      )}
     </Card>
+  );
+}
+
+type AddOnBlockProps = {
+  addOn: AddOn;
+  interactive: boolean;
+};
+
+function AddOnBlock({ addOn, interactive }: AddOnBlockProps) {
+  const decision = useUiViewStore((s) =>
+    s.view.type === 'itinerary' ? s.view.addOnDecisions[addOn.id] : undefined
+  );
+  const setAddOnDecision = useUiViewStore((s) => s.setAddOnDecision);
+
+  return (
+    <div data-testid={`add-on-${addOn.id}`} className="bg-beige-100 rounded-xl p-3">
+      <div className="text-muted-foreground flex items-center justify-between text-xs">
+        <span>Add-On</span>
+        <span>{addOn.day}</span>
+      </div>
+      <p className="text-primary mt-2 text-sm leading-snug">{addOn.title}</p>
+      {interactive && (
+        <AddOnActions addOnId={addOn.id} decision={decision} onDecide={setAddOnDecision} />
+      )}
+    </div>
+  );
+}
+
+type AddOnActionsProps = {
+  addOnId: string;
+  decision: AddOnDecision | undefined;
+  onDecide: (addOnId: string, decision: AddOnDecision) => void;
+};
+
+function AddOnActions({ addOnId, decision, onDecide }: AddOnActionsProps) {
+  if (decision === 'confirmed') {
+    return <p className="text-primary mt-3 text-xs">Confirmed</p>;
+  }
+  if (decision === 'rejected') {
+    return <p className="text-muted-foreground mt-3 text-xs">Rejected</p>;
+  }
+  return (
+    <div className="mt-3 flex gap-2">
+      <Button type="button" size="sm" onClick={() => onDecide(addOnId, 'confirmed')}>
+        Confirm
+      </Button>
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        onClick={() => onDecide(addOnId, 'rejected')}
+      >
+        Reject
+      </Button>
+    </div>
   );
 }
