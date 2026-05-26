@@ -49,7 +49,7 @@ export type City = {
 
 `addOns` is optional. Cities with no add-ons render exactly as today.
 
-The actual add-on data is hardcoded inside `lib/map/itineraries.ts`, not `cities.ts`, so the `cities` export keeps its current shape.
+The actual add-on data is hardcoded inside the `cities` array in `lib/map/cities.ts`, since `map-canvas` renders from that export. `lib/map/itineraries.ts` reuses the same `City` objects and inherits the add-ons automatically.
 
 ## View state
 
@@ -107,8 +107,8 @@ Tokens reuse what the card already uses: `bg-beige-*`, `text-primary`, `text-mut
 
 ## Files touched
 
-- `lib/map/cities.ts` — `AddOn` type; optional `addOns` on `City`.
-- `lib/map/itineraries.ts` — populate `addOns` on Vienna and Bratislava (using the copy from the reference screenshots). Wachau Valley deliberately left without add-ons to exercise the empty case.
+- `lib/map/cities.ts` — `AddOn` type; optional `addOns` on `City`; populate `addOns` on Vienna and Bratislava (using the copy from the reference screenshots). Wachau Valley deliberately left without add-ons to exercise the empty case.
+- `lib/map/itineraries.ts` — no changes needed; its local `City` literals get `addOns` if/when desired (left untouched for now).
 - `lib/agent-ui/ui-view-types.ts` — `AddOnDecision`; widen `itinerary` view with `addOnDecisions`.
 - `lib/agent-ui/ui-view-store.ts` — initialize `addOnDecisions: {}` whenever transitioning into `itinerary`; add `setAddOnDecision(id, decision)`.
 - `lib/dev/mocks.ts` — include `addOnDecisions: {}` in the itinerary mock(s).
