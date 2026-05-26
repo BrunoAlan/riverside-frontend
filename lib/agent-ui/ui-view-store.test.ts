@@ -211,7 +211,7 @@ describe('ui-view-store', () => {
         correlation_id: 'b1',
         payload: snapshot,
       });
-      store.getState().setViewFromDev({ type: 'itinerary' });
+      store.getState().setViewFromDev({ type: 'itinerary', addOnDecisions: {} });
       expect(store.getState().bookingSummary).toEqual(snapshot);
     });
 
@@ -279,6 +279,46 @@ describe('ui-view-store', () => {
         type: 'cabin_selection',
         detailCabinId: 'mozart-suite',
       });
+    });
+  });
+
+  describe('add-on decisions', () => {
+    it('setAddOnDecision writes confirmed into the active itinerary view', () => {
+      store.getState().setViewFromUser({ type: 'itinerary', addOnDecisions: {} });
+      store.getState().setAddOnDecision('vienna-chamber-music', 'confirmed');
+      expect(store.getState().view).toEqual({
+        type: 'itinerary',
+        addOnDecisions: { 'vienna-chamber-music': 'confirmed' },
+      });
+      expect(store.getState().source).toBe('user');
+    });
+
+    it('setAddOnDecision writes rejected and overwrites prior decisions', () => {
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        addOnDecisions: { 'vienna-chamber-music': 'confirmed' },
+      });
+      store.getState().setAddOnDecision('vienna-chamber-music', 'rejected');
+      expect(store.getState().view).toEqual({
+        type: 'itinerary',
+        addOnDecisions: { 'vienna-chamber-music': 'rejected' },
+      });
+    });
+
+    it('setAddOnDecision is a no-op when the active view is not itinerary', () => {
+      store.getState().setViewFromUser({ type: 'presentation' });
+      store.getState().setAddOnDecision('vienna-chamber-music', 'confirmed');
+      expect(store.getState().view).toEqual({ type: 'presentation' });
+    });
+
+    it('re-entering the itinerary view resets addOnDecisions', () => {
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        addOnDecisions: { 'vienna-chamber-music': 'confirmed' },
+      });
+      store.getState().setViewFromUser({ type: 'presentation' });
+      store.getState().setViewFromUser({ type: 'itinerary', addOnDecisions: {} });
+      expect(store.getState().view).toEqual({ type: 'itinerary', addOnDecisions: {} });
     });
   });
 });

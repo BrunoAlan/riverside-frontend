@@ -37,7 +37,7 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
       },
     },
   ],
-  itinerary: [{ id: 'default', label: 'Map', view: { type: 'itinerary' } }],
+  itinerary: [{ id: 'default', label: 'Map', view: { type: 'itinerary', addOnDecisions: {} } }],
   compare_itinerary: [
     {
       id: 'two_danube_options',
