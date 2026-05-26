@@ -211,7 +211,7 @@ describe('ui-view-store', () => {
         correlation_id: 'b1',
         payload: snapshot,
       });
-      store.getState().setViewFromDev({ type: 'itinerary' });
+      store.getState().setViewFromDev({ type: 'itinerary', addOnDecisions: {} });
       expect(store.getState().bookingSummary).toEqual(snapshot);
     });
 
