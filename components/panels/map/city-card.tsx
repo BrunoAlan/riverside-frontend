@@ -95,7 +95,7 @@ type AddOnActionsProps = {
 
 function AddOnActions({ addOnId, decision, onDecide }: AddOnActionsProps) {
   if (decision === 'confirmed') {
-    return <p className="text-primary mt-3 text-xs">Confirmed</p>;
+    return null;
   }
   if (decision === 'rejected') {
     return <p className="text-muted-foreground mt-3 text-xs">Rejected</p>;
