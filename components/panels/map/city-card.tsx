@@ -101,16 +101,16 @@ function AddOnActions({ addOnId, decision, onDecide }: AddOnActionsProps) {
     return <p className="text-muted-foreground mt-3 text-xs">Rejected</p>;
   }
   return (
-    <div className="mt-3 flex gap-2">
-      <Button type="button" size="sm" onClick={() => onDecide(addOnId, 'confirmed')}>
-        Confirm
-      </Button>
+    <div className="mt-3 flex items-center gap-2">
       <Button
         type="button"
         size="sm"
-        variant="outline"
-        onClick={() => onDecide(addOnId, 'rejected')}
+        variant="secondary"
+        onClick={() => onDecide(addOnId, 'confirmed')}
       >
+        Confirm
+      </Button>
+      <Button type="button" size="sm" variant="ghost" onClick={() => onDecide(addOnId, 'rejected')}>
         Reject
       </Button>
     </div>
