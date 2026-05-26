@@ -1,7 +1,7 @@
 import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 import type { UiCommand } from './commands';
-import type { BookingSummary, UiHint, UiSource, UiView } from './ui-view-types';
+import type { AddOnDecision, BookingSummary, UiHint, UiSource, UiView } from './ui-view-types';
 
 interface UiViewState {
   view: UiView;
@@ -16,6 +16,7 @@ interface UiViewState {
   setViewFromUser: (view: UiView) => void;
   setBookingSummaryFromDev: (summary: BookingSummary | null) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
+  setAddOnDecision: (addOnId: string, decision: AddOnDecision) => void;
 }
 
 const INITIAL_VIEW: UiView = { type: 'start' };
@@ -95,6 +96,18 @@ export function createUiViewStore() {
       set({ bookingSummary: summary, source: 'dev', lastCorrelationId: null }),
 
     recordParseError: (err) => set({ lastError: err }),
+
+    setAddOnDecision: (addOnId, decision) =>
+      set((state) => {
+        if (state.view.type !== 'itinerary') return {};
+        return {
+          view: {
+            type: 'itinerary',
+            addOnDecisions: { ...state.view.addOnDecisions, [addOnId]: decision },
+          },
+          source: 'user',
+        };
+      }),
   }));
 }
 
