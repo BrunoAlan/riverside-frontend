@@ -120,12 +120,7 @@ Tokens reuse what the card already uses: `bg-beige-*`, `text-primary`, `text-mut
   - `setAddOnDecision` writes into the active `itinerary` view's `addOnDecisions`.
   - `setAddOnDecision` is a no-op when the active view is not `itinerary`.
   - Re-entering `itinerary` resets `addOnDecisions` to `{}`.
-- `components/panels/map/city-card.test.tsx` (new if not present):
-  - Renders one block per add-on with the correct day and title.
-  - Clicking `Confirm` flips the block into the confirmed state and hides the action buttons.
-  - Clicking `Reject` flips the block into the rejected state and hides the action buttons.
-  - Renders no action buttons when `interactive={false}`.
-  - Cities without `addOns` render no add-on section.
+- No component test: the project's vitest config is `environment: 'node'`, with no jsdom / `@testing-library/react` installed, and no existing `.test.tsx` files. Setting that infra up is out of scope (YAGNI). Card behavior is verified manually via the dev panel.
 
 ## Risks / open questions
 
