@@ -15,6 +15,7 @@ import { useChatTranscription } from '@/hooks/use-chat-transcription';
 import { useDebugMode } from '@/hooks/use-debug';
 import { useUiView } from '@/lib/agent-ui/hooks';
 import { useUiCommandTransport } from '@/lib/agent-ui/transport';
+import { useDevChatMessages } from '@/lib/dev/chat-mock-store';
 import { DevPanel } from '@/lib/dev/dev-panel';
 import { getSandboxTokenSource } from '@/lib/utils';
 
@@ -27,15 +28,13 @@ function AppSetup() {
   return null;
 }
 
-function ChatDockInner() {
-  const { messages, sendMessage } = useChatTranscription();
-  return <ChatDock messages={messages} onSubmit={sendMessage} />;
-}
-
 function ChatDockContainer() {
   const view = useUiView();
+  const { messages: liveMessages, sendMessage } = useChatTranscription();
+  const mockMessages = useDevChatMessages();
   if (view.type === 'start') return null;
-  return <ChatDockInner />;
+  const messages = mockMessages ?? liveMessages;
+  return <ChatDock messages={messages} onSubmit={sendMessage} />;
 }
 
 interface AppProps {
