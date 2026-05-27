@@ -26,9 +26,13 @@ export function useChatTranscription(): UseChatTranscription {
       const localIdentity = room.localParticipant?.identity;
       const role: ChatMessage['role'] =
         participantInfo.identity === localIdentity ? 'user' : 'agent';
-      const content = await reader.readAll();
       const id = reader.info.id;
-      setMessages((list) => appendMessage(list, { id, role, content }));
+      let content = '';
+      for await (const partial of reader) {
+        content = partial;
+        setMessages((list) => appendMessage(list, { id, role, content, streaming: true }));
+      }
+      setMessages((list) => appendMessage(list, { id, role, content, streaming: false }));
     };
 
     room.registerTextStreamHandler(CHAT_TOPIC, handler);
