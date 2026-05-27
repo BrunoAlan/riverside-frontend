@@ -4,6 +4,7 @@ import { Track } from 'livekit-client';
 import { MessageSquare, Mic, MicOff, PhoneOff } from 'lucide-react';
 import { useSessionContext, useTrackToggle } from '@livekit/components-react';
 import { Button } from '@/components/ui/button';
+import { useSetViewFromUser } from '@/lib/agent-ui/hooks';
 import { cn } from '@/lib/shadcn/utils';
 
 export type ChatControlsProps = {
@@ -17,6 +18,7 @@ const buttonBase =
 
 function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps) {
   const session = useSessionContext();
+  const setView = useSetViewFromUser();
   const {
     enabled: micEnabled,
     toggle: toggleMic,
@@ -25,8 +27,9 @@ function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps
     source: Track.Source.Microphone,
   });
 
-  const handleEndCall = () => {
-    void session.end();
+  const handleEndCall = async () => {
+    await session.end();
+    setView({ type: 'start' });
   };
 
   const handleToggleMic = () => {
@@ -39,7 +42,7 @@ function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps
         type="button"
         size="icon"
         variant="destructive"
-        onClick={handleEndCall}
+        onClick={() => void handleEndCall()}
         aria-label="End call"
         className={cn(buttonBase)}
       >
