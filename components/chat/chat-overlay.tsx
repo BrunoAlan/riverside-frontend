@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { ChatAgentMessage } from '@/components/chat/chat-agent-message';
 import { ChatInput } from '@/components/chat/chat-input';
@@ -12,71 +12,73 @@ import { cn } from '@/lib/shadcn/utils';
 export type ChatOverlayProps = {
   messages: ChatMessage[];
   onSubmit: (text: string) => void;
+  transcriptCollapsed: boolean;
+  onToggleTranscript: () => void;
   className?: string;
 };
 
 const fadeMask = 'linear-gradient(to top, black 60%, transparent)';
 
-function ChatOverlay({ messages, onSubmit, className }: ChatOverlayProps) {
-  const [collapsed, setCollapsed] = useState(false);
+function ChatOverlay({
+  messages,
+  onSubmit,
+  transcriptCollapsed,
+  onToggleTranscript,
+  className,
+}: ChatOverlayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (collapsed) return;
+    if (transcriptCollapsed) return;
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [messages, collapsed]);
-
-  const hasMessages = messages.length > 0;
+  }, [messages, transcriptCollapsed]);
 
   return (
     <div
       data-slot="chat-overlay"
       className={cn(
-        'pointer-events-none absolute bottom-4 left-4 z-20 flex w-[360px] flex-col gap-2',
+        'bg-background/40 pointer-events-auto flex w-[360px] flex-col overflow-hidden rounded-2xl border border-white/10 shadow-sm backdrop-blur-md',
         className
       )}
     >
-      {hasMessages ? (
-        <div className="relative flex justify-end">
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? 'Expand chat' : 'Collapse chat'}
-            aria-expanded={!collapsed}
-            className="bg-background/40 pointer-events-auto size-7 rounded-full border border-white/10 backdrop-blur-md"
-          >
-            {collapsed ? <ChevronUp /> : <ChevronDown />}
-          </Button>
-        </div>
-      ) : null}
-
-      {!collapsed && hasMessages ? (
-        <div
-          aria-live="polite"
-          className="bg-background/40 rounded-2xl border border-white/10 shadow-sm backdrop-blur-md"
+      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
+        <span className="text-sm font-medium">Conversation history</span>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={onToggleTranscript}
+          aria-label={transcriptCollapsed ? 'Expand transcript' : 'Collapse transcript'}
+          aria-expanded={!transcriptCollapsed}
+          aria-controls="chat-transcript"
+          className="size-7 rounded-full"
         >
-          <div
-            ref={scrollRef}
-            className="flex max-h-[50vh] flex-col gap-3 overflow-y-auto px-3 py-3"
-            style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
-          >
-            {messages.map((m) =>
-              m.role === 'user' ? (
-                <ChatUserMessage key={m.id}>{m.content}</ChatUserMessage>
-              ) : (
-                <ChatAgentMessage key={m.id}>{m.content}</ChatAgentMessage>
-              )
-            )}
-          </div>
+          {transcriptCollapsed ? <ChevronDown /> : <ChevronUp />}
+        </Button>
+      </div>
+
+      {!transcriptCollapsed ? (
+        <div
+          id="chat-transcript"
+          ref={scrollRef}
+          aria-live="polite"
+          className="flex max-h-[50vh] flex-col gap-3 overflow-y-auto px-3 py-3"
+          style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
+        >
+          {messages.map((m) =>
+            m.role === 'user' ? (
+              <ChatUserMessage key={m.id}>{m.content}</ChatUserMessage>
+            ) : (
+              <ChatAgentMessage key={m.id}>{m.content}</ChatAgentMessage>
+            )
+          )}
         </div>
       ) : null}
 
       <ChatInput
-        className="pointer-events-auto"
+        className="rounded-none border-0 border-t border-white/10 bg-transparent"
         placeholder="Type here to exit voice mode..."
         onSubmit={onSubmit}
       />
