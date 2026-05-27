@@ -1,60 +1,76 @@
 'use client';
 
 import { useEffect } from 'react';
-import type { TextStreamHandler } from 'livekit-client';
+import { RoomEvent } from 'livekit-client';
 import { useMaybeRoomContext } from '@livekit/components-react';
-import { UiCommand } from './commands';
-import { uiViewStore } from './ui-view-store';
 
 const TOPIC = 'ui-commands';
 
-interface ReaderLike {
-  readAll: () => Promise<string>;
-}
-
-type ApplyFn = (cmd: import('./commands').UiCommand) => void;
-type RecordErrorFn = (err: { correlationId?: string; message: string }) => void;
-
-export async function handleUiCommandStream(
-  reader: ReaderLike,
-  applyCommand: ApplyFn,
-  recordError: RecordErrorFn
-): Promise<void> {
-  const raw = await reader.readAll();
-  console.log('[ui-debug] ui-commands raw', raw);
-  let json: unknown;
-  try {
-    json = JSON.parse(raw);
-  } catch (e) {
-    recordError({ message: `JSON parse error: ${(e as Error).message}` });
-    return;
-  }
-  const result = UiCommand.safeParse(json);
-  console.log('[ui-debug] ui-commands parsed', { ok: result.success, json });
-  if (!result.success) {
-    const correlationId =
-      typeof json === 'object' && json !== null && 'correlation_id' in json
-        ? String((json as { correlation_id?: unknown }).correlation_id)
-        : undefined;
-    recordError({ correlationId, message: result.error.message });
-    return;
-  }
-  applyCommand(result.data);
+interface EnvelopeLike {
+  correlationId?: unknown;
+  sessionId?: unknown;
+  timestamp?: unknown;
+  commands?: unknown;
 }
 
 export function useUiCommandTransport(): void {
   const room = useMaybeRoomContext();
   useEffect(() => {
     if (!room) return;
-    const handler: TextStreamHandler = (reader) => {
-      const { applyCommand, recordParseError } = uiViewStore.getState();
-      handleUiCommandStream(reader, applyCommand, recordParseError).catch((e) => {
-        recordParseError({ message: `transport error: ${(e as Error).message}` });
+
+    const handler = (
+      payload: Uint8Array,
+      _participant?: unknown,
+      _kind?: unknown,
+      topic?: string
+    ) => {
+      if (topic !== TOPIC) return;
+
+      let text: string;
+      try {
+        text = new TextDecoder().decode(payload);
+      } catch (e) {
+        console.warn('[ui-commands] decode error', e);
+        return;
+      }
+
+      let envelope: EnvelopeLike;
+      try {
+        envelope = JSON.parse(text) as EnvelopeLike;
+      } catch (e) {
+        console.warn('[ui-commands] JSON parse error', { error: e, text });
+        return;
+      }
+
+      const commands = Array.isArray(envelope.commands) ? envelope.commands : [];
+      const correlationId =
+        typeof envelope.correlationId === 'string' ? envelope.correlationId : undefined;
+
+      if (commands.length === 0) {
+        console.debug('[ui-commands] empty envelope', { correlationId });
+        return;
+      }
+
+      console.log('[ui-commands] envelope', {
+        correlationId,
+        sessionId: envelope.sessionId,
+        timestamp: envelope.timestamp,
+        count: commands.length,
       });
+
+      for (const command of commands) {
+        const c = command as { type?: unknown; correlationId?: unknown; payload?: unknown };
+        console.log('[ui-commands] command', {
+          type: c.type,
+          correlationId: c.correlationId,
+          payload: c.payload,
+        });
+      }
     };
-    room.registerTextStreamHandler(TOPIC, handler);
+
+    room.on(RoomEvent.DataReceived, handler);
     return () => {
-      room.unregisterTextStreamHandler(TOPIC);
+      room.off(RoomEvent.DataReceived, handler);
     };
   }, [room]);
 }
