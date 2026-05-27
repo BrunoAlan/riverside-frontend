@@ -1,41 +1,112 @@
-import { describe, expect, it, vi } from 'vitest';
-import { handleUiCommandStream } from './transport';
+import { describe, expect, it } from 'vitest';
+import { dispatchEnvelope } from './transport';
+import { createUiViewStore } from './ui-view-store';
 
-function fakeReader(payload: string) {
-  return { readAll: async () => payload } as { readAll: () => Promise<string> };
-}
+const validDestinationDetail = {
+  type: 'show_destination_detail',
+  correlationId: 'cmd-1',
+  payload: {
+    destination: {
+      id: 'vienna',
+      name: 'Vienna',
+      country: 'Austria',
+      region: 'Danube',
+      aliases: ['City of Music'],
+    },
+    images: [
+      {
+        url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+        caption: 'Vienna at dusk',
+      },
+    ],
+  },
+};
 
-describe('handleUiCommandStream', () => {
-  it('parses valid JSON command and forwards to applyCommand', async () => {
-    const apply = vi.fn();
-    const recordError = vi.fn();
-    const reader = fakeReader(
-      JSON.stringify({ type: 'show_discovery_canvas', correlation_id: 'c1' })
+describe('dispatchEnvelope', () => {
+  it('applies a valid command and updates the store view', () => {
+    const store = createUiViewStore();
+    dispatchEnvelope(
+      { correlationId: 'env-1', commands: [validDestinationDetail] },
+      store.getState()
     );
-    await handleUiCommandStream(reader, apply, recordError);
-    expect(apply).toHaveBeenCalledTimes(1);
-    expect(apply.mock.calls[0][0].type).toBe('show_discovery_canvas');
-    expect(recordError).not.toHaveBeenCalled();
+    const s = store.getState();
+    expect(s.view).toEqual({
+      type: 'dream_stage',
+      destination: validDestinationDetail.payload.destination,
+      images: validDestinationDetail.payload.images,
+    });
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('cmd-1');
+    expect(s.lastError).toBeNull();
   });
 
-  it('records error and does not call applyCommand for invalid JSON', async () => {
-    const apply = vi.fn();
-    const recordError = vi.fn();
-    await handleUiCommandStream(fakeReader('not json'), apply, recordError);
-    expect(apply).not.toHaveBeenCalled();
-    expect(recordError).toHaveBeenCalledTimes(1);
-    expect(recordError.mock.calls[0][0].message).toMatch(/JSON/i);
+  it('records a parse error for an unknown command type without changing the view', () => {
+    const store = createUiViewStore();
+    dispatchEnvelope(
+      {
+        correlationId: 'env-2',
+        commands: [{ type: 'show_welcome_canvas', correlationId: 'cmd-2', payload: {} }],
+      },
+      store.getState()
+    );
+    const s = store.getState();
+    expect(s.view).toEqual({ type: 'start' });
+    expect(s.lastCorrelationId).toBeNull();
+    expect(s.lastError).not.toBeNull();
+    expect(s.lastError?.correlationId).toBe('cmd-2');
   });
 
-  it('records error for valid JSON that fails schema', async () => {
-    const apply = vi.fn();
-    const recordError = vi.fn();
-    await handleUiCommandStream(
-      fakeReader(JSON.stringify({ type: 'unknown_type', correlation_id: 'c1' })),
-      apply,
-      recordError
+  it('records a parse error for a malformed payload', () => {
+    const store = createUiViewStore();
+    dispatchEnvelope(
+      {
+        correlationId: 'env-3',
+        commands: [
+          {
+            type: 'show_destination_detail',
+            correlationId: 'cmd-3',
+            payload: {
+              images: [
+                {
+                  url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+                  caption: 'x',
+                },
+              ],
+            },
+          },
+        ],
+      },
+      store.getState()
     );
-    expect(apply).not.toHaveBeenCalled();
-    expect(recordError).toHaveBeenCalledTimes(1);
+    const s = store.getState();
+    expect(s.view).toEqual({ type: 'start' });
+    expect(s.lastError).not.toBeNull();
+    expect(s.lastError?.correlationId).toBe('cmd-3');
+  });
+
+  it('applies commands in order; last view-changing command wins', () => {
+    const store = createUiViewStore();
+    dispatchEnvelope(
+      {
+        correlationId: 'env-4',
+        commands: [
+          { type: 'show_discovery_canvas', correlationId: 'cmd-a' },
+          validDestinationDetail,
+        ],
+      },
+      store.getState()
+    );
+    const s = store.getState();
+    expect(s.view.type).toBe('dream_stage');
+    expect(s.lastCorrelationId).toBe('cmd-1');
+  });
+
+  it('does not throw when commands is missing or not an array', () => {
+    const store = createUiViewStore();
+    expect(() => dispatchEnvelope({ correlationId: 'env-5' }, store.getState())).not.toThrow();
+    expect(() =>
+      dispatchEnvelope({ correlationId: 'env-6', commands: 'not-an-array' }, store.getState())
+    ).not.toThrow();
+    expect(store.getState().view).toEqual({ type: 'start' });
   });
 });

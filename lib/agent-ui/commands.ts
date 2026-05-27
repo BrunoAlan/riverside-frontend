@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 const Base = z.object({
-  correlation_id: z.string(),
-  session_id: z.string().optional(),
+  correlationId: z.string(),
+  sessionId: z.string().optional(),
 });
 
 const ShowDiscoveryCanvas = Base.extend({
@@ -32,15 +32,27 @@ const ShowItineraryOptions = Base.extend({
   payload: z.object({ options: z.array(ItineraryOption).min(1) }),
 });
 
-export const DreamImage = z.object({
-  src: z.string().url(),
-  tag: z.string(),
+export const Destination = z.object({
+  id: z.string(),
+  name: z.string(),
+  country: z.string(),
+  region: z.string(),
+  aliases: z.array(z.string()),
 });
-export type DreamImage = z.infer<typeof DreamImage>;
+export type Destination = z.infer<typeof Destination>;
 
-const ShowDreamStage = Base.extend({
-  type: z.literal('show_dream_stage'),
-  payload: z.object({ images: z.array(DreamImage).min(1).max(5) }),
+export const DestinationImage = z.object({
+  url: z.string().url(),
+  caption: z.string(),
+});
+export type DestinationImage = z.infer<typeof DestinationImage>;
+
+const ShowDestinationDetail = Base.extend({
+  type: z.literal('show_destination_detail'),
+  payload: z.object({
+    destination: Destination,
+    images: z.array(DestinationImage).min(1),
+  }),
 });
 
 export const BookingSummarySnapshot = z.object({
@@ -76,7 +88,7 @@ export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
   ShowItineraryOptions,
-  ShowDreamStage,
+  ShowDestinationDetail,
   SetBookingSummary,
   SetCabinDetail,
 ]);

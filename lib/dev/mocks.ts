@@ -12,27 +12,39 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
   dream_stage: [
     {
       id: 'default',
-      label: 'Dream collage (5 images)',
+      label: 'Vienna detail (4 images)',
       view: {
         type: 'dream_stage',
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: ['City of Music'],
+        },
         images: [
-          { src: '/dream/1.jpg', tag: '1 – Image Tag' },
-          { src: '/dream/2.jpg', tag: '2 – Image Tag' },
-          { src: '/dream/3.jpg', tag: '3 – Image Tag' },
-          { src: '/dream/4.jpg', tag: '4 – Image Tag' },
-          { src: '/dream/5.jpg', tag: '5 – Image Tag' },
+          { url: '/dream/1.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/2.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/3.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/4.jpg', caption: 'FOCUS' },
         ],
       },
     },
     {
-      id: 'three_images',
-      label: 'Partial collage (3 images)',
+      id: 'partial',
+      label: 'Vienna detail (2 images)',
       view: {
         type: 'dream_stage',
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: ['City of Music'],
+        },
         images: [
-          { src: '/dream/1.jpg', tag: '1 – Image Tag' },
-          { src: '/dream/2.jpg', tag: '2 – Image Tag' },
-          { src: '/dream/3.jpg', tag: '3 – Image Tag' },
+          { url: '/dream/1.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/2.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
         ],
       },
     },

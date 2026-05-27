@@ -20,7 +20,7 @@ describe('ui-view-store', () => {
   it('applyCommand(show_discovery_canvas) maps to presentation view', () => {
     store.getState().applyCommand({
       type: 'show_discovery_canvas',
-      correlation_id: 'c1',
+      correlationId: 'c1',
     });
     const s = store.getState();
     expect(s.view).toEqual({ type: 'presentation' });
@@ -32,7 +32,7 @@ describe('ui-view-store', () => {
   it('applyCommand(show_itinerary_options) maps to compare_itinerary view', () => {
     store.getState().applyCommand({
       type: 'show_itinerary_options',
-      correlation_id: 'c2',
+      correlationId: 'c2',
       payload: {
         options: [
           {
@@ -61,23 +61,49 @@ describe('ui-view-store', () => {
     expect(s.source).toBe('agent');
   });
 
-  it('applyCommand(show_dream_stage) maps payload images into view', () => {
+  it('applyCommand(show_destination_detail) maps destination and images into view', () => {
     store.getState().applyCommand({
-      type: 'show_dream_stage',
-      correlation_id: 'd1',
+      type: 'show_destination_detail',
+      correlationId: 'd1',
       payload: {
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: ['City of Music'],
+        },
         images: [
-          { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+          {
+            url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+            caption: 'Vienna at dusk',
+          },
+          {
+            url: 'https://res.cloudinary.com/demo/image/upload/b.jpg',
+            caption: 'Riverside terrace',
+          },
         ],
       },
     });
     const s = store.getState();
     expect(s.view).toEqual({
       type: 'dream_stage',
+      destination: {
+        id: 'vienna',
+        name: 'Vienna',
+        country: 'Austria',
+        region: 'Danube',
+        aliases: ['City of Music'],
+      },
       images: [
-        { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
-        { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+          caption: 'Vienna at dusk',
+        },
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/b.jpg',
+          caption: 'Riverside terrace',
+        },
       ],
     });
     expect(s.source).toBe('agent');
@@ -87,11 +113,11 @@ describe('ui-view-store', () => {
   it('applyCommand(soft_redirect) sets hint without changing view', () => {
     store.getState().applyCommand({
       type: 'show_discovery_canvas',
-      correlation_id: 'c1',
+      correlationId: 'c1',
     });
     store.getState().applyCommand({
       type: 'soft_redirect',
-      correlation_id: 'c2',
+      correlationId: 'c2',
       payload: { reason_code: 'MISSING_DATE', missing: ['dates'] },
     });
     const s = store.getState();
@@ -107,12 +133,12 @@ describe('ui-view-store', () => {
   it('non-hint command clears existing hint', () => {
     store.getState().applyCommand({
       type: 'soft_redirect',
-      correlation_id: 'c1',
+      correlationId: 'c1',
       payload: { reason_code: 'MISSING_DATE' },
     });
     store.getState().applyCommand({
       type: 'show_discovery_canvas',
-      correlation_id: 'c2',
+      correlationId: 'c2',
     });
     expect(store.getState().hint).toBeNull();
   });
@@ -120,16 +146,40 @@ describe('ui-view-store', () => {
   it('setViewFromDev sets view + dev source and clears lastCorrelationId', () => {
     store.getState().applyCommand({
       type: 'show_discovery_canvas',
-      correlation_id: 'c1',
+      correlationId: 'c1',
     });
     store.getState().setViewFromDev({
       type: 'dream_stage',
-      images: [{ src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'A' }],
+      destination: {
+        id: 'vienna',
+        name: 'Vienna',
+        country: 'Austria',
+        region: 'Danube',
+        aliases: [],
+      },
+      images: [
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+          caption: 'A',
+        },
+      ],
     });
     const s = store.getState();
     expect(s.view).toEqual({
       type: 'dream_stage',
-      images: [{ src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'A' }],
+      destination: {
+        id: 'vienna',
+        name: 'Vienna',
+        country: 'Austria',
+        region: 'Danube',
+        aliases: [],
+      },
+      images: [
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+          caption: 'A',
+        },
+      ],
     });
     expect(s.source).toBe('dev');
     expect(s.lastCorrelationId).toBeNull();
@@ -174,7 +224,7 @@ describe('ui-view-store', () => {
     it('applyCommand(set_booking_summary) stores the snapshot and tags source agent', () => {
       store.getState().applyCommand({
         type: 'set_booking_summary',
-        correlation_id: 'b1',
+        correlationId: 'b1',
         payload: snapshot,
       });
       const s = store.getState();
@@ -184,10 +234,10 @@ describe('ui-view-store', () => {
     });
 
     it('set_booking_summary does not change view or hint', () => {
-      store.getState().applyCommand({ type: 'show_discovery_canvas', correlation_id: 'c1' });
+      store.getState().applyCommand({ type: 'show_discovery_canvas', correlationId: 'c1' });
       store.getState().applyCommand({
         type: 'set_booking_summary',
-        correlation_id: 'b1',
+        correlationId: 'b1',
         payload: snapshot,
       });
       const s = store.getState();
@@ -198,17 +248,17 @@ describe('ui-view-store', () => {
     it('other commands do not clear bookingSummary', () => {
       store.getState().applyCommand({
         type: 'set_booking_summary',
-        correlation_id: 'b1',
+        correlationId: 'b1',
         payload: snapshot,
       });
-      store.getState().applyCommand({ type: 'show_discovery_canvas', correlation_id: 'c2' });
+      store.getState().applyCommand({ type: 'show_discovery_canvas', correlationId: 'c2' });
       expect(store.getState().bookingSummary).toEqual(snapshot);
     });
 
     it('setViewFromDev does not clear bookingSummary', () => {
       store.getState().applyCommand({
         type: 'set_booking_summary',
-        correlation_id: 'b1',
+        correlationId: 'b1',
         payload: snapshot,
       });
       store.getState().setViewFromDev({ type: 'itinerary', addOnDecisions: {} });
@@ -218,7 +268,7 @@ describe('ui-view-store', () => {
     it('setViewFromUser does not clear bookingSummary', () => {
       store.getState().applyCommand({
         type: 'set_booking_summary',
-        correlation_id: 'b1',
+        correlationId: 'b1',
         payload: snapshot,
       });
       store.getState().setViewFromUser({ type: 'presentation' });
@@ -228,7 +278,7 @@ describe('ui-view-store', () => {
     it('setBookingSummaryFromDev(null) clears the summary and tags source dev', () => {
       store.getState().applyCommand({
         type: 'set_booking_summary',
-        correlation_id: 'b1',
+        correlationId: 'b1',
         payload: snapshot,
       });
       store.getState().setBookingSummaryFromDev(null);
@@ -249,7 +299,7 @@ describe('ui-view-store', () => {
     it('applyCommand(set_cabin_detail) with a cabin_id opens the detail on cabin_selection', () => {
       store.getState().applyCommand({
         type: 'set_cabin_detail',
-        correlation_id: 'cd1',
+        correlationId: 'cd1',
         payload: { cabin_id: 'owners-suite' },
       });
       const s = store.getState();
@@ -262,17 +312,17 @@ describe('ui-view-store', () => {
     it('applyCommand(set_cabin_detail) with null closes the detail', () => {
       store.getState().applyCommand({
         type: 'set_cabin_detail',
-        correlation_id: 'cd2',
+        correlationId: 'cd2',
         payload: { cabin_id: null },
       });
       expect(store.getState().view).toEqual({ type: 'cabin_selection' });
     });
 
     it('set_cabin_detail switches to cabin_selection from another view', () => {
-      store.getState().applyCommand({ type: 'show_discovery_canvas', correlation_id: 'c1' });
+      store.getState().applyCommand({ type: 'show_discovery_canvas', correlationId: 'c1' });
       store.getState().applyCommand({
         type: 'set_cabin_detail',
-        correlation_id: 'cd3',
+        correlationId: 'cd3',
         payload: { cabin_id: 'mozart-suite' },
       });
       expect(store.getState().view).toEqual({

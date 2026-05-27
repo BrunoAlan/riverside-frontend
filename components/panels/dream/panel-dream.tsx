@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import Image from 'next/image';
-import type { DreamImage } from '@/lib/agent-ui/commands';
+import type { DestinationImage } from '@/lib/agent-ui/commands';
 
 interface DreamSlot {
   /** Desktop collage position, as CSS length strings (percentages). */
@@ -22,10 +22,10 @@ const DREAM_SLOTS: DreamSlot[] = [
 ];
 
 interface PanelDreamProps {
-  images: DreamImage[];
+  images: DestinationImage[];
 }
 
-function DreamMask({ image, index }: { image: DreamImage; index: number }) {
+function DreamMask({ image, index }: { image: DestinationImage; index: number }) {
   const maskPathRef = useRef<SVGPathElement | null>(null);
 
   const glowPathRef = useRef<SVGPathElement | null>(null);
@@ -161,8 +161,8 @@ function DreamMask({ image, index }: { image: DreamImage; index: number }) {
       <foreignObject width="100%" height="100%" mask={`url(#${maskId})`}>
         <div className="relative h-full w-full">
           <Image
-            src={image.src}
-            alt={image.tag}
+            src={image.url}
+            alt={image.caption}
             fill
             priority={index === 0}
             sizes="(max-width: 768px) 85vw, 35vw"
@@ -201,7 +201,7 @@ export function PanelDream({ images }: PanelDreamProps) {
 
           return (
             <div
-              key={`${index}-${image.src}`}
+              key={`${index}-${image.url}`}
               style={positionVars}
               className="relative mx-auto h-64 w-[85%] shrink-0 overflow-visible md:absolute md:top-[var(--dream-top)] md:left-[var(--dream-left)] md:mx-0 md:h-[var(--dream-height)] md:w-[var(--dream-width)]"
             >
@@ -212,7 +212,7 @@ export function PanelDream({ images }: PanelDreamProps) {
 
               {/* Floating tag */}
               <span className="bg-beige-900/60 absolute bottom-[20%] left-[20%] z-20 rounded-full px-4 py-2 text-xs text-white backdrop-blur-md">
-                {image.tag}
+                {image.caption}
               </span>
             </div>
           );
