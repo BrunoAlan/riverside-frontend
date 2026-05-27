@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { RoomEvent } from 'livekit-client';
 import { useMaybeRoomContext } from '@livekit/components-react';
+import { UiCommand } from './commands';
+import { uiViewStore } from './ui-view-store';
 
 const TOPIC = 'ui-commands';
 
@@ -11,6 +13,29 @@ interface EnvelopeLike {
   sessionId?: unknown;
   timestamp?: unknown;
   commands?: unknown;
+}
+
+type Store = Pick<ReturnType<typeof uiViewStore.getState>, 'applyCommand' | 'recordParseError'>;
+
+export function dispatchEnvelope(envelope: EnvelopeLike, store: Store): void {
+  const commands = Array.isArray(envelope.commands) ? envelope.commands : [];
+  for (const raw of commands) {
+    const result = UiCommand.safeParse(raw);
+    if (result.success) {
+      store.applyCommand(result.data);
+      console.log('[ui-commands] applied', {
+        type: result.data.type,
+        correlationId: result.data.correlationId,
+        payload: result.data.payload,
+      });
+    } else {
+      const r = raw as { correlationId?: unknown };
+      const correlationId = typeof r.correlationId === 'string' ? r.correlationId : undefined;
+      const message = result.error.issues.map((i) => i.message).join('; ');
+      store.recordParseError({ correlationId, message });
+      console.warn('[ui-commands] parse error', { correlationId, message, raw });
+    }
+  }
 }
 
 export function useUiCommandTransport(): void {
@@ -42,30 +67,14 @@ export function useUiCommandTransport(): void {
         return;
       }
 
-      const commands = Array.isArray(envelope.commands) ? envelope.commands : [];
-      const correlationId =
-        typeof envelope.correlationId === 'string' ? envelope.correlationId : undefined;
-
-      if (commands.length === 0) {
-        console.debug('[ui-commands] empty envelope', { correlationId });
-        return;
-      }
-
       console.log('[ui-commands] envelope', {
-        correlationId,
+        correlationId: envelope.correlationId,
         sessionId: envelope.sessionId,
         timestamp: envelope.timestamp,
-        count: commands.length,
+        count: Array.isArray(envelope.commands) ? envelope.commands.length : 0,
       });
 
-      for (const command of commands) {
-        const c = command as { type?: unknown; correlationId?: unknown; payload?: unknown };
-        console.log('[ui-commands] command', {
-          type: c.type,
-          correlationId: c.correlationId,
-          payload: c.payload,
-        });
-      }
+      dispatchEnvelope(envelope, uiViewStore.getState());
     };
 
     room.on(RoomEvent.DataReceived, handler);

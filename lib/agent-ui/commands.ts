@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 const Base = z.object({
-  correlation_id: z.string(),
-  session_id: z.string().optional(),
+  correlationId: z.string(),
+  sessionId: z.string().optional(),
 });
 
 const ShowDiscoveryCanvas = Base.extend({

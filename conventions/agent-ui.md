@@ -34,7 +34,7 @@ LiveKit text stream  ──▶  transport.ts  ──▶  Zod parse  ──▶  u
 2. [`transport.ts`](../lib/agent-ui/transport.ts) reads the stream, `JSON.parse`s, validates with the `UiCommand` Zod union, and either:
    - calls `applyCommand(cmd)` on the store, or
    - calls `recordParseError(...)` if the payload is invalid.
-3. `applyCommand` is a pure reducer (`switch` on `cmd.type`) that produces the next `UiView` and stores the `correlation_id`.
+3. `applyCommand` is a pure reducer (`switch` on `cmd.type`) that produces the next `UiView` and stores the `correlationId`.
 4. [`ContentView`](../components/agent-ui/content-view.tsx) reads the current view and renders `VIEW_REGISTRY[view.type]`.
 
 ## Sources of truth
@@ -53,7 +53,7 @@ The reducer is exhaustively type-checked — adding a new `UiCommand` variant wi
 ## Things to keep in mind
 
 - The store is a **singleton** (`uiViewStore`). For tests, use `createUiViewStore()` to get a fresh instance.
-- `commands.ts` uses **snake_case** because it mirrors the wire protocol. `ui-view-types.ts` uses **camelCase** because it's internal.
+- `commands.ts` mirrors the wire protocol. Envelope-level fields (`correlationId`, `sessionId`) are **camelCase** because that's what the backend sends today. Payload fields stay **snake_case** until the backend confirms otherwise. `ui-view-types.ts` is **camelCase** because it's internal.
 - A command may update only the `hint` (e.g. `soft_redirect`) and leave `view` untouched.
 - Never read from LiveKit directly outside `transport.ts`. Always go through the store.
 

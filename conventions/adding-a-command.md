@@ -4,7 +4,7 @@ A "command" is a message the backend agent sends to the frontend over the LiveKi
 
 ## Checklist
 
-1. **Agree on the wire shape with the backend.** Snake_case fields. Must include `correlation_id: string` (Base requires it) and optionally `session_id: string`.
+1. **Agree on the wire shape with the backend.** Envelope-level fields (`correlationId`, `sessionId`) are camelCase to match the wire; payload fields are snake_case until the backend confirms otherwise. Must include `correlationId: string` (Base requires it) and optionally `sessionId: string`.
 
 2. **Define the Zod schema** in [`lib/agent-ui/commands.ts`](../lib/agent-ui/commands.ts):
 

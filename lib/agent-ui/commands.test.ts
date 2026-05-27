@@ -5,16 +5,16 @@ describe('UiCommand schema', () => {
   it('parses show_discovery_canvas with empty payload', () => {
     const result = UiCommand.parse({
       type: 'show_discovery_canvas',
-      correlation_id: 'abc-123',
+      correlationId: 'abc-123',
     });
     expect(result.type).toBe('show_discovery_canvas');
-    expect(result.correlation_id).toBe('abc-123');
+    expect(result.correlationId).toBe('abc-123');
   });
 
   it('parses soft_redirect with reason_code and missing', () => {
     const result = UiCommand.parse({
       type: 'soft_redirect',
-      correlation_id: 'abc-123',
+      correlationId: 'abc-123',
       payload: { reason_code: 'MISSING_DATE_PREFERENCE', missing: ['dates'] },
     });
     if (result.type !== 'soft_redirect') throw new Error('discriminator failed');
@@ -25,7 +25,7 @@ describe('UiCommand schema', () => {
   it('parses show_itinerary_options with one option', () => {
     const result = UiCommand.parse({
       type: 'show_itinerary_options',
-      correlation_id: 'abc-123',
+      correlationId: 'abc-123',
       payload: {
         options: [
           {
@@ -46,7 +46,7 @@ describe('UiCommand schema', () => {
   it('parses show_destination_detail with destination and images', () => {
     const result = UiCommand.parse({
       type: 'show_destination_detail',
-      correlation_id: 'd1',
+      correlationId: 'd1',
       payload: {
         destination: {
           id: 'vienna',
@@ -77,7 +77,7 @@ describe('UiCommand schema', () => {
   it('rejects show_destination_detail with non-url image url', () => {
     const out = UiCommand.safeParse({
       type: 'show_destination_detail',
-      correlation_id: 'd1',
+      correlationId: 'd1',
       payload: {
         destination: {
           id: 'vienna',
@@ -95,7 +95,7 @@ describe('UiCommand schema', () => {
   it('rejects show_destination_detail with empty images array', () => {
     const out = UiCommand.safeParse({
       type: 'show_destination_detail',
-      correlation_id: 'd1',
+      correlationId: 'd1',
       payload: {
         destination: {
           id: 'vienna',
@@ -113,7 +113,7 @@ describe('UiCommand schema', () => {
   it('accepts show_destination_detail with more than 5 images', () => {
     const out = UiCommand.safeParse({
       type: 'show_destination_detail',
-      correlation_id: 'd1',
+      correlationId: 'd1',
       payload: {
         destination: {
           id: 'vienna',
@@ -134,7 +134,7 @@ describe('UiCommand schema', () => {
   it('rejects show_destination_detail with missing destination fields', () => {
     const out = UiCommand.safeParse({
       type: 'show_destination_detail',
-      correlation_id: 'd1',
+      correlationId: 'd1',
       payload: {
         destination: {
           id: 'vienna',
@@ -157,7 +157,7 @@ describe('UiCommand schema', () => {
   it('rejects show_itinerary_options with zero options', () => {
     const out = UiCommand.safeParse({
       type: 'show_itinerary_options',
-      correlation_id: 'abc-123',
+      correlationId: 'abc-123',
       payload: { options: [] },
     });
     expect(out.success).toBe(false);
@@ -166,7 +166,7 @@ describe('UiCommand schema', () => {
   it('rejects unknown command type', () => {
     const out = UiCommand.safeParse({
       type: 'totally_made_up',
-      correlation_id: 'abc-123',
+      correlationId: 'abc-123',
     });
     expect(out.success).toBe(false);
   });
@@ -196,7 +196,7 @@ describe('set_booking_summary', () => {
   it('parses a fully populated snapshot', () => {
     const out = UiCommand.parse({
       type: 'set_booking_summary',
-      correlation_id: 'b1',
+      correlationId: 'b1',
       payload: validPayload,
     });
     if (out.type !== 'set_booking_summary') throw new Error('discriminator failed');
@@ -208,7 +208,7 @@ describe('set_booking_summary', () => {
   it('accepts null for all nullable fields', () => {
     const out = UiCommand.safeParse({
       type: 'set_booking_summary',
-      correlation_id: 'b1',
+      correlationId: 'b1',
       payload: {
         ...validPayload,
         people: null,
@@ -225,7 +225,7 @@ describe('set_booking_summary', () => {
   it('accepts an empty slots array', () => {
     const out = UiCommand.safeParse({
       type: 'set_booking_summary',
-      correlation_id: 'b1',
+      correlationId: 'b1',
       payload: { ...validPayload, slots: [] },
     });
     expect(out.success).toBe(true);
@@ -235,7 +235,7 @@ describe('set_booking_summary', () => {
     const tooMany = Array.from({ length: 7 }, () => ({ label: 'x', state: 'empty' as const }));
     const out = UiCommand.safeParse({
       type: 'set_booking_summary',
-      correlation_id: 'b1',
+      correlationId: 'b1',
       payload: { ...validPayload, slots: tooMany },
     });
     expect(out.success).toBe(false);
@@ -244,7 +244,7 @@ describe('set_booking_summary', () => {
   it('rejects unknown slot state', () => {
     const out = UiCommand.safeParse({
       type: 'set_booking_summary',
-      correlation_id: 'b1',
+      correlationId: 'b1',
       payload: {
         ...validPayload,
         slots: [{ label: 'x', state: 'pending' as unknown as 'active' }],
@@ -256,7 +256,7 @@ describe('set_booking_summary', () => {
   it('rejects negative stops.extra', () => {
     const out = UiCommand.safeParse({
       type: 'set_booking_summary',
-      correlation_id: 'b1',
+      correlationId: 'b1',
       payload: { ...validPayload, stops: { primary: 'X', extra: -1 } },
     });
     expect(out.success).toBe(false);
@@ -267,7 +267,7 @@ describe('set_cabin_detail', () => {
   it('parses with a string cabin_id', () => {
     const out = UiCommand.parse({
       type: 'set_cabin_detail',
-      correlation_id: 'cd1',
+      correlationId: 'cd1',
       payload: { cabin_id: 'owners-suite' },
     });
     if (out.type !== 'set_cabin_detail') throw new Error('discriminator failed');
@@ -277,7 +277,7 @@ describe('set_cabin_detail', () => {
   it('parses with a null cabin_id', () => {
     const out = UiCommand.parse({
       type: 'set_cabin_detail',
-      correlation_id: 'cd1',
+      correlationId: 'cd1',
       payload: { cabin_id: null },
     });
     if (out.type !== 'set_cabin_detail') throw new Error('discriminator failed');
@@ -287,7 +287,7 @@ describe('set_cabin_detail', () => {
   it('rejects a missing cabin_id', () => {
     const out = UiCommand.safeParse({
       type: 'set_cabin_detail',
-      correlation_id: 'cd1',
+      correlationId: 'cd1',
       payload: {},
     });
     expect(out.success).toBe(false);
@@ -296,7 +296,7 @@ describe('set_cabin_detail', () => {
   it('rejects a numeric cabin_id', () => {
     const out = UiCommand.safeParse({
       type: 'set_cabin_detail',
-      correlation_id: 'cd1',
+      correlationId: 'cd1',
       payload: { cabin_id: 42 },
     });
     expect(out.success).toBe(false);

@@ -38,14 +38,14 @@ export function createUiViewStore() {
               view: { type: 'presentation' },
               hint: null,
               source: 'agent',
-              lastCorrelationId: cmd.correlation_id,
+              lastCorrelationId: cmd.correlationId,
             };
           case 'show_itinerary_options':
             return {
               view: { type: 'compare_itinerary', options: cmd.payload.options },
               hint: null,
               source: 'agent',
-              lastCorrelationId: cmd.correlation_id,
+              lastCorrelationId: cmd.correlationId,
             };
           case 'show_destination_detail':
             return {
@@ -56,7 +56,7 @@ export function createUiViewStore() {
               },
               hint: null,
               source: 'agent',
-              lastCorrelationId: cmd.correlation_id,
+              lastCorrelationId: cmd.correlationId,
             };
           case 'soft_redirect':
             return {
@@ -66,13 +66,13 @@ export function createUiViewStore() {
                 missing: cmd.payload.missing,
               },
               source: 'agent',
-              lastCorrelationId: cmd.correlation_id,
+              lastCorrelationId: cmd.correlationId,
             };
           case 'set_booking_summary':
             return {
               bookingSummary: cmd.payload,
               source: 'agent',
-              lastCorrelationId: cmd.correlation_id,
+              lastCorrelationId: cmd.correlationId,
             };
           case 'set_cabin_detail':
             return {
@@ -82,7 +82,7 @@ export function createUiViewStore() {
               },
               hint: null,
               source: 'agent',
-              lastCorrelationId: cmd.correlation_id,
+              lastCorrelationId: cmd.correlationId,
             };
           default: {
             const _exhaustive: never = cmd;
