@@ -9,8 +9,9 @@ import {
 import { ChatAgentMessage } from '@/components/chat/chat-agent-message';
 import { ChatUserMessage } from '@/components/chat/chat-user-message';
 import { AgentChatIndicator } from '@/components/livekit/agent-chat-indicator';
+import type { ChatMessage } from '@/lib/chat/messages';
 
-export type { ChatMessage } from '@/lib/chat/messages';
+export type { ChatMessage };
 
 export type ChatProps = {
   messages: ChatMessage[];
