@@ -3,10 +3,10 @@ import { TokenSource } from 'livekit-client';
 import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import type { AppConfig } from '@/app-config';
 
-export const CONFIG_ENDPOINT = process.env.NEXT_PUBLIC_APP_CONFIG_ENDPOINT;
-export const SANDBOX_ID = process.env.SANDBOX_ID;
+const CONFIG_ENDPOINT = process.env.NEXT_PUBLIC_APP_CONFIG_ENDPOINT;
+const SANDBOX_ID = process.env.SANDBOX_ID;
 
-export interface SandboxConfig {
+interface SandboxConfig {
   [key: string]:
     | { type: 'string'; value: string }
     | { type: 'number'; value: number }
