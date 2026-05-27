@@ -71,7 +71,7 @@ function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps
         aria-pressed={isChatOpen}
         className={cn(
           buttonBase,
-          isChatOpen ? 'bg-foreground text-background' : 'bg-background/40'
+          isChatOpen ? 'bg-primary text-primary-foreground' : 'bg-background/40'
         )}
       >
         <MessageSquare />
