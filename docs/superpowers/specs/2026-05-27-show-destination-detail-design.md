@@ -85,7 +85,7 @@ const ShowDestinationDetail = Base.extend({
   type: z.literal('show_destination_detail'),
   payload: z.object({
     destination: Destination,
-    images: z.array(DestinationImage).min(1).max(5),
+    images: z.array(DestinationImage).min(1),
   }),
 });
 ```
@@ -93,10 +93,12 @@ const ShowDestinationDetail = Base.extend({
 Swap `ShowDestinationDetail` in for `ShowDreamStage` in the `UiCommand`
 discriminated union. Remove the `DreamImage` export.
 
-Image-count bounds (`min(1).max(5)`) are kept from the previous schema:
-`PanelDream` slices to its 5 collage slots, so >5 wastes payload and 0
-images means there's nothing to render. If the backend regularly sends
-more we can revisit, but bounding loudly is better than silently dropping.
+Only the lower bound (`min(1)`) is enforced: a zero-image payload has
+nothing to render and is clearly a backend bug, but the upper bound is
+left to the panel. `PanelDream` slices to `DREAM_SLOTS.length` (5)
+already; duplicating that cap in the schema would throw away the whole
+command — including `destination` — over what is really a cosmetic
+limit. Extras beyond the slot count are silently ignored by the panel.
 
 ### 2. `lib/agent-ui/ui-view-types.ts`
 
@@ -153,8 +155,12 @@ from the live Vienna payload. One full collage (4–5 images), one partial
     both `destination` and `images` round-trip.
   - Rename and update `rejects show_dream_stage with non-url src` →
     `rejects show_destination_detail with non-url image url`.
-  - Rename and update `rejects show_dream_stage with more than 5 images`
-    accordingly.
+  - Drop `rejects show_dream_stage with more than 5 images` — the cap
+    moves to `PanelDream`, the schema no longer enforces it.
+  - Add: `rejects show_destination_detail with empty images array` —
+    guards the remaining `min(1)` bound.
+  - Add: `accepts show_destination_detail with more than 5 images` —
+    pins the new lenient behaviour so it doesn't silently regress.
   - Add: `rejects show_destination_detail with missing destination fields`
     (e.g. drop `country`) — guards the new required shape.
 - `lib/agent-ui/ui-view-store.test.ts`:
