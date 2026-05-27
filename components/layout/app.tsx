@@ -27,11 +27,15 @@ function AppSetup() {
   return null;
 }
 
+function ChatOverlayInner() {
+  const { messages, sendMessage } = useChatTranscription();
+  return <ChatOverlay messages={messages} onSubmit={sendMessage} />;
+}
+
 function ChatOverlayContainer() {
   const view = useUiView();
-  const { messages, sendMessage } = useChatTranscription();
   if (view.type === 'start') return null;
-  return <ChatOverlay messages={messages} onSubmit={sendMessage} />;
+  return <ChatOverlayInner />;
 }
 
 interface AppProps {

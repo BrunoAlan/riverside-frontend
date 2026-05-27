@@ -12,16 +12,9 @@ export type ChatOverlayProps = {
   className?: string;
 };
 
-function findLast<T>(list: T[], predicate: (item: T) => boolean): T | undefined {
-  for (let i = list.length - 1; i >= 0; i--) {
-    if (predicate(list[i])) return list[i];
-  }
-  return undefined;
-}
-
 function ChatOverlay({ messages, onSubmit, className }: ChatOverlayProps) {
-  const lastUser = findLast(messages, (m) => m.role === 'user');
-  const lastAgent = findLast(messages, (m) => m.role === 'agent');
+  const lastUser = messages.findLast((m) => m.role === 'user');
+  const lastAgent = messages.findLast((m) => m.role === 'agent');
 
   const fadeMask = 'linear-gradient(to top, black 60%, transparent)';
 

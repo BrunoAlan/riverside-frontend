@@ -22,22 +22,17 @@ export function useChatTranscription(): UseChatTranscription {
   useEffect(() => {
     if (!room) return;
 
-    const makeHandler =
-      (role: ChatMessage['role']): TextStreamHandler =>
-      async (reader, participantInfo) => {
-        const localIdentity = room.localParticipant?.identity;
-        const isLocal = participantInfo.identity === localIdentity;
-        const resolvedRole: ChatMessage['role'] = isLocal ? 'user' : role;
-        const content = await reader.readAll();
-        const id = reader.info.id;
-        setMessages((list) => appendMessage(list, { id, role: resolvedRole, content }));
-      };
+    const handler: TextStreamHandler = async (reader, participantInfo) => {
+      const localIdentity = room.localParticipant?.identity;
+      const role: ChatMessage['role'] =
+        participantInfo.identity === localIdentity ? 'user' : 'agent';
+      const content = await reader.readAll();
+      const id = reader.info.id;
+      setMessages((list) => appendMessage(list, { id, role, content }));
+    };
 
-    const chatHandler = makeHandler('user');
-    const transcriptionHandler = makeHandler('agent');
-
-    room.registerTextStreamHandler(CHAT_TOPIC, chatHandler);
-    room.registerTextStreamHandler(TRANSCRIPTION_TOPIC, transcriptionHandler);
+    room.registerTextStreamHandler(CHAT_TOPIC, handler);
+    room.registerTextStreamHandler(TRANSCRIPTION_TOPIC, handler);
 
     return () => {
       room.unregisterTextStreamHandler(CHAT_TOPIC);
