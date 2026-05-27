@@ -27,6 +27,7 @@ This file is the entry point for AI coding agents (Claude Code, Cursor, Copilot,
 - **Don't reach into LiveKit transport details** outside `lib/agent-ui/transport.ts`. The rest of the app talks to `uiViewStore`.
 - **Tests live next to the code** they cover (`foo.ts` ↔ `foo.test.ts`).
 - **Don't commit secrets.** `.env.local` is gitignored — keep it that way.
+- **Never push to `main` (direct or via PR merge) without a clean `pnpm lint` and `pnpm test`.** Run both locally, confirm they pass, and only then push or merge. If either fails, fix the root cause — don't disable rules, skip tests, or use `--no-verify` to bypass.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
