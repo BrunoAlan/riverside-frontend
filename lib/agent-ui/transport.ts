@@ -21,6 +21,7 @@ export async function handleUiCommandStream(
   recordError: RecordErrorFn
 ): Promise<void> {
   const raw = await reader.readAll();
+  console.log('[ui-debug] ui-commands raw', raw);
   let json: unknown;
   try {
     json = JSON.parse(raw);
@@ -29,6 +30,7 @@ export async function handleUiCommandStream(
     return;
   }
   const result = UiCommand.safeParse(json);
+  console.log('[ui-debug] ui-commands parsed', { ok: result.success, json });
   if (!result.success) {
     const correlationId =
       typeof json === 'object' && json !== null && 'correlation_id' in json
