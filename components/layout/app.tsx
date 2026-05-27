@@ -5,7 +5,7 @@ import { TokenSource } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
 import { BookingSummaryContainer } from '@/components/agent-ui/booking-summary';
-import { ChatOverlay } from '@/components/chat/chat-overlay';
+import { ChatDock } from '@/components/chat/chat-dock';
 import { AppConfigProvider } from '@/components/layout/app-config-context';
 import { ViewController } from '@/components/layout/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
@@ -27,15 +27,15 @@ function AppSetup() {
   return null;
 }
 
-function ChatOverlayInner() {
+function ChatDockInner() {
   const { messages, sendMessage } = useChatTranscription();
-  return <ChatOverlay messages={messages} onSubmit={sendMessage} />;
+  return <ChatDock messages={messages} onSubmit={sendMessage} />;
 }
 
-function ChatOverlayContainer() {
+function ChatDockContainer() {
   const view = useUiView();
   if (view.type === 'start') return null;
-  return <ChatOverlayInner />;
+  return <ChatDockInner />;
 }
 
 interface AppProps {
@@ -61,7 +61,7 @@ export function App({ appConfig }: AppProps) {
         <div className="flex h-full flex-col">
           <div className="relative min-h-0 flex-1">
             <ViewController />
-            <ChatOverlayContainer />
+            <ChatDockContainer />
           </div>
           <BookingSummaryContainer />
         </div>
