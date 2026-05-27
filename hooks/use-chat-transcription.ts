@@ -28,8 +28,8 @@ export function useChatTranscription(): UseChatTranscription {
         participantInfo.identity === localIdentity ? 'user' : 'agent';
       const id = reader.info.id;
       let content = '';
-      for await (const partial of reader) {
-        content = partial;
+      for await (const chunk of reader) {
+        content += chunk;
         setMessages((list) => appendMessage(list, { id, role, content, streaming: true }));
       }
       setMessages((list) => appendMessage(list, { id, role, content, streaming: false }));
