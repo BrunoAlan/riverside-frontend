@@ -61,23 +61,49 @@ describe('ui-view-store', () => {
     expect(s.source).toBe('agent');
   });
 
-  it('applyCommand(show_dream_stage) maps payload images into view', () => {
+  it('applyCommand(show_destination_detail) maps destination and images into view', () => {
     store.getState().applyCommand({
-      type: 'show_dream_stage',
+      type: 'show_destination_detail',
       correlation_id: 'd1',
       payload: {
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: ['City of Music'],
+        },
         images: [
-          { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+          {
+            url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+            caption: 'Vienna at dusk',
+          },
+          {
+            url: 'https://res.cloudinary.com/demo/image/upload/b.jpg',
+            caption: 'Riverside terrace',
+          },
         ],
       },
     });
     const s = store.getState();
     expect(s.view).toEqual({
       type: 'dream_stage',
+      destination: {
+        id: 'vienna',
+        name: 'Vienna',
+        country: 'Austria',
+        region: 'Danube',
+        aliases: ['City of Music'],
+      },
       images: [
-        { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
-        { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+          caption: 'Vienna at dusk',
+        },
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/b.jpg',
+          caption: 'Riverside terrace',
+        },
       ],
     });
     expect(s.source).toBe('agent');
@@ -124,12 +150,36 @@ describe('ui-view-store', () => {
     });
     store.getState().setViewFromDev({
       type: 'dream_stage',
-      images: [{ src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'A' }],
+      destination: {
+        id: 'vienna',
+        name: 'Vienna',
+        country: 'Austria',
+        region: 'Danube',
+        aliases: [],
+      },
+      images: [
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+          caption: 'A',
+        },
+      ],
     });
     const s = store.getState();
     expect(s.view).toEqual({
       type: 'dream_stage',
-      images: [{ src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'A' }],
+      destination: {
+        id: 'vienna',
+        name: 'Vienna',
+        country: 'Austria',
+        region: 'Danube',
+        aliases: [],
+      },
+      images: [
+        {
+          url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+          caption: 'A',
+        },
+      ],
     });
     expect(s.source).toBe('dev');
     expect(s.lastCorrelationId).toBeNull();

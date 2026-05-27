@@ -47,9 +47,13 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,
             };
-          case 'show_dream_stage':
+          case 'show_destination_detail':
             return {
-              view: { type: 'dream_stage', images: cmd.payload.images },
+              view: {
+                type: 'dream_stage',
+                destination: cmd.payload.destination,
+                images: cmd.payload.images,
+              },
               hint: null,
               source: 'agent',
               lastCorrelationId: cmd.correlation_id,

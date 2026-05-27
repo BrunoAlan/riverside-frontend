@@ -43,40 +43,112 @@ describe('UiCommand schema', () => {
     expect(result.payload.options[0].id).toBe('majesty_of_the_danube');
   });
 
-  it('parses show_dream_stage with 1-5 images', () => {
+  it('parses show_destination_detail with destination and images', () => {
     const result = UiCommand.parse({
-      type: 'show_dream_stage',
+      type: 'show_destination_detail',
       correlation_id: 'd1',
       payload: {
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: ['City of Music'],
+        },
         images: [
-          { src: 'https://res.cloudinary.com/demo/image/upload/a.jpg', tag: 'Venice' },
-          { src: 'https://res.cloudinary.com/demo/image/upload/b.jpg', tag: 'Budapest' },
+          {
+            url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+            caption: 'Vienna at dusk',
+          },
+          {
+            url: 'https://res.cloudinary.com/demo/image/upload/b.jpg',
+            caption: 'Riverside terrace',
+          },
         ],
       },
     });
-    if (result.type !== 'show_dream_stage') throw new Error('discriminator failed');
+    if (result.type !== 'show_destination_detail') throw new Error('discriminator failed');
+    expect(result.payload.destination.name).toBe('Vienna');
+    expect(result.payload.destination.aliases).toEqual(['City of Music']);
     expect(result.payload.images).toHaveLength(2);
-    expect(result.payload.images[0].src).toMatch(/^https:\/\//);
+    expect(result.payload.images[0].url).toMatch(/^https:\/\//);
   });
 
-  it('rejects show_dream_stage with non-url src', () => {
+  it('rejects show_destination_detail with non-url image url', () => {
     const out = UiCommand.safeParse({
-      type: 'show_dream_stage',
+      type: 'show_destination_detail',
       correlation_id: 'd1',
-      payload: { images: [{ src: '/dream/1.jpg', tag: 'Venice' }] },
+      payload: {
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: [],
+        },
+        images: [{ url: '/dream/1.jpg', caption: 'Vienna' }],
+      },
     });
     expect(out.success).toBe(false);
   });
 
-  it('rejects show_dream_stage with more than 5 images', () => {
+  it('rejects show_destination_detail with empty images array', () => {
     const out = UiCommand.safeParse({
-      type: 'show_dream_stage',
+      type: 'show_destination_detail',
       correlation_id: 'd1',
       payload: {
-        images: Array.from({ length: 6 }, (_, i) => ({
-          src: `https://res.cloudinary.com/demo/image/upload/${i}.jpg`,
-          tag: String(i),
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: [],
+        },
+        images: [],
+      },
+    });
+    expect(out.success).toBe(false);
+  });
+
+  it('accepts show_destination_detail with more than 5 images', () => {
+    const out = UiCommand.safeParse({
+      type: 'show_destination_detail',
+      correlation_id: 'd1',
+      payload: {
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          region: 'Danube',
+          aliases: [],
+        },
+        images: Array.from({ length: 7 }, (_, i) => ({
+          url: `https://res.cloudinary.com/demo/image/upload/${i}.jpg`,
+          caption: String(i),
         })),
+      },
+    });
+    expect(out.success).toBe(true);
+  });
+
+  it('rejects show_destination_detail with missing destination fields', () => {
+    const out = UiCommand.safeParse({
+      type: 'show_destination_detail',
+      correlation_id: 'd1',
+      payload: {
+        destination: {
+          id: 'vienna',
+          name: 'Vienna',
+          // country missing
+          region: 'Danube',
+          aliases: [],
+        },
+        images: [
+          {
+            url: 'https://res.cloudinary.com/demo/image/upload/a.jpg',
+            caption: 'Vienna',
+          },
+        ],
       },
     });
     expect(out.success).toBe(false);
