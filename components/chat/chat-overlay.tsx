@@ -79,7 +79,6 @@ function ChatOverlay({
 
       <ChatInput
         className="rounded-none border-0 border-t border-white/10 bg-transparent"
-        placeholder="Type here to exit voice mode..."
         onSubmit={onSubmit}
       />
     </div>
