@@ -5,10 +5,11 @@ import { cn } from '@/lib/shadcn/utils';
 
 export type ChatAgentMessageProps = {
   children: React.ReactNode;
+  streaming?: boolean;
   className?: string;
 };
 
-function ChatAgentMessage({ children, className }: ChatAgentMessageProps) {
+function ChatAgentMessage({ children, streaming, className }: ChatAgentMessageProps) {
   return (
     <p
       data-slot="chat-agent-message"
@@ -18,6 +19,11 @@ function ChatAgentMessage({ children, className }: ChatAgentMessageProps) {
       )}
     >
       {children}
+      {streaming ? (
+        <span aria-hidden="true" className="ml-1 animate-pulse">
+          …
+        </span>
+      ) : null}
     </p>
   );
 }

@@ -10,11 +10,7 @@ import { ChatAgentMessage } from '@/components/chat/chat-agent-message';
 import { ChatUserMessage } from '@/components/chat/chat-user-message';
 import { AgentChatIndicator } from '@/components/livekit/agent-chat-indicator';
 
-export type ChatMessage = {
-  id: string;
-  role: 'user' | 'agent';
-  content: string;
-};
+export type { ChatMessage } from '@/lib/chat/messages';
 
 export type ChatProps = {
   messages: ChatMessage[];
