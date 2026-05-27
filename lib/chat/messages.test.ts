@@ -25,4 +25,11 @@ describe('appendMessage', () => {
     const next = appendMessage(list, msg('a', 'user', 'hi'));
     expect(next).toBe(list);
   });
+
+  it('returns a new array when only the streaming flag changes', () => {
+    const list: ChatMessage[] = [{ id: 'a', role: 'agent', content: 'hi', streaming: true }];
+    const next = appendMessage(list, { id: 'a', role: 'agent', content: 'hi', streaming: false });
+    expect(next).not.toBe(list);
+    expect(next[0]).toEqual({ id: 'a', role: 'agent', content: 'hi', streaming: false });
+  });
 });
