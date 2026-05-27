@@ -5,12 +5,15 @@ import { TokenSource } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
 import { BookingSummaryContainer } from '@/components/agent-ui/booking-summary';
+import { ChatOverlay } from '@/components/chat/chat-overlay';
 import { AppConfigProvider } from '@/components/layout/app-config-context';
 import { ViewController } from '@/components/layout/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
 import { useAgentErrors } from '@/hooks/use-agent-errors';
+import { useChatTranscription } from '@/hooks/use-chat-transcription';
 import { useDebugMode } from '@/hooks/use-debug';
+import { useUiView } from '@/lib/agent-ui/hooks';
 import { useUiCommandTransport } from '@/lib/agent-ui/transport';
 import { DevPanel } from '@/lib/dev/dev-panel';
 import { getSandboxTokenSource } from '@/lib/utils';
@@ -22,6 +25,13 @@ function AppSetup() {
   useAgentErrors();
   useUiCommandTransport();
   return null;
+}
+
+function ChatOverlayContainer() {
+  const view = useUiView();
+  const { messages, sendMessage } = useChatTranscription();
+  if (view.type === 'start') return null;
+  return <ChatOverlay messages={messages} onSubmit={sendMessage} />;
 }
 
 interface AppProps {
@@ -47,6 +57,7 @@ export function App({ appConfig }: AppProps) {
         <div className="flex h-full flex-col">
           <div className="relative min-h-0 flex-1">
             <ViewController />
+            <ChatOverlayContainer />
           </div>
           <BookingSummaryContainer />
         </div>
