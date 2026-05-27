@@ -55,7 +55,7 @@ function ChatOverlay({
           aria-controls="chat-transcript"
           className="size-7 rounded-full"
         >
-          {transcriptCollapsed ? <ChevronDown /> : <ChevronUp />}
+          {transcriptCollapsed ? <ChevronUp /> : <ChevronDown />}
         </Button>
       </div>
 
@@ -71,7 +71,9 @@ function ChatOverlay({
             m.role === 'user' ? (
               <ChatUserMessage key={m.id}>{m.content}</ChatUserMessage>
             ) : (
-              <ChatAgentMessage key={m.id}>{m.content}</ChatAgentMessage>
+              <ChatAgentMessage key={m.id} streaming={m.streaming}>
+                {m.content}
+              </ChatAgentMessage>
             )
           )}
         </div>
