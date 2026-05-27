@@ -23,22 +23,10 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
           aliases: ['City of Music'],
         },
         images: [
-          {
-            url: 'https://res.cloudinary.com/dxcabwnx7/image/upload/funnel/riverside_mozart_mvp/page_005_image_01.jpg',
-            caption: 'SIGNATURE VIENNA: VIP EVENING AT',
-          },
-          {
-            url: 'https://res.cloudinary.com/dxcabwnx7/image/upload/funnel/riverside_mozart_mvp/page_005_image_02.jpg',
-            caption: 'SIGNATURE VIENNA: VIP EVENING AT',
-          },
-          {
-            url: 'https://res.cloudinary.com/dxcabwnx7/image/upload/funnel/riverside_mozart_mvp/page_005_image_03.jpg',
-            caption: 'SIGNATURE VIENNA: VIP EVENING AT',
-          },
-          {
-            url: 'https://res.cloudinary.com/dxcabwnx7/image/upload/funnel/riverside_mozart_mvp/page_007_image_01.jpg',
-            caption: 'FOCUS',
-          },
+          { url: '/dream/1.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/2.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/3.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/4.jpg', caption: 'FOCUS' },
         ],
       },
     },
@@ -55,14 +43,8 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
           aliases: ['City of Music'],
         },
         images: [
-          {
-            url: 'https://res.cloudinary.com/dxcabwnx7/image/upload/funnel/riverside_mozart_mvp/page_005_image_01.jpg',
-            caption: 'SIGNATURE VIENNA: VIP EVENING AT',
-          },
-          {
-            url: 'https://res.cloudinary.com/dxcabwnx7/image/upload/funnel/riverside_mozart_mvp/page_005_image_02.jpg',
-            caption: 'SIGNATURE VIENNA: VIP EVENING AT',
-          },
+          { url: '/dream/1.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
+          { url: '/dream/2.jpg', caption: 'SIGNATURE VIENNA: VIP EVENING' },
         ],
       },
     },
