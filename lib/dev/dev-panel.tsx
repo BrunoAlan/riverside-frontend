@@ -9,9 +9,12 @@ import {
   useUiView,
 } from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
+import { useSetDevChatMessages } from './chat-mock-store';
+import { CHAT_MOCKS } from './chat-mocks';
 import { BOOKING_SUMMARY_MOCKS, VIEW_MOCKS } from './mocks';
 
 const VIEW_TYPES = Object.keys(VIEW_MOCKS) as UiView['type'][];
+const CHAT_DOCK_OPEN_KEY = 'chat:dock:open';
 
 export function DevPanel() {
   const [open, setOpen] = useState(false);
@@ -20,12 +23,14 @@ export function DevPanel() {
   const lastError = useUiLastError();
   const setViewFromDev = useSetViewFromDev();
   const setBookingSummaryFromDev = useSetBookingSummaryFromDev();
+  const setDevChatMessages = useSetDevChatMessages();
 
   const [type, setType] = useState<UiView['type']>(view.type);
   const mocks = VIEW_MOCKS[type];
   const [mockId, setMockId] = useState(mocks[0]?.id ?? '');
 
   const [summaryMockId, setSummaryMockId] = useState(BOOKING_SUMMARY_MOCKS[0]?.id ?? '');
+  const [chatMockId, setChatMockId] = useState(CHAT_MOCKS[0]?.id ?? '');
 
   useEffect(() => {
     setType(view.type);
@@ -41,6 +46,21 @@ export function DevPanel() {
     const chosen =
       BOOKING_SUMMARY_MOCKS.find((m) => m.id === summaryMockId) ?? BOOKING_SUMMARY_MOCKS[0];
     if (chosen) setBookingSummaryFromDev(chosen.summary);
+  };
+
+  const applyChat = () => {
+    const chosen = CHAT_MOCKS.find((m) => m.id === chatMockId) ?? CHAT_MOCKS[0];
+    if (!chosen) return;
+    setDevChatMessages(chosen.messages);
+    if (view.type === 'start') applyView();
+    try {
+      window.sessionStorage.setItem(CHAT_DOCK_OPEN_KEY, JSON.stringify(true));
+    } catch {}
+  };
+
+  const reset = () => {
+    setViewFromDev({ type: 'start' });
+    setDevChatMessages(null);
   };
 
   return (
@@ -105,11 +125,7 @@ export function DevPanel() {
             >
               Apply view
             </button>
-            <button
-              type="button"
-              onClick={() => setViewFromDev({ type: 'start' })}
-              className="rounded bg-white/20 px-2 text-white"
-            >
+            <button type="button" onClick={reset} className="rounded bg-white/20 px-2 text-white">
               Reset
             </button>
           </div>
@@ -135,6 +151,25 @@ export function DevPanel() {
             className="w-full rounded bg-white text-black"
           >
             Apply summary
+          </button>
+
+          <div className="mt-2 border-t border-white/20 pt-2">chat</div>
+          <label className="block">
+            mock
+            <select
+              className="mt-1 w-full bg-white/10 px-1 py-0.5"
+              value={chatMockId}
+              onChange={(e) => setChatMockId(e.target.value)}
+            >
+              {CHAT_MOCKS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="button" onClick={applyChat} className="w-full rounded bg-white text-black">
+            Apply chat
           </button>
 
           {lastError && (
