@@ -20,7 +20,9 @@ Full replacement of the current visual treatment. No data-shape changes.
   `DREAM_SLOTS`, the collage layout, and all SVG/glow/mask code. Renders the carousel.
 - **`components/agent-ui/views/dream-stage-view.tsx`** — unchanged (still passes
   `view.images` to `PanelDream`).
-- **`components/panels/dream/panel-dream.test.tsx`** — new tests.
+- **`lib/agent-ui/dream-slides.ts`** + **`lib/agent-ui/dream-slides.test.ts`** — new pure
+  helper that clones the image list to fill the carousel, with a unit test. (This is the
+  only non-trivial logic and it lives in `lib/` so Vitest collects its test.)
 - Data unchanged: `PanelDream` keeps receiving `images: DestinationImage[]`
   (`{ url: string; caption: string }`).
 
@@ -75,12 +77,13 @@ feel).
 
 ## Testing
 
-Per `conventions/testing.md`, `panel-dream.test.tsx`:
+Per `conventions/testing.md`, **React components are not unit-tested** here (Vitest only
+collects `lib/**/*.test.ts`; UI is verified visually via the dev panel). So:
 
-- Renders the expected slides for N images.
-- Caption corresponds to the focused index.
-- With few images (2), slides are cloned to fill.
-- Animation/timers mocked (`vi.useFakeTimers`) — no pixel testing.
+- **Unit test:** `lib/agent-ui/dream-slides.test.ts` covers the pure clone-to-fill helper
+  (N≥5 untouched, N=2 cloned to ≥5, captions preserved, N=1 handled).
+- **Component:** no unit test for `panel-dream.tsx`. Correctness verified by `pnpm lint`,
+  `pnpm test` (existing suite stays green) and visual check in the dev panel by the user.
 
 ## Non-goals
 
