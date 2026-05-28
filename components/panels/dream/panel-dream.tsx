@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { UseEmblaCarouselType } from 'embla-carousel-react';
@@ -31,7 +31,7 @@ function lerp(from: number, to: number, t: number): number {
 }
 
 export function PanelDream({ images }: PanelDreamProps) {
-  const slides = buildDreamSlides(images, MIN_SLIDES);
+  const slides = useMemo(() => buildDreamSlides(images, MIN_SLIDES), [images]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -159,7 +159,7 @@ export function PanelDream({ images }: PanelDreamProps) {
                   type="button"
                   onClick={() => handleSlideClick(index)}
                   aria-label={slide.caption}
-                  className="relative block aspect-[16/10] w-full overflow-hidden rounded-3xl focus:outline-none"
+                  className="focus-visible:ring-beige-600 relative block aspect-[16/10] w-full overflow-hidden rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 >
                   <Image
                     src={slide.url}
