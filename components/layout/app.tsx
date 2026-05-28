@@ -61,8 +61,8 @@ export function App({ appConfig }: AppProps) {
           <div className="relative min-h-0 flex-1">
             <ViewController />
             <ChatDockContainer />
+            <BookingSummaryContainer />
           </div>
-          <BookingSummaryContainer />
         </div>
         <StartAudioButton label="Start Audio" />
         {IN_DEVELOPMENT && <DevPanel />}
