@@ -10,6 +10,7 @@ import { buildDreamSlides } from '@/lib/agent-ui/dream-slides';
 // keep that buffer full through a 2-step slide (clicking the 2nd image out, |k| = 2).
 const WINDOW_HALF = 6;
 const WINDOW = WINDOW_HALF * 2 + 1;
+const VISIBLE_HALF = 2; // strips shown each side of the focus; outer nodes are off-screen buffer
 const MIN_PANELS = WINDOW; // ensure the window never shows duplicate panels
 const DWELL_MS = 2500; // focus rest time before sliding to the next image
 const SLIDE_MS = 600; // slide duration
@@ -55,8 +56,9 @@ export function PanelDream({ images }: PanelDreamProps) {
   // Latest slideTo, reachable from the dwell timer without making scheduleNext depend
   // on slideTo (slideTo depends on scheduleNext, so a direct reference would form a cycle).
   const slideToRef = useRef<(target: number) => void>(() => {});
-  // Reused across frames to avoid allocating a left-edges object every animation tick.
-  // Indexed by slot i (= k + WINDOW_HALF).
+  // Reused across frames to avoid allocating per animation tick. Both indexed by slot
+  // i (= k + WINDOW_HALF): widths are computed once and read back, left edges accumulate.
+  const widthsRef = useRef<Float64Array>(new Float64Array(WINDOW));
   const leftRef = useRef<Float64Array>(new Float64Array(WINDOW));
 
   // Reset to the first image when the image set changes. Cancellation of any in-flight
@@ -78,8 +80,14 @@ export function PanelDream({ images }: PanelDreamProps) {
     const c = cRef.current;
     const b = baseRef.current;
 
-    // width of each slot k in px, keyed by offset from centre.
-    const widthOf = (k: number) => widthFracFor(Math.abs(b + k - c)) * w;
+    // width of each slot k in px, keyed by offset from centre. Computed once per frame
+    // into a reused array; widthOf is then a lookup (it's read several times below).
+    const widths = widthsRef.current;
+    for (let i = 0; i < WINDOW; i++) {
+      const k = i - WINDOW_HALF;
+      widths[i] = widthFracFor(Math.abs(b + k - c)) * w;
+    }
+    const widthOf = (k: number) => widths[k + WINDOW_HALF];
 
     // cumulative left edges, anchoring slot k=0's left edge at 0.
     // Stored in a reused Float64Array indexed by slot i (= k + WINDOW_HALF).
@@ -191,7 +199,7 @@ export function PanelDream({ images }: PanelDreamProps) {
               slotRefs.current[i] = el;
             }}
             type="button"
-            tabIndex={Math.abs(k) > 2 ? -1 : 0}
+            tabIndex={Math.abs(k) > VISIBLE_HALF ? -1 : 0}
             onClick={() => handleSlotClick(k)}
             aria-label={panel.caption}
             className="focus-visible:ring-beige-600 absolute top-1/2 h-[70%] overflow-hidden rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
