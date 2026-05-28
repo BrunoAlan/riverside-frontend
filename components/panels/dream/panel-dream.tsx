@@ -75,6 +75,8 @@ export function PanelDream({ images }: PanelDreamProps) {
     [pauseThenResume]
   );
 
+  const safeIndex = Math.min(activeIndex, panels.length - 1);
+
   if (panels.length === 0) {
     return <div className="bg-beige-200 h-full w-full" />;
   }
@@ -82,8 +84,8 @@ export function PanelDream({ images }: PanelDreamProps) {
   return (
     <div className="bg-beige-200 flex h-full w-full items-center justify-center gap-3 overflow-hidden p-6">
       {panels.map((panel, index) => {
-        const distance = Math.abs(index - activeIndex);
-        const isFocused = index === activeIndex;
+        const distance = Math.abs(index - safeIndex);
+        const isFocused = index === safeIndex;
 
         return (
           <button
