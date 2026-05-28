@@ -51,8 +51,10 @@ export function PanelDream({ images }: PanelDreamProps) {
   const controlsRef = useRef<AnimationPlaybackControls | null>(null);
   const dwellRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reset to the first image when the image set changes.
+  // Reset to the first image when the image set changes; cancel any in-flight slide/timer.
   useEffect(() => {
+    controlsRef.current?.stop();
+    if (dwellRef.current) clearTimeout(dwellRef.current);
     baseRef.current = 0;
     cRef.current = 0;
     setBase(0);
@@ -116,14 +118,15 @@ export function PanelDream({ images }: PanelDreamProps) {
           layout();
         },
         onComplete: () => {
-          baseRef.current = target;
-          cRef.current = target;
-          setBase(target); // grows unbounded; only ever read through mod(base + k, len)
+          const normalised = mod(target, panels.length);
+          baseRef.current = normalised;
+          cRef.current = normalised;
+          setBase(normalised);
           scheduleNext();
         },
       });
     },
-    [layout, scheduleNext]
+    [layout, scheduleNext, panels.length]
   );
 
   const handleSlotClick = useCallback(
@@ -169,6 +172,7 @@ export function PanelDream({ images }: PanelDreamProps) {
               slotRefs.current[i] = el;
             }}
             type="button"
+            tabIndex={Math.abs(k) > 1 ? -1 : 0}
             onClick={() => handleSlotClick(k)}
             aria-label={panel.caption}
             className="focus-visible:ring-beige-600 absolute top-1/2 h-[70%] -translate-y-1/2 overflow-hidden rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
