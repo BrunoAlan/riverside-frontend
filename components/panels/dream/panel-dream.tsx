@@ -51,10 +51,11 @@ export function PanelDream({ images }: PanelDreamProps) {
   const controlsRef = useRef<AnimationPlaybackControls | null>(null);
   const dwellRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reset to the first image when the image set changes; cancel any in-flight slide/timer.
+  // Reset to the first image when the image set changes. Cancellation of any in-flight
+  // slide/timer is handled by the autoscroll layout effect's cleanup, which re-runs on the
+  // same `panels.length` change; clearing it here would race ahead of that effect re-arming
+  // the timer (passive effects run after layout effects) and stop autoscroll from starting.
   useEffect(() => {
-    controlsRef.current?.stop();
-    if (dwellRef.current) clearTimeout(dwellRef.current);
     baseRef.current = 0;
     cRef.current = 0;
     setBase(0);
