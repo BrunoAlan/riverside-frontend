@@ -52,6 +52,9 @@ export function PanelDream({ images }: PanelDreamProps) {
   const captionRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const controlsRef = useRef<AnimationPlaybackControls | null>(null);
   const dwellRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Latest slideTo, reachable from the dwell timer without making scheduleNext depend
+  // on slideTo (slideTo depends on scheduleNext, so a direct reference would form a cycle).
+  const slideToRef = useRef<(target: number) => void>(() => {});
   // Reused across frames to avoid allocating a left-edges object every animation tick.
   // Indexed by slot i (= k + WINDOW_HALF).
   const leftRef = useRef<Float64Array>(new Float64Array(WINDOW));
@@ -114,8 +117,7 @@ export function PanelDream({ images }: PanelDreamProps) {
   const scheduleNext = useCallback(() => {
     if (panels.length <= 1) return;
     if (dwellRef.current) clearTimeout(dwellRef.current);
-    dwellRef.current = setTimeout(() => slideTo(baseRef.current + 1), DWELL_MS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    dwellRef.current = setTimeout(() => slideToRef.current(baseRef.current + 1), DWELL_MS);
   }, [panels.length]);
 
   const slideTo = useCallback(
@@ -144,6 +146,7 @@ export function PanelDream({ images }: PanelDreamProps) {
     },
     [layout, scheduleNext, panels.length]
   );
+  slideToRef.current = slideTo;
 
   const handleSlotClick = useCallback(
     (k: number) => {

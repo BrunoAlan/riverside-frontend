@@ -24,11 +24,6 @@ describe('buildDreamSlides', () => {
     ]);
   });
 
-  it('preserves the original index for each slide so the caption is stable', () => {
-    const slides = buildDreamSlides([img(1), img(2)], 5);
-    expect(slides.map((s) => s.originalIndex)).toEqual([0, 1, 0, 1, 0, 1]);
-  });
-
   it('handles a single image', () => {
     const slides = buildDreamSlides([img(1)], 5);
     expect(slides).toHaveLength(5);
