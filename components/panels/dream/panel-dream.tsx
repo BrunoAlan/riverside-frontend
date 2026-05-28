@@ -6,7 +6,9 @@ import { type AnimationPlaybackControls, animate } from 'motion/react';
 import type { DestinationImage } from '@/lib/agent-ui/commands';
 import { buildDreamSlides } from '@/lib/agent-ui/dream-slides';
 
-const WINDOW_HALF = 4; // 9 nodes: 5 visible (k = -2..2) + 2 off-screen buffer each side
+// 13 nodes: 5 visible (k = -2..2) + 2 off-screen buffer each side, plus enough lead to
+// keep that buffer full through a 2-step slide (clicking the 2nd image out, |k| = 2).
+const WINDOW_HALF = 6;
 const WINDOW = WINDOW_HALF * 2 + 1;
 const MIN_PANELS = WINDOW; // ensure the window never shows duplicate panels
 const DWELL_MS = 2500; // focus rest time before sliding to the next image
@@ -50,6 +52,9 @@ export function PanelDream({ images }: PanelDreamProps) {
   const captionRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const controlsRef = useRef<AnimationPlaybackControls | null>(null);
   const dwellRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Reused across frames to avoid allocating a left-edges object every animation tick.
+  // Indexed by slot i (= k + WINDOW_HALF).
+  const leftRef = useRef<Float64Array>(new Float64Array(WINDOW));
 
   // Reset to the first image when the image set changes. Cancellation of any in-flight
   // slide/timer is handled by the autoscroll layout effect's cleanup, which re-runs on the
@@ -74,14 +79,22 @@ export function PanelDream({ images }: PanelDreamProps) {
     const widthOf = (k: number) => widthFracFor(Math.abs(b + k - c)) * w;
 
     // cumulative left edges, anchoring slot k=0's left edge at 0.
-    const left: Record<number, number> = { 0: 0 };
-    for (let k = 1; k <= WINDOW_HALF; k++) left[k] = left[k - 1] + widthOf(k - 1) + GAP;
-    for (let k = -1; k >= -WINDOW_HALF; k--) left[k] = left[k + 1] - GAP - widthOf(k);
+    // Stored in a reused Float64Array indexed by slot i (= k + WINDOW_HALF).
+    const left = leftRef.current;
+    left[WINDOW_HALF] = 0;
+    for (let k = 1; k <= WINDOW_HALF; k++)
+      left[k + WINDOW_HALF] = left[k - 1 + WINDOW_HALF] + widthOf(k - 1) + GAP;
+    for (let k = -1; k >= -WINDOW_HALF; k--)
+      left[k + WINDOW_HALF] = left[k + 1 + WINDOW_HALF] - GAP - widthOf(k);
 
-    // align the fractional centre point with the container centre.
+    // align the fractional centre point with the container centre. frac can span
+    // multiple steps (clicking a non-adjacent slot), so interpolate between the two
+    // integer slots straddling it instead of extrapolating the slot0->slot1 vector —
+    // slot spacing varies with width, so that vector mis-centres once |frac| > 1.
     const frac = c - b;
-    const centreOf = (k: number) => left[k] + widthOf(k) / 2;
-    const pointAtC = centreOf(0) + (centreOf(1) - centreOf(0)) * frac;
+    const f0 = Math.floor(frac);
+    const centreOf = (k: number) => left[k + WINDOW_HALF] + widthOf(k) / 2;
+    const pointAtC = centreOf(f0) + (centreOf(f0 + 1) - centreOf(f0)) * (frac - f0);
     const shift = w / 2 - pointAtC;
 
     for (let i = 0; i < WINDOW; i++) {
@@ -89,7 +102,9 @@ export function PanelDream({ images }: PanelDreamProps) {
       const node = slotRefs.current[i];
       if (node) {
         node.style.width = `${widthOf(k)}px`;
-        node.style.left = `${left[k] + shift}px`;
+        // translate3d (compositable) instead of `left` to avoid per-frame reflow.
+        // The Y component replaces the Tailwind -translate-y-1/2 centring.
+        node.style.transform = `translate3d(${left[k + WINDOW_HALF] + shift}px, -50%, 0)`;
       }
       const caption = captionRefs.current[i];
       if (caption) caption.style.opacity = `${clamp01(1 - 2 * Math.abs(b + k - c))}`;
@@ -176,8 +191,8 @@ export function PanelDream({ images }: PanelDreamProps) {
             tabIndex={Math.abs(k) > 2 ? -1 : 0}
             onClick={() => handleSlotClick(k)}
             aria-label={panel.caption}
-            className="focus-visible:ring-beige-600 absolute top-1/2 h-[70%] -translate-y-1/2 overflow-hidden rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-            style={{ left: 0, width: 0 }}
+            className="focus-visible:ring-beige-600 absolute top-1/2 h-[70%] overflow-hidden rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style={{ left: 0, width: 0, transform: 'translate3d(0, -50%, 0)' }}
           >
             <Image
               src={panel.url}
