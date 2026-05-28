@@ -1,29 +1,50 @@
-# Dream Stage Carousel — Design (v3: balanced windowed panels, crossfade)
+# Dream Stage Carousel — Design (v4: sliding coverflow, derived from reference video)
 
 **Date:** 2026-05-28
-**Status:** Approved (revised twice after visual review)
+**Status:** Approved (source of truth: user screen-recording, analysed frame-by-frame)
 
 ## Goal
 
-Replace the current dream stage with the reference carousel: a **wide focused panel always
-in the centre**, flanked by an **equal number of narrower side strips on each side**
-(balanced), rotating **circularly** (the first image becomes the last). The focus advances
-on a timer and on click; each advance is a **crossfade/morph in place** — panels keep their
-positions and the images dissolve to the next state (no horizontal sliding).
+Replace the dream stage with the reference carousel from the video: a **wide focused image
+always centred**, flanked by an **equal number of progressively narrower vertical strips on
+each side** (balanced), looping **circularly**. The carousel advances by **sliding the whole
+filmstrip horizontally** — the focused image moves out to the left shrinking while the next
+image slides in from the right growing — with the **width of each image interpolating
+continuously by its distance from the centre line** (a coverflow effect). The strips are
+**cropped** (vertical slivers via `object-cover`), not the full image scaled down.
 
-## Why this model (history of the two rejected builds)
+## Why this model (history)
 
-1. **v1 — Embla sliding filmstrip:** rejected because every image stayed the same landscape
-   size and the row could mount off-centre with a left gap.
-2. **v2 — expanding panels, fixed DOM order, focus moves across positions:** closer, but
-   near the ends it became **unbalanced** (fewer panels on one side) and it was not
-   circular.
+Three prior builds missed the animation because the written specs guessed at it:
 
-**v3 fixes the state model:** instead of moving the focus across fixed panels, we keep the
-focus **fixed in the centre slot** and **rotate the images through a fixed window of slots**
-using circular (modulo) indexing. This guarantees the layout is always centred and balanced
-(same number of side strips each side) and wraps around infinitely. The chosen transition is
-a **crossfade in place** (not a slide).
+1. **v1 — Embla sliding filmstrip:** rejected — side images stayed full landscape size (no
+   width morph) and the row mounted off-centre with a left gap.
+2. **v2 — expanding panels, focus moves across fixed DOM positions:** rejected — went
+   unbalanced near the ends and was not circular.
+3. **v3 — balanced windowed crossfade:** rejected — the real animation is **not** a crossfade
+   in place; it is a horizontal slide with a continuous width morph.
+
+**v4 is derived directly from the user's screen recording** (analysed frame-by-frame), not
+from prose. The observed mechanics are listed below and are the contract for this build.
+
+## Observed mechanics (the contract)
+
+From the video frames:
+
+- **Horizontal slide, not crossfade.** The entire filmstrip translates left by one position
+  each step. Content physically travels: the focus exits toward the left as the next image
+  enters from the right.
+- **Focus always centred & balanced** — 2 narrow strips each side at rest.
+- **Continuous width morph by distance from centre.** Mid-transition the outgoing and
+  incoming images are both ~medium width; the centred one is widest; width shrinks smoothly
+  with distance from the centre line. Strips are **cropped** vertical slivers (`object-cover`).
+- **Circular / infinite loop.**
+- **Cadence:** the focus dwells ~**2.5 s** then slides to the next over ~**0.6 s** with an
+  **ease-in-out** curve.
+- **Caption** (pill, bottom-left) appears only on the centred image and **fades out** as an
+  image leaves the centre.
+- **Click a strip → it slides to the centre**; autoplay pauses, then resumes after the normal
+  dwell.
 
 ## Scope
 
@@ -31,100 +52,118 @@ Full replacement of the current visual treatment. No data-shape changes.
 
 ### Files affected
 
-- **`components/panels/dream/panel-dream.tsx`** — rewritten (replaces the v2 expanding-panel
-  build). Renders the balanced windowed carousel with crossfade.
+- **`components/panels/dream/panel-dream.tsx`** — rewritten (replaces the v3 crossfade build)
+  as the sliding coverflow carousel.
 - **`components/agent-ui/views/dream-stage-view.tsx`** — unchanged (still renders
   `<PanelDream images={view.images} />`; keep the named export `PanelDream`).
 - **`lib/agent-ui/dream-slides.ts`** + **`.test.ts`** — existing tested helper, reused
-  unchanged to guarantee a minimum number of panels.
+  unchanged to clone-to-fill a minimum number of slides.
 - Data unchanged: `images: DestinationImage[]` (`{ url, caption }`).
 
 ### Dependencies
 
-- `motion/react` — already installed (crossfade via `AnimatePresence`). Repo convention is
-  the `motion/react` import.
-- `embla-carousel-react` — **not used** by this component (stays in `package.json`).
+- `motion/react` — already installed; used here for the eased value animation (`animate(...)`)
+  that drives the slide. Repo convention is the `motion/react` import.
+- **`embla-carousel-react` is NOT used** by this component. Embla requires fixed per-slide
+  sizes for its snap math, which is incompatible with "the centred slide is widest and morphs
+  as it centres". It stays in `package.json` (unused by this file).
 - **No new dependencies.**
 
-## Layout & window model (the core)
+## Architecture — custom sliding coverflow
 
-- **Constants:** `SIDE_PANELS = 2` → `WINDOW = SIDE_PANELS * 2 + 1 = 5` visible slots
-  (centre + 2 each side). `MIN_PANELS = WINDOW`.
-- **Panels:** `const panels = buildDreamSlides(images, MIN_PANELS)` (memoized on `images`).
-  Guarantees `panels.length >= WINDOW`, so a 2-image destination still fills the row and the
-  window always has distinct panels.
-- **State:** `activeIndex` — the index (into `panels`) shown in the **centre slot**. Starts
-  at 0; re-centres to 0 if the image set changes.
-- **Slots:** render exactly `WINDOW` slots. The panel shown in slot `s` (0..WINDOW-1) is
-  `panels[(activeIndex - SIDE_PANELS + s + panels.length) % panels.length]`. So the centre
-  slot (`s === SIDE_PANELS`) always shows `activeIndex`, with equal panels wrapping in on
-  both sides — always balanced, always circular.
-- **Container:** full-height, full-width flex row, `items-center justify-center`,
-  `overflow-hidden`, small gap and padding.
+The component renders a **fixed pool of slot nodes** (a window around the focus) absolutely
+positioned inside a `relative overflow-hidden` container. A single continuous float `c`
+("fractional centre") drives the layout; advancing means animating `c` from `base` to
+`base + 1`. Each frame, every slot's **width and left position are computed from its signed
+distance to `c`** and written directly to the DOM (no React re-render during the slide). The
+images shown in the slots come from React state `base` (changes once per step, ~every 3 s),
+so the only React renders are the cheap per-step src swaps.
 
-## Sizing model
+### Slot ↔ panel mapping (circular)
 
-Each slot has a **fixed** width based on its position (distance from the centre slot), so the
-layout never reflows when the images rotate:
+- `panels = buildDreamSlides(images, MIN_PANELS)` — guarantees `panels.length >= WINDOW` so
+  the window never shows duplicates (a 2-image destination clones to fill).
+- Render `WINDOW = 2 * WINDOW_HALF + 1` slot nodes (`WINDOW_HALF = 3` → 7 nodes; ~5 visible
+  plus off-screen buffer). Slot offset `k ∈ [-WINDOW_HALF, +WINDOW_HALF]`.
+- Slot `k` shows `panels[mod(base + k, panels.length)]`.
 
-- centre slot: `flex-grow` ~**8** (wide landscape focus).
-- distance 1: ~**1.6** (medium strip).
-- distance 2: ~**0.9** (narrow strip).
+### The continuous-centre trick (no jump on wrap)
 
-Slots use `flex-basis: 0` + `flex-grow` weight, a fixed height (`h-[70%]`, tunable),
-`rounded-3xl overflow-hidden`, and the image is `fill object-cover` so the narrow slots crop
-to vertical strips. Because slot widths are static, **there is no width animation** — the
-motion comes entirely from the crossfade. Exact weights/height are tunable during visual
-verification.
+- State `base: number` (integer, in React state) — the panel index currently centred.
+- Ref `cRef: number` — the fractional centre. At rest `c === base`.
+- Advance: `animate(cRef, base + 1, { duration: 0.6, ease: 'easeInOut' })`. During the slide
+  `base` is unchanged and `c ∈ (base, base+1)`; slot `k` has signed distance `d = (base+k) - c`.
+- On complete: set `base = base + 1` (React) **and** normalise `cRef = base + 1`. Because the
+  post-step layout uses `d = (base+1+k) - (base+1) = k` — identical geometry to the pre-slide
+  rest state — while every slot's src has shifted by one, the result is seamless: the image
+  that was the right neighbour is now centred, with **no visual jump**.
+- `base` grows unbounded (fine); panel lookup is always `mod(base + k, len)`.
 
-## Transition (crossfade in place)
+### Per-frame layout math
 
-When `activeIndex` changes, each slot shows a different panel. Inside every slot, an
-`AnimatePresence` keyed by the panel's identity crossfades: the outgoing image animates
-`opacity 1 → 0` and the incoming `opacity 0 → 1` (both absolutely positioned to overlap),
-over ~**0.5s ease-out**. A subtle `scale` (e.g. `1.03 → 1`) on the incoming image adds life.
-Panels stay in place; only the imagery dissolves. `mode` is the default (overlapping) so the
-crossfade truly overlaps rather than waiting for exit.
+For fractional centre `c` and integer `base = floor at rest` (slot `k=0` is `panels[base]`):
 
-## Interaction & autoscroll
+1. For each slot `k`: `d = (base + k) - c`; `width_k = widthFrac(|d|) * containerWidth`.
+2. `widthFrac(dAbs)` interpolates a table by distance:
+   `WIDTH_FRAC = [0.50, 0.14, 0.06, 0.035]` (index 0 = focus; `dAbs >= 3` → last value);
+   linear-interpolate between `floor` and `ceil` for fractional `dAbs`.
+3. Cumulative left edges anchored at slot `k=0` left edge `= 0`, walking outward with a fixed
+   `GAP` (≈12px): `left[k] = left[k-1] + width[k-1] + GAP` (and the mirror for negative `k`).
+4. Centre the fractional point `c`: with `frac = c - base`,
+   `pointAtC = lerp(centreOf(slot 0), centreOf(slot 1), frac)` where
+   `centreOf(k) = left[k] + width[k]/2`. Shift every slot by `containerWidth/2 - pointAtC`.
+5. Write `style.left` and `style.width` per slot. Caption opacity per slot
+   `= clamp(1 - 2*|d|, 0, 1)` (1 at centre, 0 by half a step out) → caption shows only on the
+   centred image and fades during the slide.
 
-- **Autoscroll:** `setInterval` advances `activeIndex` via `(activeIndex + 1) % panels.length`
-  every ~**3.5s** (uses a functional state update; guarded against double intervals;
-  disabled when `panels.length <= 1`).
-- **Click on a slot:** sets `activeIndex` to that slot's panel index (it rotates to the
-  centre); pause the interval and **resume after ~5s**.
-- **No drag/swipe** (there is no scroll track); tap focuses on mobile.
-- **Cleanup:** clear the interval and the resume timeout on unmount.
+### Timeline & interaction
+
+- **Autoplay:** after each settle, `setTimeout(DWELL_MS ≈ 2500)` → animate to `base + 1`.
+- **Click slot `k`:** stop the running animation + clear the pending dwell timer; animate `c`
+  to `base + k` (negative `k` slides right, positive slides left); on complete set
+  `base += k`, normalise `c`, then resume autoplay after the normal dwell. `k === 0` is a
+  no-op.
+- **Disabled** when `panels.length <= 1`.
+- **Cleanup:** stop the animation, clear the timer, disconnect the `ResizeObserver` on unmount.
+
+### Responsiveness
+
+- Container width is read live (a `ResizeObserver` on the container triggers `layout()`), so
+  the fractional widths scale to any viewport. Vertical centring via absolute
+  `top-1/2 -translate-y-1/2`, slot height `h-[70%]` (tunable).
+- Same 5-visible layout on mobile; `WIDTH_FRAC`/`GAP` tunable during verification.
 
 ## Visual details
 
-- **Caption:** only on the centre slot (the focused image), pill style
-  `bg-beige-900/60 ... backdrop-blur-md`, fading with the crossfade.
-- **Background:** `bg-beige-200`.
-- **Focus ring:** each slot is a `<button>` with `aria-label` (the centre/focused caption,
-  or the panel caption) and `focus-visible:ring-2 focus-visible:ring-beige-600
-  focus-visible:ring-offset-2` (no bare `focus:outline-none`).
+- **Background:** `bg-beige-200`. Container `relative overflow-hidden`, padding.
+- **Slots:** `<button>` absolutely positioned, `rounded-3xl overflow-hidden`, image
+  `fill object-cover`. Accessible: `aria-label={caption}`,
+  `focus-visible:ring-2 focus-visible:ring-beige-600 focus-visible:ring-offset-2` (no bare
+  `focus:outline-none` without a visible alternative).
+- **Caption:** pill `bg-beige-900/60 ... backdrop-blur-md` bottom-left, opacity driven by
+  distance (centre only).
 
-## Responsive
+## Tunable constants (Task 2, user)
 
-- **Desktop:** centre + 2 strips per side (5 slots), as the reference.
-- **Mobile:** same 5-slot row; the fixed grow weights keep the focus dominant and side
-  strips thin on narrow viewports. Tunable during verification (optionally raise the centre
-  weight on small screens).
+`DWELL_MS` (2500), `SLIDE_MS` (600) + ease, `WIDTH_FRAC` table, `GAP`, `WINDOW_HALF`,
+slot height (`h-[70%]`), `MIN_PANELS`.
 
 ## Testing
 
 Per `conventions/testing.md`, **React components are not unit-tested** (Vitest collects only
-`lib/**/*.test.ts`; UI is verified visually). So:
+`lib/**/*.test.ts`; UI is verified visually):
 
 - **Unit test:** `lib/agent-ui/dream-slides.test.ts` (unchanged) covers the clone-to-fill
   helper.
 - **Component:** no unit test for `panel-dream.tsx`. Verified by `pnpm lint`, `pnpm test`
-  (suite stays green), and a visual check by the user (4-image and 2-image mocks).
+  (suite stays green), and a visual check by the user against the reference video (4-image and
+  2-image mocks).
 
 ## Non-goals
 
 - No Riverside logo in this component (app chrome renders it).
 - No retained "dream" glow/mask aesthetic.
-- Caption on side slots (centre only).
-- No horizontal sliding animation (crossfade in place was chosen).
+- No crossfade (v3) and no in-place width morph without translation (v2) — the motion is a
+  horizontal slide with continuous width morph.
+- Captions on side images (centre only, fading).
+- No drag/swipe gesture (advance is timer + click).
