@@ -49,7 +49,52 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
       },
     },
   ],
-  itinerary: [{ id: 'default', label: 'Map', view: { type: 'itinerary', addOnDecisions: {} } }],
+  itinerary: [
+    {
+      id: 'default',
+      label: 'Map (fallback cities)',
+      view: { type: 'itinerary', addOnDecisions: {} },
+    },
+    {
+      id: 'danube_legends',
+      label: 'Danube Legends (agent payload)',
+      view: {
+        type: 'itinerary',
+        addOnDecisions: {},
+        itinerary: {
+          id: 'danube_legends_from_budapest_to_vienna',
+          name: 'Danube Legends from Budapest to Vienna',
+          duration: { days: 12, nights: 11 },
+          match_score: 0.6667,
+          departure_dates: ['2026-04-22', '2026-05-06', '2026-05-20'],
+          center: [16.570283333333332, 48.15495000000001],
+          zoom: 6,
+          cities: [
+            {
+              id: 'budapest',
+              name: 'Budapest',
+              country: 'Hungary',
+              image:
+                'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+              days: 'Days 1, 2, 6 & 7',
+              lon: 19.0402,
+              lat: 47.4979,
+            },
+            {
+              id: 'vienna',
+              name: 'Vienna',
+              country: 'Austria',
+              image:
+                'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_005_image_01.jpg',
+              days: 'Days 5, 10 & 11',
+              lon: 16.3738,
+              lat: 48.2082,
+            },
+          ],
+        },
+      },
+    },
+  ],
   compare_itinerary: [
     {
       id: 'two_danube_options',
@@ -60,16 +105,74 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
           {
             id: 'majesty_of_the_danube',
             name: 'Majesty of the Danube',
-            embarkation_port: 'Budapest',
-            disembarkation_port: 'Vienna',
+            duration: { days: 8, nights: 7 },
             match_score: 1.0,
+            departure_dates: ['2026-04-22', '2026-05-06'],
+            center: [17.5, 48.0],
+            zoom: 6.8,
+            cities: [
+              {
+                id: 'budapest',
+                name: 'Budapest',
+                country: 'Hungary',
+                image:
+                  'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+                days: 'Days 1 & 2',
+                lon: 19.0402,
+                lat: 47.4979,
+              },
+              {
+                id: 'vienna',
+                name: 'Vienna',
+                country: 'Austria',
+                image:
+                  'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_005_image_01.jpg',
+                days: 'Days 7 & 8',
+                lon: 16.3738,
+                lat: 48.2082,
+              },
+            ],
           },
           {
             id: 'majesty_of_the_danube_scenic_wachau_from_budapest_to_vienna',
             name: 'Majesty of the Danube & Scenic Wachau from Budapest to Vienna',
-            embarkation_port: 'Budapest',
-            disembarkation_port: 'Vienna',
+            duration: { days: 10, nights: 9 },
             match_score: 1.0,
+            departure_dates: ['2026-09-02', '2026-09-16'],
+            center: [16.3, 48.3],
+            zoom: 7,
+            cities: [
+              {
+                id: 'budapest',
+                name: 'Budapest',
+                country: 'Hungary',
+                image:
+                  'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+                days: 'Days 1 & 2',
+                lon: 19.0402,
+                lat: 47.4979,
+              },
+              {
+                id: 'wachau_valley',
+                name: 'Wachau Valley',
+                country: 'Austria',
+                image:
+                  'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676657/hiperfunnel/riverside_mozart_mvp/page_007_image_01.jpg',
+                days: 'Days 6 & 7',
+                lon: 15.33,
+                lat: 48.35,
+              },
+              {
+                id: 'vienna',
+                name: 'Vienna',
+                country: 'Austria',
+                image:
+                  'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_005_image_01.jpg',
+                days: 'Days 9 & 10',
+                lon: 16.3738,
+                lat: 48.2082,
+              },
+            ],
           },
         ],
       },

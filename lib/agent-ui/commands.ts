@@ -18,18 +18,33 @@ const SoftRedirect = Base.extend({
   }),
 });
 
-export const ItineraryOption = z.object({
+// A city as it travels inside an itinerary payload. Structurally a `City`
+// (lib/map/cities.ts) minus the local-only `addOns`.
+const ItineraryCity = z.object({
   id: z.string(),
   name: z.string(),
-  embarkation_port: z.string(),
-  disembarkation_port: z.string(),
-  match_score: z.number(),
+  country: z.string(),
+  image: z.string(),
+  days: z.string(),
+  lon: z.number(),
+  lat: z.number(),
 });
-export type ItineraryOption = z.infer<typeof ItineraryOption>;
+
+export const ItineraryFull = z.object({
+  id: z.string(),
+  name: z.string(),
+  duration: z.object({ days: z.number().int(), nights: z.number().int() }),
+  match_score: z.number(),
+  departure_dates: z.array(z.string()),
+  center: z.tuple([z.number(), z.number()]), // [lon, lat]
+  zoom: z.number(),
+  cities: z.array(ItineraryCity).min(1),
+});
+export type ItineraryFull = z.infer<typeof ItineraryFull>;
 
 const ShowItineraryOptions = Base.extend({
   type: z.literal('show_itinerary_options'),
-  payload: z.object({ options: z.array(ItineraryOption).min(1) }),
+  payload: z.object({ itinerary: ItineraryFull }),
 });
 
 export const Destination = z.object({

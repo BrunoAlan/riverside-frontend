@@ -5,6 +5,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { CityCardLayer } from '@/components/panels/map/city-card-layer';
 import { type City, cities } from '@/lib/map/cities';
+import { cityBounds } from '@/lib/map/city-bounds';
 import { parchmentStyle } from '@/lib/map/parchment-style';
 
 // Paper-grain texture for the parchment look. The seamless feTurbulence tile
@@ -15,6 +16,12 @@ const GRAIN_IMAGE = "url('/map/grain.svg')";
 // Module-level defaults so omitted props keep a stable reference across renders.
 const DEFAULT_CENTER: [number, number] = [17.5, 48.0];
 const DEFAULT_ZOOM = 6.8;
+
+// Camera padding (px) when auto-fitting to cities, so cards — which anchor
+// centered and cascade up-left — and the top/bottom gradients don't clip.
+const FIT_PADDING = { top: 130, bottom: 100, left: 150, right: 130 };
+// Cap auto-fit zoom so two near-adjacent cities don't snap to extreme zoom.
+const FIT_MAX_ZOOM = 9;
 
 type MapCanvasProps = {
   cities?: City[];
@@ -57,10 +64,20 @@ export function MapCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- create once on mount
   }, []);
 
-  // Move the camera when center/zoom change, without recreating the map.
+  // Frame the cities: fit the camera to their bounds so cards spread out as
+  // closely as the viewport allows instead of stacking. With fewer than two
+  // cities there's nothing to fit, so fall back to the explicit center/zoom.
   useEffect(() => {
-    map?.jumpTo({ center, zoom });
-  }, [map, center, zoom]);
+    if (!map) return;
+    if (cityList.length >= 2) {
+      const bounds = cityBounds(cityList);
+      if (bounds) {
+        map.fitBounds(bounds, { padding: FIT_PADDING, maxZoom: FIT_MAX_ZOOM, animate: false });
+        return;
+      }
+    }
+    map.jumpTo({ center, zoom });
+  }, [map, cityList, center, zoom]);
 
   return (
     <div className="bg-beige-200 relative h-full w-full">

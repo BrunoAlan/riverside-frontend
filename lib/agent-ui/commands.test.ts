@@ -22,25 +22,38 @@ describe('UiCommand schema', () => {
     expect(result.payload.missing).toEqual(['dates']);
   });
 
-  it('parses show_itinerary_options with one option', () => {
+  it('parses show_itinerary_options with a single rich itinerary', () => {
     const result = UiCommand.parse({
       type: 'show_itinerary_options',
-      correlationId: 'abc-123',
+      correlationId: '64c2a3c4-2623-4f4b-99a3-bbc3bb1db205',
       payload: {
-        options: [
-          {
-            id: 'majesty_of_the_danube',
-            name: 'Majesty of the Danube',
-            embarkation_port: 'Budapest',
-            disembarkation_port: 'Vienna',
-            match_score: 1.0,
-          },
-        ],
+        itinerary: {
+          id: 'danube_legends_from_budapest_to_vienna',
+          name: 'Danube Legends from Budapest to Vienna',
+          duration: { days: 12, nights: 11 },
+          match_score: 0.6667,
+          departure_dates: ['2026-04-22', '2026-05-06'],
+          center: [16.570283333333332, 48.15495000000001],
+          zoom: 6,
+          cities: [
+            {
+              id: 'budapest',
+              name: 'Budapest',
+              country: 'Hungary',
+              image: 'https://res.cloudinary.com/demo/image/upload/budapest.jpg',
+              days: 'Days 1, 2, 6 & 7',
+              lon: 19.0402,
+              lat: 47.4979,
+            },
+          ],
+        },
       },
     });
     if (result.type !== 'show_itinerary_options') throw new Error('discriminator failed');
-    expect(result.payload.options).toHaveLength(1);
-    expect(result.payload.options[0].id).toBe('majesty_of_the_danube');
+    expect(result.payload.itinerary.id).toBe('danube_legends_from_budapest_to_vienna');
+    expect(result.payload.itinerary.center).toEqual([16.570283333333332, 48.15495000000001]);
+    expect(result.payload.itinerary.cities).toHaveLength(1);
+    expect(result.payload.itinerary.cities[0].name).toBe('Budapest');
   });
 
   it('parses show_destination_detail with destination and images', () => {
@@ -154,11 +167,22 @@ describe('UiCommand schema', () => {
     expect(out.success).toBe(false);
   });
 
-  it('rejects show_itinerary_options with zero options', () => {
+  it('rejects show_itinerary_options with zero cities', () => {
     const out = UiCommand.safeParse({
       type: 'show_itinerary_options',
       correlationId: 'abc-123',
-      payload: { options: [] },
+      payload: {
+        itinerary: {
+          id: 'x',
+          name: 'X',
+          duration: { days: 1, nights: 0 },
+          match_score: 1,
+          departure_dates: [],
+          center: [0, 0],
+          zoom: 6,
+          cities: [],
+        },
+      },
     });
     expect(out.success).toBe(false);
   });
