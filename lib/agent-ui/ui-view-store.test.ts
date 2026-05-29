@@ -29,36 +29,70 @@ describe('ui-view-store', () => {
     expect(s.hint).toBeNull();
   });
 
-  it('applyCommand(show_itinerary_options) maps to compare_itinerary view', () => {
+  it('applyCommand(show_itinerary_options) maps the itinerary into the itinerary view', () => {
+    const itinerary = {
+      id: 'danube_legends',
+      name: 'Danube Legends',
+      duration: { days: 12, nights: 11 },
+      match_score: 0.6667,
+      departure_dates: ['2026-04-22'],
+      center: [16.57, 48.15] as [number, number],
+      zoom: 6,
+      cities: [
+        {
+          id: 'budapest',
+          name: 'Budapest',
+          country: 'Hungary',
+          image: 'https://res.cloudinary.com/demo/image/upload/budapest.jpg',
+          days: 'Days 1, 2, 6 & 7',
+          lon: 19.0402,
+          lat: 47.4979,
+        },
+      ],
+    };
     store.getState().applyCommand({
       type: 'show_itinerary_options',
       correlationId: 'c2',
-      payload: {
-        options: [
-          {
-            id: 'a',
-            name: 'A',
-            embarkation_port: 'X',
-            disembarkation_port: 'Y',
-            match_score: 1,
-          },
-        ],
-      },
+      payload: { itinerary },
     });
     const s = store.getState();
-    expect(s.view).toEqual({
-      type: 'compare_itinerary',
-      options: [
+    expect(s.view).toEqual({ type: 'itinerary', itinerary, addOnDecisions: {} });
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('c2');
+  });
+
+  it('setAddOnDecision preserves the itinerary on the view', () => {
+    const itinerary = {
+      id: 'danube_legends',
+      name: 'Danube Legends',
+      duration: { days: 12, nights: 11 },
+      match_score: 0.6667,
+      departure_dates: ['2026-04-22'],
+      center: [16.57, 48.15] as [number, number],
+      zoom: 6,
+      cities: [
         {
-          id: 'a',
-          name: 'A',
-          embarkation_port: 'X',
-          disembarkation_port: 'Y',
-          match_score: 1,
+          id: 'budapest',
+          name: 'Budapest',
+          country: 'Hungary',
+          image: 'https://res.cloudinary.com/demo/image/upload/budapest.jpg',
+          days: 'Days 1, 2, 6 & 7',
+          lon: 19.0402,
+          lat: 47.4979,
         },
       ],
+    };
+    store.getState().applyCommand({
+      type: 'show_itinerary_options',
+      correlationId: 'c2',
+      payload: { itinerary },
     });
-    expect(s.source).toBe('agent');
+    store.getState().setAddOnDecision('budapest-extra', 'confirmed');
+    expect(store.getState().view).toEqual({
+      type: 'itinerary',
+      itinerary,
+      addOnDecisions: { 'budapest-extra': 'confirmed' },
+    });
   });
 
   it('applyCommand(show_destination_detail) maps destination and images into view', () => {

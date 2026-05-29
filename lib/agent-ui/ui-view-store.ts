@@ -42,7 +42,7 @@ export function createUiViewStore() {
             };
           case 'show_itinerary_options':
             return {
-              view: { type: 'compare_itinerary', options: cmd.payload.options },
+              view: { type: 'itinerary', itinerary: cmd.payload.itinerary, addOnDecisions: {} },
               hint: null,
               source: 'agent',
               lastCorrelationId: cmd.correlationId,
@@ -107,6 +107,7 @@ export function createUiViewStore() {
         return {
           view: {
             type: 'itinerary',
+            itinerary: state.view.itinerary,
             addOnDecisions: { ...state.view.addOnDecisions, [addOnId]: decision },
           },
           source: 'user',

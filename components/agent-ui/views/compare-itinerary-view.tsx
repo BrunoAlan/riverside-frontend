@@ -4,7 +4,6 @@ import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import type { City } from '@/lib/map/cities';
-import { itineraries } from '@/lib/map/itineraries';
 
 const MapCanvas = dynamic(
   () => import('@/components/panels/map/map-canvas').then((m) => m.MapCanvas),
@@ -13,16 +12,6 @@ const MapCanvas = dynamic(
     loading: () => <div className="bg-beige-200 h-full w-full" />,
   }
 );
-
-function resolveItinerary(optionId: string, fallbackIndex: number) {
-  const match = itineraries.find((i) => i.id === optionId);
-  if (!match) {
-    console.warn(
-      `[compare_itinerary] unknown option id "${optionId}", falling back to itineraries[${fallbackIndex}]`
-    );
-  }
-  return match ?? itineraries[fallbackIndex];
-}
 
 export function CompareItineraryView({
   view,
@@ -33,9 +22,7 @@ export function CompareItineraryView({
     console.log('expand city', city.id);
   }, []);
 
-  const [first, second] = view.options;
-  const left = first ? resolveItinerary(first.id, 0) : undefined;
-  const right = second ? resolveItinerary(second.id, 1) : undefined;
+  const [left, right] = view.options;
 
   return (
     <div className="absolute inset-0 flex">

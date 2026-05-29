@@ -12,7 +12,13 @@ const MapCanvas = dynamic(
   }
 );
 
-export function PanelMap() {
+type PanelMapProps = {
+  cities?: City[];
+  center?: [number, number];
+  zoom?: number;
+};
+
+export function PanelMap({ cities, center, zoom }: PanelMapProps = {}) {
   const handleCityExpand = useCallback((city: City) => {
     // TODO: wire up expand behavior (e.g. open detail panel for `city`).
     console.log('expand city', city.id);
@@ -20,7 +26,7 @@ export function PanelMap() {
 
   return (
     <div className="absolute inset-0">
-      <MapCanvas onCityExpand={handleCityExpand} />
+      <MapCanvas cities={cities} center={center} zoom={zoom} onCityExpand={handleCityExpand} />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import type {
   BookingSummarySnapshot,
   Destination,
   DestinationImage,
-  ItineraryOption,
+  ItineraryFull,
 } from './commands';
 
 export type AddOnDecision = 'confirmed' | 'rejected';
@@ -11,8 +11,8 @@ export type UiView =
   | { type: 'start' }
   | { type: 'presentation' }
   | { type: 'dream_stage'; destination: Destination; images: DestinationImage[] }
-  | { type: 'itinerary'; addOnDecisions: Record<string, AddOnDecision> }
-  | { type: 'compare_itinerary'; options: ItineraryOption[] }
+  | { type: 'itinerary'; itinerary?: ItineraryFull; addOnDecisions: Record<string, AddOnDecision> }
+  | { type: 'compare_itinerary'; options: ItineraryFull[] }
   | { type: 'cabin_selection'; detailCabinId?: string };
 
 export type UiHint = { type: 'soft_redirect'; reasonCode: string; missing?: string[] };
