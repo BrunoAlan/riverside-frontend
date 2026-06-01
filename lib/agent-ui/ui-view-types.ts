@@ -11,7 +11,12 @@ export type UiView =
   | { type: 'start' }
   | { type: 'presentation' }
   | { type: 'dream_stage'; destination: Destination; images: DestinationImage[] }
-  | { type: 'itinerary'; itinerary?: ItineraryFull; addOnDecisions: Record<string, AddOnDecision> }
+  | {
+      type: 'itinerary';
+      itinerary?: ItineraryFull;
+      addOnDecisions: Record<string, AddOnDecision>;
+      detailCityId?: string;
+    }
   | { type: 'compare_itinerary'; options: ItineraryFull[] }
   | { type: 'cabin_selection'; detailCabinId?: string };
 
