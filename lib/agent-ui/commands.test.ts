@@ -199,6 +199,100 @@ describe('UiCommand schema', () => {
     const out = UiCommand.safeParse({ type: 'show_discovery_canvas' });
     expect(out.success).toBe(false);
   });
+
+  it('parses show_itinerary_options with per-city day_details', () => {
+    const result = UiCommand.parse({
+      type: 'show_itinerary_options',
+      correlationId: 'c-daydetails',
+      payload: {
+        itinerary: {
+          id: 'danube_legends',
+          name: 'Danube Legends',
+          duration: { days: 12, nights: 11 },
+          match_score: 0.6667,
+          departure_dates: ['2026-04-22'],
+          center: [16.57, 48.15],
+          zoom: 6,
+          cities: [
+            {
+              id: 'vienna',
+              name: 'Vienna',
+              country: 'Austria',
+              image: 'https://example.com/vienna.jpg',
+              days: 'Days 5, 10 & 11',
+              lon: 16.3738,
+              lat: 48.2082,
+              day_details: [{ day: 'Day 01', description: 'Arrive in Vienna.' }],
+            },
+          ],
+        },
+      },
+    });
+    if (result.type !== 'show_itinerary_options') throw new Error('discriminator failed');
+    expect(result.payload.itinerary.cities[0].day_details).toEqual([
+      { day: 'Day 01', description: 'Arrive in Vienna.' },
+    ]);
+  });
+
+  it('rejects a malformed day_details entry', () => {
+    const parsed = UiCommand.safeParse({
+      type: 'show_itinerary_options',
+      correlationId: 'c-bad',
+      payload: {
+        itinerary: {
+          id: 'x',
+          name: 'X',
+          duration: { days: 1, nights: 0 },
+          match_score: 1,
+          departure_dates: [],
+          center: [0, 0],
+          zoom: 1,
+          cities: [
+            {
+              id: 'a',
+              name: 'A',
+              country: 'C',
+              image: 'https://example.com/a.jpg',
+              days: 'Day 1',
+              lon: 0,
+              lat: 0,
+              day_details: [{ day: 'Day 01' }],
+            },
+          ],
+        },
+      },
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it('parses show_city_detail with a string city_id', () => {
+    const result = UiCommand.parse({
+      type: 'show_city_detail',
+      correlationId: 'c-detail',
+      payload: { city_id: 'vienna' },
+    });
+    if (result.type !== 'show_city_detail') throw new Error('discriminator failed');
+    expect(result.payload.city_id).toBe('vienna');
+  });
+
+  it('parses show_city_detail with a null city_id (close)', () => {
+    const result = UiCommand.parse({
+      type: 'show_city_detail',
+      correlationId: 'c-close',
+      payload: { city_id: null },
+    });
+    if (result.type !== 'show_city_detail') throw new Error('discriminator failed');
+    expect(result.payload.city_id).toBeNull();
+  });
+
+  it('rejects show_city_detail without a city_id', () => {
+    const parsed = UiCommand.safeParse({
+      type: 'show_city_detail',
+      correlationId: 'c-bad',
+      payload: {},
+    });
+    expect(parsed.success).toBe(false);
+  });
 });
 
 describe('set_booking_summary', () => {

@@ -6,6 +6,56 @@ export interface ViewMock {
   view: UiView;
 }
 
+const danubeLegends = {
+  id: 'danube_legends_from_budapest_to_vienna',
+  name: 'Danube Legends from Budapest to Vienna',
+  duration: { days: 12, nights: 11 },
+  match_score: 0.6667,
+  departure_dates: ['2026-04-22', '2026-05-06', '2026-05-20'],
+  center: [16.570283333333332, 48.15495000000001] as [number, number],
+  zoom: 6,
+  cities: [
+    {
+      id: 'budapest',
+      name: 'Budapest',
+      country: 'Hungary',
+      image:
+        'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+      days: 'Days 1, 2, 6 & 7',
+      lon: 19.0402,
+      lat: 47.4979,
+      day_details: [
+        {
+          day: 'Day 01',
+          description: 'Arrive in Budapest and embark. Evening welcome dinner aboard.',
+        },
+        { day: 'Day 02', description: 'Guided tour of Buda Castle and the Fisherman’s Bastion.' },
+      ],
+    },
+    {
+      id: 'vienna',
+      name: 'Vienna',
+      country: 'Austria',
+      image:
+        'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_005_image_01.jpg',
+      days: 'Days 5, 10 & 11',
+      lon: 16.3738,
+      lat: 48.2082,
+      day_details: [
+        {
+          day: 'Day 05',
+          description:
+            'Vienna, once an imperial capital, boasts grand Baroque architecture and historic charm.',
+        },
+        {
+          day: 'Day 10',
+          description: 'A day among palaces, cathedrals, museums and romantic coffee houses.',
+        },
+      ],
+    },
+  ],
+};
+
 export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
   start: [{ id: 'default', label: 'Default', view: { type: 'start' } }],
   presentation: [{ id: 'default', label: 'Video playing', view: { type: 'presentation' } }],
@@ -51,47 +101,18 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
   ],
   itinerary: [
     {
-      id: 'default',
-      label: 'Map (fallback cities)',
-      view: { type: 'itinerary', addOnDecisions: {} },
-    },
-    {
       id: 'danube_legends',
       label: 'Danube Legends (agent payload)',
+      view: { type: 'itinerary', addOnDecisions: {}, itinerary: danubeLegends },
+    },
+    {
+      id: 'danube_legends_detail',
+      label: 'Detail open (Vienna)',
       view: {
         type: 'itinerary',
         addOnDecisions: {},
-        itinerary: {
-          id: 'danube_legends_from_budapest_to_vienna',
-          name: 'Danube Legends from Budapest to Vienna',
-          duration: { days: 12, nights: 11 },
-          match_score: 0.6667,
-          departure_dates: ['2026-04-22', '2026-05-06', '2026-05-20'],
-          center: [16.570283333333332, 48.15495000000001],
-          zoom: 6,
-          cities: [
-            {
-              id: 'budapest',
-              name: 'Budapest',
-              country: 'Hungary',
-              image:
-                'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
-              days: 'Days 1, 2, 6 & 7',
-              lon: 19.0402,
-              lat: 47.4979,
-            },
-            {
-              id: 'vienna',
-              name: 'Vienna',
-              country: 'Austria',
-              image:
-                'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_005_image_01.jpg',
-              days: 'Days 5, 10 & 11',
-              lon: 16.3738,
-              lat: 48.2082,
-            },
-          ],
-        },
+        itinerary: danubeLegends,
+        detailCityId: 'vienna',
       },
     },
   ],

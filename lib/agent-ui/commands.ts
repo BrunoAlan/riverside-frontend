@@ -20,7 +20,7 @@ const SoftRedirect = Base.extend({
 
 // A city as it travels inside an itinerary payload. Structurally a `City`
 // (lib/map/cities.ts) minus the local-only `addOns`.
-const ItineraryCity = z.object({
+export const ItineraryCity = z.object({
   id: z.string(),
   name: z.string(),
   country: z.string(),
@@ -28,7 +28,9 @@ const ItineraryCity = z.object({
   days: z.string(),
   lon: z.number(),
   lat: z.number(),
+  day_details: z.array(z.object({ day: z.string(), description: z.string() })).optional(),
 });
+export type ItineraryCity = z.infer<typeof ItineraryCity>;
 
 export const ItineraryFull = z.object({
   id: z.string(),
@@ -99,6 +101,11 @@ const SetCabinDetail = Base.extend({
   payload: z.object({ cabin_id: z.string().nullable() }),
 });
 
+const ShowCityDetail = Base.extend({
+  type: z.literal('show_city_detail'),
+  payload: z.object({ city_id: z.string().nullable() }),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
@@ -106,5 +113,6 @@ export const UiCommand = z.discriminatedUnion('type', [
   ShowDestinationDetail,
   SetBookingSummary,
   SetCabinDetail,
+  ShowCityDetail,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
