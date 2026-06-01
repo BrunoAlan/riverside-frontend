@@ -49,15 +49,16 @@ In `app-config.ts`, inside `export interface AppConfig { ... }`, add after the `
 In the same file, inside `export const APP_CONFIG_DEFAULTS: AppConfig = { ... }`, add after the `agentName: process.env.AGENT_NAME ?? undefined,` line:
 
 ```ts
-  // voice selection — Cartesia voice IDs (provided by the team)
+  // voice selection — Cartesia voice IDs
   voices: [
-    { id: 'PLACEHOLDER_CARTESIA_ID_1', label: 'Voz 1' },
-    { id: 'PLACEHOLDER_CARTESIA_ID_2', label: 'Voz 2' },
+    { id: '78ab82d5-25be-4f7d-82b3-7ad64e5b85b2', label: 'Savannah' },
+    { id: 'd1d9c946-7cfc-4378-85a4-07d09827cb7e', label: 'Jolene' },
+    { id: '98a34ef2-2140-4c28-9c71-663dc4dd7022', label: 'Clyde' },
   ],
-  defaultVoiceId: 'PLACEHOLDER_CARTESIA_ID_1',
+  defaultVoiceId: '78ab82d5-25be-4f7d-82b3-7ad64e5b85b2',
 ```
 
-> The `PLACEHOLDER_CARTESIA_ID_*` strings and labels are filled in with the real Cartesia voice IDs supplied by the team before merge. The feature degrades cleanly if `voices` is empty (no icon rendered).
+> The feature degrades cleanly if `voices` is empty (no icon rendered).
 
 - [ ] **Step 3: Verify it compiles**
 
