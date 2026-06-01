@@ -24,9 +24,9 @@ export function buildFrontendIntent(intent: string, opts: BuildOptions = {}): Fr
     version: 'v1',
     topic: FRONTEND_INTENT_TOPIC,
     intent,
-    ...(opts.entities ? { entities: opts.entities } : {}),
-    ...(opts.userMessage ? { user_message: opts.userMessage } : {}),
-    ...(opts.correlationId ? { correlationId: opts.correlationId } : {}),
+    ...(opts.entities !== undefined ? { entities: opts.entities } : {}),
+    ...(opts.userMessage !== undefined ? { user_message: opts.userMessage } : {}),
+    ...(opts.correlationId !== undefined ? { correlationId: opts.correlationId } : {}),
   };
 }
 
@@ -35,5 +35,5 @@ export async function publishFrontendIntent(
   envelope: FrontendIntent
 ): Promise<void> {
   const bytes = new TextEncoder().encode(JSON.stringify(envelope));
-  await participant.publishData(bytes, { topic: FRONTEND_INTENT_TOPIC, reliable: true });
+  await participant.publishData(bytes, { topic: envelope.topic, reliable: true });
 }

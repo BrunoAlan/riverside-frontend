@@ -27,4 +27,10 @@ describe('buildFrontendIntent', () => {
     expect('entities' in env).toBe(false);
     expect('user_message' in env).toBe(false);
   });
+
+  it('preserves an empty-string user_message', () => {
+    const env = buildFrontendIntent('view_itinerary', { userMessage: '' });
+    expect('user_message' in env).toBe(true);
+    expect(env.user_message).toBe('');
+  });
 });
