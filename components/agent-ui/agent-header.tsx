@@ -9,7 +9,7 @@ export function AgentHeader() {
         width={694}
         height={275}
         priority
-        className="h-16 w-auto"
+        className="h-16 w-auto pt-4"
       />
     </div>
   );
