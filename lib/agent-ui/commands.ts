@@ -101,6 +101,11 @@ const SetCabinDetail = Base.extend({
   payload: z.object({ cabin_id: z.string().nullable() }),
 });
 
+const ShowCityDetail = Base.extend({
+  type: z.literal('show_city_detail'),
+  payload: z.object({ city_id: z.string().nullable() }),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
@@ -108,5 +113,6 @@ export const UiCommand = z.discriminatedUnion('type', [
   ShowDestinationDetail,
   SetBookingSummary,
   SetCabinDetail,
+  ShowCityDetail,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;

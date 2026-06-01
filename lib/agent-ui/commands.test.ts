@@ -264,6 +264,35 @@ describe('UiCommand schema', () => {
     });
     expect(parsed.success).toBe(false);
   });
+
+  it('parses show_city_detail with a string city_id', () => {
+    const result = UiCommand.parse({
+      type: 'show_city_detail',
+      correlationId: 'c-detail',
+      payload: { city_id: 'vienna' },
+    });
+    if (result.type !== 'show_city_detail') throw new Error('discriminator failed');
+    expect(result.payload.city_id).toBe('vienna');
+  });
+
+  it('parses show_city_detail with a null city_id (close)', () => {
+    const result = UiCommand.parse({
+      type: 'show_city_detail',
+      correlationId: 'c-close',
+      payload: { city_id: null },
+    });
+    if (result.type !== 'show_city_detail') throw new Error('discriminator failed');
+    expect(result.payload.city_id).toBeNull();
+  });
+
+  it('rejects show_city_detail without a city_id', () => {
+    const parsed = UiCommand.safeParse({
+      type: 'show_city_detail',
+      correlationId: 'c-bad',
+      payload: {},
+    });
+    expect(parsed.success).toBe(false);
+  });
 });
 
 describe('set_booking_summary', () => {
