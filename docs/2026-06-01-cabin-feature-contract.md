@@ -15,8 +15,8 @@ El diseño es **espejo exacto del itinerario**:
 
 | Itinerario (referencia)              | Cabinas (este contrato)               |
 | ------------------------------------ | ------------------------------------- |
-| `show_itinerary_options` (lleva `itinerary`) | `show_cabin_selection` (lleva `cabins[]`) |
-| `show_city_detail` (solo `city_id`)  | `set_cabin_detail` (solo `cabin_id`)  |
+| `show_itinerary_options` (lleva `itinerary`) | `show_cabin_options` (lleva `cabins[]`) |
+| `show_city_detail` (solo `city_id`)  | `show_cabin_detail` (solo `cabin_id`)  |
 
 ---
 
@@ -135,7 +135,7 @@ type Cabin = {
 
 ### 2.A — Ir a la vista de cabinas (enviar la lista)
 
-**Comando `show_cabin_selection`.** Lleva el array completo de cabinas y conmuta la UI a la
+**Comando `show_cabin_options`.** Lleva el array completo de cabinas y conmuta la UI a la
 vista `cabin_selection` (grilla, sin detalle abierto). Es el equivalente a
 `show_itinerary_options`.
 
@@ -145,7 +145,7 @@ vista `cabin_selection` (grilla, sin detalle abierto). Es el equivalente a
   "sessionId": "sess-abc",
   "commands": [
     {
-      "type": "show_cabin_selection",
+      "type": "show_cabin_options",
       "correlationId": "c-101",
       "payload": {
         "cabins": [
@@ -191,7 +191,7 @@ vista `cabin_selection` (grilla, sin detalle abierto). Es el equivalente a
 
 ### 2.B — Abrir el DETALLE de una cabina
 
-**Comando `set_cabin_detail`** con el `cabin_id`. Abre el modal de detalle de esa cabina.
+**Comando `show_cabin_detail`** con el `cabin_id`. Abre el modal de detalle de esa cabina.
 **Requiere que la UI ya esté en `cabin_selection`** (igual que `show_city_detail` requiere estar
 en el itinerario): el front no recarga la lista, solo marca cuál abrir. El `cabin_id` debe
 existir en el array enviado en 2.A.
@@ -201,7 +201,7 @@ existir en el array enviado en 2.A.
   "correlationId": "c-102",
   "commands": [
     {
-      "type": "set_cabin_detail",
+      "type": "show_cabin_detail",
       "correlationId": "c-102",
       "payload": { "cabin_id": "owners-suite" }
     }
@@ -218,7 +218,7 @@ Mismo comando con `cabin_id: null`. Cierra el modal y deja la grilla. No borra l
   "correlationId": "c-103",
   "commands": [
     {
-      "type": "set_cabin_detail",
+      "type": "show_cabin_detail",
       "correlationId": "c-103",
       "payload": { "cabin_id": null }
     }
@@ -230,13 +230,13 @@ Mismo comando con `cabin_id: null`. Cierra el modal y deja la grilla. No borra l
 
 | Comando                 | `payload`                      | Resultado en la UI                                |
 | ----------------------- | ------------------------------ | ------------------------------------------------- |
-| `show_cabin_selection`  | `{ cabins: [...] }`            | Conmuta a `cabin_selection` con la grilla cargada |
-| `set_cabin_detail`      | `{ cabin_id: "owners-suite" }` | Abre el detalle de esa cabina (si ya hay lista)   |
-| `set_cabin_detail`      | `{ cabin_id: null }`           | Cierra el detalle, queda en la grilla             |
+| `show_cabin_options`  | `{ cabins: [...] }`            | Conmuta a `cabin_selection` con la grilla cargada |
+| `show_cabin_detail`      | `{ cabin_id: "owners-suite" }` | Abre el detalle de esa cabina (si ya hay lista)   |
+| `show_cabin_detail`      | `{ cabin_id: null }`           | Cierra el detalle, queda en la grilla             |
 
-> Si llega `set_cabin_detail` y la UI **no** está en `cabin_selection`, el comando se ignora
+> Si llega `show_cabin_detail` y la UI **no** está en `cabin_selection`, el comando se ignora
 > (igual que `show_city_detail` fuera del itinerario). Para mostrar cabinas hay que mandar
-> primero `show_cabin_selection`.
+> primero `show_cabin_options`.
 
 ---
 
@@ -296,8 +296,8 @@ determinístico debe **registrar handlers** para estos dos. (Ya implementado en 
 
 | Dirección       | Topic             | Identificador           | Payload clave                                    |
 | --------------- | ----------------- | ----------------------- | ------------------------------------------------ |
-| Agente → Front  | `ui-commands`     | `show_cabin_selection`  | `payload.cabins: Cabin[]` (carga la lista)       |
-| Agente → Front  | `ui-commands`     | `set_cabin_detail`      | `payload.cabin_id` (`id` abre / `null` cierra)   |
+| Agente → Front  | `ui-commands`     | `show_cabin_options`  | `payload.cabins: Cabin[]` (carga la lista)       |
+| Agente → Front  | `ui-commands`     | `show_cabin_detail`      | `payload.cabin_id` (`id` abre / `null` cierra)   |
 | Front → Agente  | `frontend-intent` | `explore_cabin`         | `entities.cabin_id`                              |
 | Front → Agente  | `frontend-intent` | `view_cabin_selection`  | (sin entities)                                   |
 
@@ -308,11 +308,13 @@ determinístico debe **registrar handlers** para estos dos. (Ya implementado en 
 El contrato de arriba implica cambios en el front que **todavía no están hechos** (este doc es la
 especificación para coordinar). En particular:
 
-- Nuevo comando `show_cabin_selection` (schema Zod en `lib/agent-ui/commands.ts` + reducer).
+- Nuevo comando `show_cabin_options` (schema Zod en `lib/agent-ui/commands.ts` + reducer).
 - Schema Zod del tipo `Cabin` (con `detail`) en `commands.ts`.
 - La vista `cabin_selection` debe pasar a llevar `cabins: Cabin[]` (hoy solo tiene
   `detailCabinId`), y `panel-cabin-selection.tsx` leer de la vista en vez de importar el array
   hardcodeado de `lib/cabins.ts`.
-- `set_cabin_detail` pasa a requerir estar en `cabin_selection` y preservar la lista.
+- **Renombrar** el comando existente `set_cabin_detail` → `show_cabin_detail` (para igualar el
+  verbo `show` de `show_city_detail`). Pasa a requerir estar en `cabin_selection` y preservar la
+  lista.
 
 Los intents salientes (`explore_cabin`, `view_cabin_selection`) **ya están implementados**.
