@@ -22,11 +22,14 @@ const DEFAULT_ZOOM = 6.8;
 const FIT_PADDING = { top: 130, bottom: 100, left: 150, right: 130 };
 // Cap auto-fit zoom so two near-adjacent cities don't snap to extreme zoom.
 const FIT_MAX_ZOOM = 9;
+// Zoom level the camera flies to when focusing a single city in detail mode.
+const DETAIL_ZOOM = 8.5;
 
 type MapCanvasProps = {
   cities?: City[];
   center?: [number, number];
   zoom?: number;
+  focusCity?: City;
   onCityExpand?: (city: City) => void;
 };
 
@@ -34,6 +37,7 @@ export function MapCanvas({
   cities: cityList = cities,
   center = DEFAULT_CENTER,
   zoom = DEFAULT_ZOOM,
+  focusCity,
   onCityExpand,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,6 +73,10 @@ export function MapCanvas({
   // cities there's nothing to fit, so fall back to the explicit center/zoom.
   useEffect(() => {
     if (!map) return;
+    if (focusCity) {
+      map.flyTo({ center: [focusCity.lon, focusCity.lat], zoom: DETAIL_ZOOM, duration: 800 });
+      return;
+    }
     if (cityList.length >= 2) {
       const bounds = cityBounds(cityList);
       if (bounds) {
@@ -77,7 +85,7 @@ export function MapCanvas({
       }
     }
     map.jumpTo({ center, zoom });
-  }, [map, cityList, center, zoom]);
+  }, [map, cityList, center, zoom, focusCity]);
 
   return (
     <div className="bg-beige-200 relative h-full w-full">
@@ -95,7 +103,9 @@ export function MapCanvas({
         aria-hidden
         className="from-beige-200 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent"
       />
-      {map && <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />}
+      {map && !focusCity && (
+        <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />
+      )}
     </div>
   );
 }
