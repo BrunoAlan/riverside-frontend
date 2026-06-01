@@ -4,12 +4,12 @@ export function AgentHeader() {
   return (
     <div className="flex justify-center">
       <Image
-        src="/riverside-logo.svg"
+        src="/riverside-logo-small.svg"
         alt="Riverside Luxury Cruises"
-        width={100}
-        height={110}
+        width={694}
+        height={275}
         priority
-        className="h-[90px] w-auto"
+        className="h-14 w-auto pt-4"
       />
     </div>
   );

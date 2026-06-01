@@ -49,7 +49,7 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
       {cabin && (
         <DialogPrimitive.Content
           onInteractOutside={(event) => event.preventDefault()}
-          className="bg-beige-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 absolute inset-0 flex flex-col overflow-y-auto outline-none lg:flex-row lg:overflow-hidden"
+          className="bg-beige-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 absolute inset-0 flex flex-col overflow-y-auto pt-16 outline-none lg:flex-row lg:overflow-hidden"
         >
           <div className="h-72 shrink-0 sm:h-80 lg:h-auto lg:flex-1">
             <CabinDetailGallery images={cabin.detail.gallery} alt={cabin.name} />
