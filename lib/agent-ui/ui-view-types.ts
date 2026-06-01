@@ -1,5 +1,6 @@
 import type {
   BookingSummarySnapshot,
+  Cabin,
   Destination,
   DestinationImage,
   ItineraryFull,
@@ -18,7 +19,7 @@ export type UiView =
       detailCityId?: string;
     }
   | { type: 'compare_itinerary'; options: ItineraryFull[] }
-  | { type: 'cabin_selection'; detailCabinId?: string };
+  | { type: 'cabin_selection'; cabins: Cabin[]; detailCabinId?: string };
 
 export type UiHint = { type: 'soft_redirect'; reasonCode: string; missing?: string[] };
 

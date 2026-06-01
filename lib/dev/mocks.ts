@@ -1,3 +1,4 @@
+import type { Cabin } from '@/lib/agent-ui/commands';
 import type { BookingSummary, UiView } from '@/lib/agent-ui/ui-view-types';
 
 export interface ViewMock {
@@ -5,6 +6,52 @@ export interface ViewMock {
   label: string;
   view: UiView;
 }
+
+// Shared placeholder detail content, reused by every sample cabin until the
+// agent sends per-cabin content.
+const cabinDetail: Cabin['detail'] = {
+  gallery: ['/cabin-modal/1.png', '/cabin-modal/2.png', '/cabin-modal/3.png', '/cabin-modal/4.png'],
+  bedroom: [
+    'King-size bed (convertible to two twin beds)',
+    'King-size pillows and Superior Cotton linens',
+    'Beds face forward',
+  ],
+  bathroom: [
+    'Single vanity',
+    'Glass-enclosed shower with overhead and handheld showerhead',
+    'Luxurious terry robes, slippers and upscale amenities',
+    '220V power',
+    'Hairdryer',
+  ],
+  amenities: [
+    'Bedside table with convenient iPad',
+    'Closet with shelving and full-height hanging',
+    'In-suite safe',
+    'Writing desk/vanity area',
+    '40" wall-mounted flat-screen HD TV',
+    'Refrigerator',
+    'Nespresso coffee machine',
+    'Adjustable height/extendable coffee/dining table',
+    'Sofa',
+    'French Balcony',
+  ],
+};
+
+const sampleCabins: Cabin[] = [
+  { id: 'owners-suite', name: "Owner's Suite", image: '/cabin/1.png' },
+  { id: 'mozart-suite', name: 'Mozart Suite', image: '/cabin/2.png' },
+  { id: 'penthouse-suite', name: 'Penthouse Suite', image: '/cabin/3.png' },
+  { id: 'riverside-suite', name: 'Riverside Suite', image: '/cabin/4.png' },
+  { id: 'symphony-suite', name: 'Symphony Suite', image: '/cabin/5.png' },
+  { id: 'harmony-suite', name: 'Harmony Suite', image: '/cabin/6.png' },
+].map((c) => ({
+  ...c,
+  guests: 2,
+  area: 80,
+  price_from: 12229,
+  view: 'Balcony',
+  detail: cabinDetail,
+}));
 
 const danubeLegends = {
   id: 'danube_legends_from_budapest_to_vienna',
@@ -200,11 +247,15 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
     },
   ],
   cabin_selection: [
-    { id: 'default', label: 'All cabins', view: { type: 'cabin_selection' } },
+    {
+      id: 'default',
+      label: 'All cabins',
+      view: { type: 'cabin_selection', cabins: sampleCabins },
+    },
     {
       id: 'with_detail',
       label: "Detail open (Owner's Suite)",
-      view: { type: 'cabin_selection', detailCabinId: 'owners-suite' },
+      view: { type: 'cabin_selection', cabins: sampleCabins, detailCabinId: 'owners-suite' },
     },
   ],
 };

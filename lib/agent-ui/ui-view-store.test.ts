@@ -329,40 +329,86 @@ describe('ui-view-store', () => {
     });
   });
 
-  describe('cabin detail', () => {
-    it('applyCommand(set_cabin_detail) with a cabin_id opens the detail on cabin_selection', () => {
+  describe('cabin selection', () => {
+    const cabin = {
+      id: 'owners-suite',
+      name: "Owner's Suite",
+      image: '/cabin/1.png',
+      guests: 2,
+      area: 80,
+      price_from: 12229,
+      view: 'Balcony',
+      detail: {
+        gallery: ['/cabin-modal/1.png'],
+        bedroom: ['King-size bed'],
+        bathroom: ['Single vanity'],
+        amenities: ['In-suite safe'],
+      },
+    };
+
+    it('applyCommand(show_cabin_options) loads the list on cabin_selection', () => {
       store.getState().applyCommand({
-        type: 'set_cabin_detail',
+        type: 'show_cabin_options',
+        correlationId: 'co1',
+        payload: { cabins: [cabin] },
+      });
+      const s = store.getState();
+      expect(s.view).toEqual({ type: 'cabin_selection', cabins: [cabin] });
+      expect(s.source).toBe('agent');
+      expect(s.lastCorrelationId).toBe('co1');
+      expect(s.hint).toBeNull();
+    });
+
+    it('applyCommand(show_cabin_detail) sets detailCabinId and preserves the list', () => {
+      store.getState().applyCommand({
+        type: 'show_cabin_options',
+        correlationId: 'co1',
+        payload: { cabins: [cabin] },
+      });
+      store.getState().applyCommand({
+        type: 'show_cabin_detail',
         correlationId: 'cd1',
         payload: { cabin_id: 'owners-suite' },
       });
       const s = store.getState();
-      expect(s.view).toEqual({ type: 'cabin_selection', detailCabinId: 'owners-suite' });
-      expect(s.source).toBe('agent');
+      if (s.view.type !== 'cabin_selection') throw new Error('expected cabin_selection view');
+      expect(s.view.detailCabinId).toBe('owners-suite');
+      expect(s.view.cabins).toEqual([cabin]);
       expect(s.lastCorrelationId).toBe('cd1');
-      expect(s.hint).toBeNull();
     });
 
-    it('applyCommand(set_cabin_detail) with null closes the detail', () => {
+    it('applyCommand(show_cabin_detail) with null clears the detail, keeping the list', () => {
       store.getState().applyCommand({
-        type: 'set_cabin_detail',
+        type: 'show_cabin_options',
+        correlationId: 'co1',
+        payload: { cabins: [cabin] },
+      });
+      store.getState().applyCommand({
+        type: 'show_cabin_detail',
+        correlationId: 'cd1',
+        payload: { cabin_id: 'owners-suite' },
+      });
+      store.getState().applyCommand({
+        type: 'show_cabin_detail',
         correlationId: 'cd2',
         payload: { cabin_id: null },
       });
-      expect(store.getState().view).toEqual({ type: 'cabin_selection' });
+      const s = store.getState();
+      if (s.view.type !== 'cabin_selection') throw new Error('expected cabin_selection view');
+      expect(s.view.detailCabinId).toBeUndefined();
+      expect(s.view.cabins).toEqual([cabin]);
     });
 
-    it('set_cabin_detail switches to cabin_selection from another view', () => {
+    it('show_cabin_detail is a no-op on the view when not on cabin_selection', () => {
       store.getState().applyCommand({ type: 'show_discovery_canvas', correlationId: 'c1' });
       store.getState().applyCommand({
-        type: 'set_cabin_detail',
+        type: 'show_cabin_detail',
         correlationId: 'cd3',
         payload: { cabin_id: 'mozart-suite' },
       });
-      expect(store.getState().view).toEqual({
-        type: 'cabin_selection',
-        detailCabinId: 'mozart-suite',
-      });
+      const s = store.getState();
+      expect(s.view).toEqual({ type: 'presentation' });
+      expect(s.lastCorrelationId).toBe('cd3');
     });
   });
 

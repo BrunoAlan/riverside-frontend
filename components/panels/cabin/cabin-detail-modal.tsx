@@ -5,7 +5,8 @@ import { ArmchairIcon, BathtubIcon, BedIcon, XIcon } from '@phosphor-icons/react
 // modal={false} — keeping the bottom bar and voice input interactive.
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
-import { CABIN_DETAIL, type Cabin, formatCabinPrice } from '@/lib/cabins';
+import type { Cabin } from '@/lib/agent-ui/commands';
+import { formatCabinPrice } from '@/lib/cabins';
 
 type CabinDetailModalProps = {
   cabin: Cabin | null;
@@ -51,7 +52,7 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
           className="bg-beige-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 absolute inset-0 flex flex-col overflow-y-auto outline-none lg:flex-row lg:overflow-hidden"
         >
           <div className="h-72 shrink-0 sm:h-80 lg:h-auto lg:flex-1">
-            <CabinDetailGallery images={[...CABIN_DETAIL.gallery]} alt={cabin.name} />
+            <CabinDetailGallery images={cabin.detail.gallery} alt={cabin.name} />
           </div>
           <div className="p-6 lg:w-[400px] lg:shrink-0 lg:overflow-y-auto">
             <div className="flex items-start justify-between gap-4">
@@ -72,7 +73,7 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
               {[
                 `${cabin.guests} guests`,
                 `${cabin.area}m²`,
-                `from ${formatCabinPrice(cabin.priceFrom)} EUR`,
+                `from ${formatCabinPrice(cabin.price_from)} EUR`,
                 cabin.view,
               ].map((item, index) => (
                 <span key={index} className="flex items-center gap-3">
@@ -82,9 +83,9 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
               ))}
             </div>
             <div className="mt-6 flex flex-col gap-6">
-              <DetailSection icon={BedIcon} title="Bedroom" items={CABIN_DETAIL.bedroom} />
-              <DetailSection icon={BathtubIcon} title="Bathroom" items={CABIN_DETAIL.bathroom} />
-              <DetailSection icon={ArmchairIcon} title="Amenities" items={CABIN_DETAIL.amenities} />
+              <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
+              <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
+              <DetailSection icon={ArmchairIcon} title="Amenities" items={cabin.detail.amenities} />
             </div>
           </div>
         </DialogPrimitive.Content>

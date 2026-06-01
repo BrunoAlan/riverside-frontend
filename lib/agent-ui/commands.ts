@@ -96,8 +96,32 @@ const SetBookingSummary = Base.extend({
   payload: BookingSummarySnapshot,
 });
 
-const SetCabinDetail = Base.extend({
-  type: z.literal('set_cabin_detail'),
+// A cabin as it travels in a cabin_selection payload. Card fields plus the
+// detail-only content shown in the cabin modal.
+export const Cabin = z.object({
+  id: z.string(),
+  name: z.string(),
+  image: z.string(),
+  guests: z.number().int(),
+  area: z.number(),
+  price_from: z.number(),
+  view: z.string(),
+  detail: z.object({
+    gallery: z.array(z.string()).min(1),
+    bedroom: z.array(z.string()),
+    bathroom: z.array(z.string()),
+    amenities: z.array(z.string()),
+  }),
+});
+export type Cabin = z.infer<typeof Cabin>;
+
+const ShowCabinOptions = Base.extend({
+  type: z.literal('show_cabin_options'),
+  payload: z.object({ cabins: z.array(Cabin).min(1) }),
+});
+
+const ShowCabinDetail = Base.extend({
+  type: z.literal('show_cabin_detail'),
   payload: z.object({ cabin_id: z.string().nullable() }),
 });
 
@@ -112,7 +136,8 @@ export const UiCommand = z.discriminatedUnion('type', [
   ShowItineraryOptions,
   ShowDestinationDetail,
   SetBookingSummary,
-  SetCabinDetail,
+  ShowCabinOptions,
+  ShowCabinDetail,
   ShowCityDetail,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
