@@ -74,16 +74,24 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlationId,
             };
-          case 'set_cabin_detail':
+          case 'show_cabin_options':
             return {
-              view: {
-                type: 'cabin_selection',
-                detailCabinId: cmd.payload.cabin_id ?? undefined,
-              },
+              view: { type: 'cabin_selection', cabins: cmd.payload.cabins },
               hint: null,
               source: 'agent',
               lastCorrelationId: cmd.correlationId,
             };
+          case 'show_cabin_detail': {
+            if (state.view.type !== 'cabin_selection') {
+              return { source: 'agent', lastCorrelationId: cmd.correlationId };
+            }
+            return {
+              view: { ...state.view, detailCabinId: cmd.payload.cabin_id ?? undefined },
+              hint: null,
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
+          }
           case 'show_city_detail': {
             if (state.view.type !== 'itinerary') {
               return { source: 'agent', lastCorrelationId: cmd.correlationId };

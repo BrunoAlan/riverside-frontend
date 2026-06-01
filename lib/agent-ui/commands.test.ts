@@ -381,30 +381,30 @@ describe('set_booking_summary', () => {
   });
 });
 
-describe('set_cabin_detail', () => {
+describe('show_cabin_detail', () => {
   it('parses with a string cabin_id', () => {
     const out = UiCommand.parse({
-      type: 'set_cabin_detail',
+      type: 'show_cabin_detail',
       correlationId: 'cd1',
       payload: { cabin_id: 'owners-suite' },
     });
-    if (out.type !== 'set_cabin_detail') throw new Error('discriminator failed');
+    if (out.type !== 'show_cabin_detail') throw new Error('discriminator failed');
     expect(out.payload.cabin_id).toBe('owners-suite');
   });
 
   it('parses with a null cabin_id', () => {
     const out = UiCommand.parse({
-      type: 'set_cabin_detail',
+      type: 'show_cabin_detail',
       correlationId: 'cd1',
       payload: { cabin_id: null },
     });
-    if (out.type !== 'set_cabin_detail') throw new Error('discriminator failed');
+    if (out.type !== 'show_cabin_detail') throw new Error('discriminator failed');
     expect(out.payload.cabin_id).toBeNull();
   });
 
   it('rejects a missing cabin_id', () => {
     const out = UiCommand.safeParse({
-      type: 'set_cabin_detail',
+      type: 'show_cabin_detail',
       correlationId: 'cd1',
       payload: {},
     });
@@ -413,9 +413,75 @@ describe('set_cabin_detail', () => {
 
   it('rejects a numeric cabin_id', () => {
     const out = UiCommand.safeParse({
-      type: 'set_cabin_detail',
+      type: 'show_cabin_detail',
       correlationId: 'cd1',
       payload: { cabin_id: 42 },
+    });
+    expect(out.success).toBe(false);
+  });
+});
+
+describe('show_cabin_options', () => {
+  const validCabin = {
+    id: 'owners-suite',
+    name: "Owner's Suite",
+    image: '/cabin/1.png',
+    guests: 2,
+    area: 80,
+    price_from: 12229,
+    view: 'Balcony',
+    detail: {
+      gallery: ['/cabin-modal/1.png'],
+      bedroom: ['King-size bed'],
+      bathroom: ['Single vanity'],
+      amenities: ['In-suite safe'],
+    },
+  };
+
+  it('parses with a non-empty cabins array', () => {
+    const out = UiCommand.parse({
+      type: 'show_cabin_options',
+      correlationId: 'co1',
+      payload: { cabins: [validCabin] },
+    });
+    if (out.type !== 'show_cabin_options') throw new Error('discriminator failed');
+    expect(out.payload.cabins).toHaveLength(1);
+    expect(out.payload.cabins[0].price_from).toBe(12229);
+    expect(out.payload.cabins[0].detail.amenities).toEqual(['In-suite safe']);
+  });
+
+  it('rejects an empty cabins array', () => {
+    const out = UiCommand.safeParse({
+      type: 'show_cabin_options',
+      correlationId: 'co1',
+      payload: { cabins: [] },
+    });
+    expect(out.success).toBe(false);
+  });
+
+  it('rejects a cabin missing the detail object', () => {
+    const noDetail = {
+      id: 'owners-suite',
+      name: "Owner's Suite",
+      image: '/cabin/1.png',
+      guests: 2,
+      area: 80,
+      price_from: 12229,
+      view: 'Balcony',
+    };
+    const out = UiCommand.safeParse({
+      type: 'show_cabin_options',
+      correlationId: 'co1',
+      payload: { cabins: [noDetail] },
+    });
+    expect(out.success).toBe(false);
+  });
+
+  it('rejects a cabin whose detail.gallery is empty', () => {
+    const out = UiCommand.safeParse({
+      type: 'show_cabin_options',
+      correlationId: 'co1',
+      payload: { cabins: [{ ...validCabin, detail: { ...validCabin.detail, gallery: [] } }] },
     });
     expect(out.success).toBe(false);
   });

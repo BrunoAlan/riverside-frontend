@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import { ArrowsOutSimpleIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
-import { type Cabin, formatCabinPrice } from '@/lib/cabins';
+import type { Cabin } from '@/lib/agent-ui/commands';
+import { formatCabinPrice } from '@/lib/cabins';
 
 type CabinCardProps = {
   cabin: Cabin;
@@ -13,7 +14,7 @@ export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProp
   const info = [
     `${cabin.guests} guests`,
     `${cabin.area}m²`,
-    `from ${formatCabinPrice(cabin.priceFrom)} EUR`,
+    `from ${formatCabinPrice(cabin.price_from)} EUR`,
     cabin.view,
   ];
 

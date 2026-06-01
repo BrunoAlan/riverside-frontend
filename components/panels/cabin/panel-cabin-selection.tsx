@@ -3,9 +3,10 @@
 import { useCallback } from 'react';
 import { CabinCard } from '@/components/panels/cabin/cabin-card';
 import { CabinDetailModal } from '@/components/panels/cabin/cabin-detail-modal';
+import { useFrontendIntent } from '@/hooks/use-frontend-intent';
+import type { Cabin } from '@/lib/agent-ui/commands';
 import { useSetViewFromUser } from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
-import { type Cabin, cabins } from '@/lib/cabins';
 
 type PanelCabinSelectionProps = {
   view: Extract<UiView, { type: 'cabin_selection' }>;
@@ -13,17 +14,27 @@ type PanelCabinSelectionProps = {
 
 export function PanelCabinSelection({ view }: PanelCabinSelectionProps) {
   const setViewFromUser = useSetViewFromUser();
+  const sendIntent = useFrontendIntent();
+
+  const { cabins } = view;
 
   const handleExpand = useCallback(
     (cabin: Cabin) => {
-      setViewFromUser({ type: 'cabin_selection', detailCabinId: cabin.id });
+      setViewFromUser({ type: 'cabin_selection', cabins, detailCabinId: cabin.id });
+      void sendIntent('explore_cabin', {
+        entities: { cabin_id: cabin.id },
+        userMessage: `User opened ${cabin.name} detail`,
+      });
     },
-    [setViewFromUser]
+    [setViewFromUser, sendIntent, cabins]
   );
 
   const handleClose = useCallback(() => {
-    setViewFromUser({ type: 'cabin_selection' });
-  }, [setViewFromUser]);
+    setViewFromUser({ type: 'cabin_selection', cabins });
+    void sendIntent('view_cabin_selection', {
+      userMessage: 'User closed cabin detail',
+    });
+  }, [setViewFromUser, sendIntent, cabins]);
 
   const detailCabin = view.detailCabinId
     ? (cabins.find((cabin) => cabin.id === view.detailCabinId) ?? null)
