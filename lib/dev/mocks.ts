@@ -101,11 +101,6 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
   ],
   itinerary: [
     {
-      id: 'default',
-      label: 'Map (fallback cities)',
-      view: { type: 'itinerary', addOnDecisions: {} },
-    },
-    {
       id: 'danube_legends',
       label: 'Danube Legends (agent payload)',
       view: { type: 'itinerary', addOnDecisions: {}, itinerary: danubeLegends },
