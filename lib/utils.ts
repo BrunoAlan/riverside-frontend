@@ -2,6 +2,7 @@ import { cache } from 'react';
 import { TokenSource } from 'livekit-client';
 import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import type { AppConfig } from '@/app-config';
+import { voiceStore } from '@/lib/agent-ui/voice-store';
 
 const CONFIG_ENDPOINT = process.env.NEXT_PUBLIC_APP_CONFIG_ENDPOINT;
 const SANDBOX_ID = process.env.SANDBOX_ID;
@@ -90,6 +91,24 @@ export function getStyles(appConfig: AppConfig) {
     .join('\n');
 }
 
+type AgentDispatch = { agent_name: string; metadata?: string };
+
+/**
+ * Build the LiveKit room_config agent dispatch, embedding the chosen Cartesia
+ * voice as `{ voice_id }` metadata. Returns undefined when no agent is configured.
+ */
+export function buildRoomConfig(
+  agentName: string | undefined,
+  voiceId: string | null
+): { agents: AgentDispatch[] } | undefined {
+  if (!agentName) return undefined;
+  const agent: AgentDispatch = { agent_name: agentName };
+  if (voiceId) {
+    agent.metadata = JSON.stringify({ voice_id: voiceId });
+  }
+  return { agents: [agent] };
+}
+
 /**
  * Get a token source for a sandboxed LiveKit session
  * @param appConfig - The app configuration
@@ -99,11 +118,7 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
   return TokenSource.custom(async () => {
     const url = new URL(process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT!, window.location.origin);
     const sandboxId = appConfig.sandboxId ?? '';
-    const roomConfig = appConfig.agentName
-      ? {
-          agents: [{ agent_name: appConfig.agentName }],
-        }
-      : undefined;
+    const roomConfig = buildRoomConfig(appConfig.agentName, voiceStore.getState().voiceId);
 
     try {
       const res = await fetch(url.toString(), {
@@ -115,6 +130,28 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
         body: JSON.stringify({
           room_config: roomConfig,
         }),
+      });
+      return await res.json();
+    } catch (error) {
+      console.error('Error fetching connection details:', error);
+      throw new Error('Error fetching connection details!');
+    }
+  });
+}
+
+/**
+ * Token source for the local dev `/api/token` route. Posts room_config so the
+ * selected Cartesia voice reaches the agent via dispatch metadata, exactly like
+ * the sandbox path.
+ */
+export function getLocalTokenSource(appConfig: AppConfig) {
+  return TokenSource.custom(async () => {
+    const roomConfig = buildRoomConfig(appConfig.agentName, voiceStore.getState().voiceId);
+    try {
+      const res = await fetch('/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_config: roomConfig }),
       });
       return await res.json();
     } catch (error) {
