@@ -31,7 +31,7 @@ export function createUiViewStore() {
     bookingSummary: null,
 
     applyCommand: (cmd) =>
-      set(() => {
+      set((state) => {
         switch (cmd.type) {
           case 'show_discovery_canvas':
             return {
@@ -84,6 +84,17 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlationId,
             };
+          case 'show_city_detail': {
+            if (state.view.type !== 'itinerary') {
+              return { source: 'agent', lastCorrelationId: cmd.correlationId };
+            }
+            return {
+              view: { ...state.view, detailCityId: cmd.payload.city_id ?? undefined },
+              hint: null,
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
+          }
           default: {
             const _exhaustive: never = cmd;
             void _exhaustive;
@@ -106,8 +117,7 @@ export function createUiViewStore() {
         if (state.view.type !== 'itinerary') return {};
         return {
           view: {
-            type: 'itinerary',
-            itinerary: state.view.itinerary,
+            ...state.view,
             addOnDecisions: { ...state.view.addOnDecisions, [addOnId]: decision },
           },
           source: 'user',

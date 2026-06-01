@@ -366,6 +366,97 @@ describe('ui-view-store', () => {
     });
   });
 
+  const itineraryPayload = {
+    id: 'danube_legends',
+    name: 'Danube Legends',
+    duration: { days: 12, nights: 11 },
+    match_score: 0.6667,
+    departure_dates: ['2026-04-22'],
+    center: [16.57, 48.15] as [number, number],
+    zoom: 6,
+    cities: [
+      {
+        id: 'vienna',
+        name: 'Vienna',
+        country: 'Austria',
+        image: 'https://example.com/vienna.jpg',
+        days: 'Days 5, 10 & 11',
+        lon: 16.3738,
+        lat: 48.2082,
+      },
+    ],
+  };
+
+  it('applyCommand(show_city_detail) sets detailCityId on the itinerary view', () => {
+    store.getState().applyCommand({
+      type: 'show_itinerary_options',
+      correlationId: 'c1',
+      payload: { itinerary: itineraryPayload },
+    });
+    store.getState().applyCommand({
+      type: 'show_city_detail',
+      correlationId: 'c2',
+      payload: { city_id: 'vienna' },
+    });
+    const s = store.getState();
+    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
+    expect(s.view.detailCityId).toBe('vienna');
+    expect(s.view.itinerary?.id).toBe('danube_legends');
+    expect(s.view.addOnDecisions).toEqual({});
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('c2');
+  });
+
+  it('applyCommand(show_city_detail) with null clears detailCityId', () => {
+    store.getState().applyCommand({
+      type: 'show_itinerary_options',
+      correlationId: 'c1',
+      payload: { itinerary: itineraryPayload },
+    });
+    store.getState().applyCommand({
+      type: 'show_city_detail',
+      correlationId: 'c2',
+      payload: { city_id: 'vienna' },
+    });
+    store.getState().applyCommand({
+      type: 'show_city_detail',
+      correlationId: 'c3',
+      payload: { city_id: null },
+    });
+    const s = store.getState();
+    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
+    expect(s.view.detailCityId).toBeUndefined();
+  });
+
+  it('applyCommand(show_city_detail) is a no-op on the view when not on itinerary', () => {
+    store.getState().applyCommand({
+      type: 'show_city_detail',
+      correlationId: 'c1',
+      payload: { city_id: 'vienna' },
+    });
+    const s = store.getState();
+    expect(s.view).toEqual({ type: 'start' });
+    expect(s.lastCorrelationId).toBe('c1');
+  });
+
+  it('setAddOnDecision preserves detailCityId', () => {
+    store.getState().applyCommand({
+      type: 'show_itinerary_options',
+      correlationId: 'c1',
+      payload: { itinerary: itineraryPayload },
+    });
+    store.getState().applyCommand({
+      type: 'show_city_detail',
+      correlationId: 'c2',
+      payload: { city_id: 'vienna' },
+    });
+    store.getState().setAddOnDecision('vienna-addon', 'confirmed');
+    const s = store.getState();
+    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
+    expect(s.view.detailCityId).toBe('vienna');
+    expect(s.view.addOnDecisions).toEqual({ 'vienna-addon': 'confirmed' });
+  });
+
   describe('add-on decisions', () => {
     it('setAddOnDecision writes confirmed into the active itinerary view', () => {
       store.getState().setViewFromUser({ type: 'itinerary', addOnDecisions: {} });
