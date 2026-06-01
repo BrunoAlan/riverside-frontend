@@ -302,19 +302,3 @@ determinístico debe **registrar handlers** para estos dos. (Ya implementado en 
 | Front → Agente  | `frontend-intent` | `view_cabin_selection`  | (sin entities)                                   |
 
 ---
-
-## 5) Pendiente en el Frontend (para que esto funcione)
-
-El contrato de arriba implica cambios en el front que **todavía no están hechos** (este doc es la
-especificación para coordinar). En particular:
-
-- Nuevo comando `show_cabin_options` (schema Zod en `lib/agent-ui/commands.ts` + reducer).
-- Schema Zod del tipo `Cabin` (con `detail`) en `commands.ts`.
-- La vista `cabin_selection` debe pasar a llevar `cabins: Cabin[]` (hoy solo tiene
-  `detailCabinId`), y `panel-cabin-selection.tsx` leer de la vista en vez de importar el array
-  hardcodeado de `lib/cabins.ts`.
-- **Renombrar** el comando existente `set_cabin_detail` → `show_cabin_detail` (para igualar el
-  verbo `show` de `show_city_detail`). Pasa a requerir estar en `cabin_selection` y preservar la
-  lista.
-
-Los intents salientes (`explore_cabin`, `view_cabin_selection`) **ya están implementados**.
