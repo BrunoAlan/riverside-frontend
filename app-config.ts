@@ -28,6 +28,10 @@ export interface AppConfig {
   // agent dispatch configuration
   agentName?: string;
 
+  // voice selection (Cartesia voice IDs)
+  voices?: { id: string; label: string }[];
+  defaultVoiceId?: string;
+
   // LiveKit Cloud Sandbox configuration
   sandboxId?: string;
 }
@@ -66,6 +70,14 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
 
   // agent dispatch configuration
   agentName: process.env.AGENT_NAME ?? undefined,
+
+  // voice selection — Cartesia voice IDs
+  voices: [
+    { id: '78ab82d5-25be-4f7d-82b3-7ad64e5b85b2', label: 'Savannah' },
+    { id: 'd1d9c946-7cfc-4378-85a4-07d09827cb7e', label: 'Jolene' },
+    { id: '98a34ef2-2140-4c28-9c71-663dc4dd7022', label: 'Clyde' },
+  ],
+  defaultVoiceId: '78ab82d5-25be-4f7d-82b3-7ad64e5b85b2',
 
   // LiveKit Cloud Sandbox configuration
   sandboxId: undefined,
