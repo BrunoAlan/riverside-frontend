@@ -16,7 +16,10 @@ export function useFrontendIntent(): (intent: string, opts?: SendIntentOptions) 
 
   return useCallback(async (intent: string, opts: SendIntentOptions = {}) => {
     const participant = roomRef.current?.localParticipant;
-    if (!participant) return;
+    if (!participant) {
+      console.warn('[frontend-intent] dropped (no participant)', { intent, ...opts });
+      return;
+    }
     await publishFrontendIntent(participant, buildFrontendIntent(intent, opts));
   }, []);
 }

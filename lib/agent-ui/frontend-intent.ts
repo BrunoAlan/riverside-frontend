@@ -36,4 +36,10 @@ export async function publishFrontendIntent(
 ): Promise<void> {
   const bytes = new TextEncoder().encode(JSON.stringify(envelope));
   await participant.publishData(bytes, { topic: envelope.topic, reliable: true });
+  console.log('[frontend-intent] sent', {
+    intent: envelope.intent,
+    entities: envelope.entities,
+    user_message: envelope.user_message,
+    correlationId: envelope.correlationId,
+  });
 }
