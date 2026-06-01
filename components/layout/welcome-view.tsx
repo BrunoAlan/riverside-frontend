@@ -1,14 +1,34 @@
 import { MicrophoneIcon, SpeakerHighIcon } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+interface Voice {
+  id: string;
+  label: string;
+}
 
 interface WelcomeViewProps {
   startButtonText: string;
   onStartCall: () => void;
+  voices: Voice[];
+  selectedVoiceId: string | null;
+  onSelectVoice: (id: string) => void;
 }
 
 export const WelcomeView = ({
   startButtonText,
   onStartCall,
+  voices,
+  selectedVoiceId,
+  onSelectVoice,
   ref,
 }: React.ComponentProps<'div'> & WelcomeViewProps) => {
   return (
@@ -25,9 +45,40 @@ export const WelcomeView = ({
           Please grant the concierge permission to use your microphone and play sound.
         </p>
 
-        <Button size="lg" onClick={onStartCall} className="mt-7 rounded-lg px-4 py-2">
-          {startButtonText}
-        </Button>
+        <div className="mt-7 flex items-center gap-2">
+          <Button size="lg" onClick={onStartCall} className="rounded-lg px-4 py-2">
+            {startButtonText}
+          </Button>
+
+          {voices.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  aria-label="Select agent voice"
+                  className="rounded-lg px-3 py-2"
+                >
+                  <SpeakerHighIcon size={20} weight="regular" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Voice</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  value={selectedVoiceId ?? undefined}
+                  onValueChange={onSelectVoice}
+                >
+                  {voices.map((voice) => (
+                    <DropdownMenuRadioItem key={voice.id} value={voice.id}>
+                      {voice.label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </section>
     </div>
   );
