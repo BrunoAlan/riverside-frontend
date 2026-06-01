@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { TokenSource } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
 import { BookingSummaryContainer } from '@/components/agent-ui/booking-summary';
@@ -17,7 +16,7 @@ import { useUiView } from '@/lib/agent-ui/hooks';
 import { useUiCommandTransport } from '@/lib/agent-ui/transport';
 import { useDevChatMessages } from '@/lib/dev/chat-mock-store';
 import { DevPanel } from '@/lib/dev/dev-panel';
-import { getSandboxTokenSource } from '@/lib/utils';
+import { getLocalTokenSource, getSandboxTokenSource } from '@/lib/utils';
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
@@ -45,7 +44,7 @@ export function App({ appConfig }: AppProps) {
   const tokenSource = useMemo(() => {
     return typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string'
       ? getSandboxTokenSource(appConfig)
-      : TokenSource.endpoint('/api/token');
+      : getLocalTokenSource(appConfig);
   }, [appConfig]);
 
   const session = useSession(
