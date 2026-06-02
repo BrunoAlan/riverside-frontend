@@ -54,12 +54,12 @@ export function IdentityGate({ children }: IdentityGateProps) {
         <div className="text-center">
           <h1 className="text-foreground text-2xl font-medium">Welcome</h1>
           <p className="text-muted-foreground mt-2 text-sm leading-6">
-            Antes de empezar, contanos quién sos. Esta sesión se graba con fines de prueba.
+            Before we start, tell us who you are. This session is recorded for testing purposes.
           </p>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="tester-name">Nombre</Label>
+            <Label htmlFor="tester-name">Name</Label>
             <Input
               id="tester-name"
               value={name}
@@ -80,7 +80,7 @@ export function IdentityGate({ children }: IdentityGateProps) {
             />
           </div>
           <Button type="submit" size="lg" disabled={!valid} className="mt-2 rounded-lg">
-            Empezar
+            Start
           </Button>
         </form>
       </Card>
