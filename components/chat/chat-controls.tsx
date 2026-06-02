@@ -14,7 +14,7 @@ export type ChatControlsProps = {
 };
 
 const buttonBase =
-  'pointer-events-auto size-10 rounded-full border border-white/10 backdrop-blur-md';
+  'pointer-events-auto size-10 rounded-xl bg-beige-300 hover:bg-beige-400/40 text-primary backdrop-blur-md cursor-pointer';
 
 function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps) {
   const session = useSessionContext();
@@ -44,9 +44,9 @@ function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps
         variant="destructive"
         onClick={() => void handleEndCall()}
         aria-label="End call"
-        className={cn(buttonBase)}
+        className={cn(buttonBase, 'bg-red-300/40 hover:bg-red-400/40')}
       >
-        <PhoneOff />
+        <PhoneOff className="stroke-red-500" />
       </Button>
 
       <Button
@@ -57,7 +57,7 @@ function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps
         disabled={micPending}
         aria-label={micEnabled ? 'Mute microphone' : 'Unmute microphone'}
         aria-pressed={!micEnabled}
-        className={cn(buttonBase, 'bg-background/40')}
+        className={cn(buttonBase)}
       >
         {micEnabled ? <Mic /> : <MicOff />}
       </Button>
@@ -69,10 +69,7 @@ function ChatControls({ isChatOpen, onToggleChat, className }: ChatControlsProps
         onClick={onToggleChat}
         aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
         aria-pressed={isChatOpen}
-        className={cn(
-          buttonBase,
-          isChatOpen ? 'bg-primary text-primary-foreground' : 'bg-background/40'
-        )}
+        className={cn(buttonBase, isChatOpen ? 'bg-beige-400/60' : '')}
       >
         <MessageSquare />
       </Button>

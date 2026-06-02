@@ -52,7 +52,7 @@ function ChatInput({
   return (
     <div
       data-slot="chat-input"
-      className={cn('bg-card flex items-end gap-2 rounded-2xl border px-3 py-2', className)}
+      className={cn('bg-card flex items-end gap-2 rounded-2xl border p-2 pl-1', className)}
     >
       <Textarea
         value={text}
@@ -62,7 +62,7 @@ function ChatInput({
         disabled={disabled}
         autoFocus={autoFocus}
         rows={1}
-        className="max-h-40 min-h-9 resize-none overflow-y-auto border-0 bg-transparent px-2 py-1 shadow-none focus-visible:ring-0"
+        className="max-h-40 min-h-9 resize-none overflow-y-auto border-0 bg-transparent p-2 shadow-none focus-visible:ring-0"
       />
       <Button
         type="button"
