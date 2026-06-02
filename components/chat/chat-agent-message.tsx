@@ -13,10 +13,7 @@ function ChatAgentMessage({ children, streaming, className }: ChatAgentMessagePr
   return (
     <p
       data-slot="chat-agent-message"
-      className={cn(
-        'text-muted-foreground text-base leading-normal whitespace-pre-wrap',
-        className
-      )}
+      className={cn('text-muted-foreground text-sm leading-normal whitespace-pre-wrap', className)}
     >
       {children}
       {streaming ? (

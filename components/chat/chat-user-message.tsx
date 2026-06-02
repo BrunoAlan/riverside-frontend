@@ -12,7 +12,7 @@ function ChatUserMessage({ children, className }: ChatUserMessageProps) {
   return (
     <p
       data-slot="chat-user-message"
-      className={cn('text-foreground text-base leading-normal whitespace-pre-wrap', className)}
+      className={cn('text-foreground text-sm leading-normal whitespace-pre-wrap', className)}
     >
       {children}
     </p>
