@@ -41,9 +41,12 @@ export async function POST(req: Request) {
       ? RoomConfiguration.fromJson(body.room_config, { ignoreUnknownFields: true })
       : new RoomConfiguration();
 
-    // Generate participant token
-    const participantName = 'user';
-    const participantIdentity = `voice_assistant_user_${Math.floor(Math.random() * 10_000)}`;
+    // Identify the participant by the tester's declared identity when present,
+    // so LiveKit sessions correlate to the tester; fall back to a random id.
+    const tester = body?.participant as { identity?: string; name?: string } | undefined;
+    const participantName = tester?.name?.trim() || 'user';
+    const participantIdentity =
+      tester?.identity?.trim() || `voice_assistant_user_${Math.floor(Math.random() * 10_000)}`;
     const roomName = `voice_assistant_room_${Math.floor(Math.random() * 10_000)}`;
 
     const participantToken = await createParticipantToken(
