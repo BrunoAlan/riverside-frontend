@@ -7,6 +7,7 @@ export const ANALYTICS_EVENTS = {
   sessionEnded: 'session_ended',
   agentError: 'agent_error',
   agentViewShown: 'agent_view_shown',
+  agentViewDetailShown: 'agent_view_detail_shown',
 } as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];
@@ -17,4 +18,9 @@ export type AnalyticsEventProps = {
   [ANALYTICS_EVENTS.sessionEnded]: { duration_seconds: number; voice_id: string | null };
   [ANALYTICS_EVENTS.agentError]: { reasons: string[]; duration_seconds: number };
   [ANALYTICS_EVENTS.agentViewShown]: { view_type: string };
+  [ANALYTICS_EVENTS.agentViewDetailShown]: {
+    view_type: string;
+    detail_id: string;
+    source: 'agent' | 'user';
+  };
 };
