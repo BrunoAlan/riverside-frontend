@@ -340,6 +340,24 @@ describe('set_booking_summary', () => {
     expect(out.success).toBe(true);
   });
 
+  it('normalizes { label: null } to null for label fields', () => {
+    const out = UiCommand.safeParse({
+      type: 'set_booking_summary',
+      correlationId: 'b1',
+      payload: {
+        ...validPayload,
+        price: { label: null },
+        duration: { label: null },
+      },
+    });
+    expect(out.success).toBe(true);
+    if (!out.success || out.data.type !== 'set_booking_summary') {
+      throw new Error('expected a valid set_booking_summary');
+    }
+    expect(out.data.payload.price).toBeNull();
+    expect(out.data.payload.duration).toBeNull();
+  });
+
   it('accepts an empty slots array', () => {
     const out = UiCommand.safeParse({
       type: 'set_booking_summary',
