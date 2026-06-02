@@ -12,6 +12,8 @@ import { StartAudioButton } from '@/components/livekit/start-audio-button';
 import { useAgentErrors } from '@/hooks/use-agent-errors';
 import { useChatTranscription } from '@/hooks/use-chat-transcription';
 import { useDebugMode } from '@/hooks/use-debug';
+import { useSessionAnalytics } from '@/hooks/use-session-analytics';
+import { useViewAnalytics } from '@/hooks/use-view-analytics';
 import { useUiView } from '@/lib/agent-ui/hooks';
 import { useUiCommandTransport } from '@/lib/agent-ui/transport';
 import { useDevChatMessages } from '@/lib/dev/chat-mock-store';
@@ -24,6 +26,8 @@ function AppSetup() {
   useDebugMode({ enabled: IN_DEVELOPMENT });
   useAgentErrors();
   useUiCommandTransport();
+  useSessionAnalytics();
+  useViewAnalytics();
   return null;
 }
 

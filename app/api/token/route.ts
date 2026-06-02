@@ -14,11 +14,17 @@ const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
 const LIVEKIT_URL = process.env.LIVEKIT_URL;
 
+// Local prod-build testing escape hatch. Set ALLOW_INSECURE_TOKEN_ENDPOINT=true in
+// `.env.local` (gitignored) to exercise this route under `next start` while keeping
+// NODE_ENV=production (so analytics stays enabled). NEVER set this in a real
+// deployment — the route still has no authentication layer.
+const ALLOW_INSECURE_TOKEN_ENDPOINT = process.env.ALLOW_INSECURE_TOKEN_ENDPOINT === 'true';
+
 // don't cache the results
 export const revalidate = 0;
 
 export async function POST(req: Request) {
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== 'development' && !ALLOW_INSECURE_TOKEN_ENDPOINT) {
     throw new Error(
       'THIS API ROUTE IS INSECURE. DO NOT USE THIS ROUTE IN PRODUCTION WITHOUT AN AUTHENTICATION LAYER.'
     );
@@ -41,9 +47,12 @@ export async function POST(req: Request) {
       ? RoomConfiguration.fromJson(body.room_config, { ignoreUnknownFields: true })
       : new RoomConfiguration();
 
-    // Generate participant token
-    const participantName = 'user';
-    const participantIdentity = `voice_assistant_user_${Math.floor(Math.random() * 10_000)}`;
+    // Identify the participant by the tester's declared identity when present,
+    // so LiveKit sessions correlate to the tester; fall back to a random id.
+    const tester = body?.participant as { identity?: string; name?: string } | undefined;
+    const participantName = tester?.name?.trim() || 'user';
+    const participantIdentity =
+      tester?.identity?.trim() || `voice_assistant_user_${Math.floor(Math.random() * 10_000)}`;
     const roomName = `voice_assistant_room_${Math.floor(Math.random() * 10_000)}`;
 
     const participantToken = await createParticipantToken(

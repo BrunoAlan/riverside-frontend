@@ -3,6 +3,7 @@ import { TokenSource } from 'livekit-client';
 import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import type { AppConfig } from '@/app-config';
 import { voiceStore } from '@/lib/agent-ui/voice-store';
+import { readIdentity } from '@/lib/analytics/identity';
 
 const CONFIG_ENDPOINT = process.env.NEXT_PUBLIC_APP_CONFIG_ENDPOINT;
 const SANDBOX_ID = process.env.SANDBOX_ID;
@@ -119,6 +120,8 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
     const url = new URL(process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT!, window.location.origin);
     const sandboxId = appConfig.sandboxId ?? '';
     const roomConfig = buildRoomConfig(appConfig.agentName, voiceStore.getState().voiceId);
+    // Runs at connect time in the browser; IdentityGate has already stored the tester by now.
+    const tester = readIdentity();
 
     try {
       const res = await fetch(url.toString(), {
@@ -129,6 +132,7 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
         },
         body: JSON.stringify({
           room_config: roomConfig,
+          participant: tester ? { identity: tester.email, name: tester.name } : undefined,
         }),
       });
       return await res.json();
@@ -147,11 +151,16 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
 export function getLocalTokenSource(appConfig: AppConfig) {
   return TokenSource.custom(async () => {
     const roomConfig = buildRoomConfig(appConfig.agentName, voiceStore.getState().voiceId);
+    // Runs at connect time in the browser; IdentityGate has already stored the tester by now.
+    const tester = readIdentity();
     try {
       const res = await fetch('/api/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ room_config: roomConfig }),
+        body: JSON.stringify({
+          room_config: roomConfig,
+          participant: tester ? { identity: tester.email, name: tester.name } : undefined,
+        }),
       });
       return await res.json();
     } catch (error) {

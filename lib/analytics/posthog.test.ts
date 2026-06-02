@@ -1,0 +1,76 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ANALYTICS_EVENTS } from './events';
+import { captureEvent, identifyTester, initPostHog, resetAnalyticsForTests } from './posthog';
+
+const mockPosthog = vi.hoisted(() => ({
+  init: vi.fn(),
+  identify: vi.fn(),
+  capture: vi.fn(),
+}));
+
+vi.mock('posthog-js', () => ({ posthog: mockPosthog }));
+
+describe('posthog wrapper', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetAnalyticsForTests();
+    vi.stubGlobal('window', {});
+    vi.stubEnv('NODE_ENV', 'test');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it('does not init or capture without a key', () => {
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_KEY', '');
+    initPostHog();
+    captureEvent(ANALYTICS_EVENTS.sessionStarted, { voice_id: null });
+    identifyTester('a@b.com', 'Ada');
+    expect(mockPosthog.init).not.toHaveBeenCalled();
+    expect(mockPosthog.capture).not.toHaveBeenCalled();
+    expect(mockPosthog.identify).not.toHaveBeenCalled();
+  });
+
+  it('inits with the key and forwards events when configured', () => {
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_KEY', 'phc_test');
+    initPostHog();
+    expect(mockPosthog.init).toHaveBeenCalledTimes(1);
+    expect(mockPosthog.init).toHaveBeenCalledWith('phc_test', expect.any(Object));
+
+    captureEvent(ANALYTICS_EVENTS.sessionStarted, { voice_id: 'voice-1' });
+    expect(mockPosthog.capture).toHaveBeenCalledWith(ANALYTICS_EVENTS.sessionStarted, {
+      voice_id: 'voice-1',
+    });
+
+    identifyTester('ada@b.com', 'Ada');
+    expect(mockPosthog.identify).toHaveBeenCalledWith('ada@b.com', {
+      name: 'Ada',
+      email: 'ada@b.com',
+    });
+  });
+
+  it('inits at most once', () => {
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_KEY', 'phc_test');
+    initPostHog();
+    initPostHog();
+    expect(mockPosthog.init).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not init in local dev even with a key', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_KEY', 'phc_test');
+    initPostHog();
+    captureEvent(ANALYTICS_EVENTS.sessionStarted, { voice_id: null });
+    expect(mockPosthog.init).not.toHaveBeenCalled();
+    expect(mockPosthog.capture).not.toHaveBeenCalled();
+  });
+
+  it('does not init on the server (window undefined)', () => {
+    vi.unstubAllGlobals(); // drop the window stub from beforeEach
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_KEY', 'phc_test');
+    initPostHog();
+    expect(mockPosthog.init).not.toHaveBeenCalled();
+  });
+});
