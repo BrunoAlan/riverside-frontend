@@ -7,13 +7,14 @@ const mockPosthog = vi.hoisted(() => ({
   capture: vi.fn(),
 }));
 
-vi.mock('posthog-js', () => ({ default: mockPosthog }));
+vi.mock('posthog-js', () => ({ posthog: mockPosthog }));
 
 describe('posthog wrapper', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetAnalyticsForTests();
     vi.stubGlobal('window', {});
+    vi.stubEnv('NODE_ENV', 'test');
   });
 
   afterEach(() => {

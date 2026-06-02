@@ -1,4 +1,4 @@
-import posthog from 'posthog-js';
+import { posthog } from 'posthog-js';
 import type { AnalyticsEventName, AnalyticsEventProps } from './events';
 
 let initialized = false;

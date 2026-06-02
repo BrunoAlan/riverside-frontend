@@ -3,10 +3,9 @@ export type TesterIdentity = { name: string; email: string };
 const STORAGE_KEY = 'riverside.tester-identity';
 
 export function readIdentity(): TesterIdentity | null {
-  if (typeof localStorage === 'undefined') return null;
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
   try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
     const parsed = JSON.parse(raw) as unknown;
     if (
       typeof parsed === 'object' &&
@@ -23,6 +22,9 @@ export function readIdentity(): TesterIdentity | null {
 }
 
 export function writeIdentity(identity: TesterIdentity): void {
-  if (typeof localStorage === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
+  } catch {
+    // Silently ignore — private mode or storage quota exceeded.
+  }
 }
