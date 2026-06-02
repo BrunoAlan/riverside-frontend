@@ -7,6 +7,7 @@ export function useViewAnalytics() {
   const view = useUiView();
 
   useEffect(() => {
+    if (view.type === 'start') return;
     captureEvent(ANALYTICS_EVENTS.agentViewShown, { view_type: view.type });
   }, [view.type]);
 }
