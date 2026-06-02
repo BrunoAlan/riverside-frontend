@@ -80,9 +80,11 @@ function ChatOverlay({
         </Button>
       </div>
 
-      <div
-        className={`pointer-events-none absolute top-[60px] right-0 left-0 z-1 h-[45px] bg-gradient-to-b from-[#FBF9F8] transition-opacity duration-200 ${showTopFade ? 'opacity-100' : 'opacity-0'} `}
-      />
+      {!transcriptCollapsed && (
+        <div
+          className={`pointer-events-none absolute top-[50px] right-0 left-0 z-1 h-[45px] bg-gradient-to-b from-[#FBF9F8] transition-opacity duration-200 ${showTopFade ? 'opacity-100' : 'opacity-0'} `}
+        />
+      )}
 
       {!transcriptCollapsed ? (
         <div
@@ -103,9 +105,11 @@ function ChatOverlay({
         </div>
       ) : null}
 
-      <div
-        className={`pointer-events-none absolute right-0 bottom-[60px] left-0 z-1 h-[45px] bg-gradient-to-t from-[#FBF9F8] transition-opacity duration-200 ${showBottomFade ? 'opacity-100' : 'opacity-0'} `}
-      />
+      {!transcriptCollapsed && (
+        <div
+          className={`pointer-events-none absolute right-0 bottom-[60px] left-0 z-1 h-[45px] bg-gradient-to-t from-[#FBF9F8] transition-opacity duration-200 ${showBottomFade ? 'opacity-100' : 'opacity-0'} `}
+        />
+      )}
 
       <ChatInput className="rounded-lg border-0 bg-white" onSubmit={onSubmit} />
     </div>
