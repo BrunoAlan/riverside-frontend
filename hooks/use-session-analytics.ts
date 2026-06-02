@@ -22,6 +22,7 @@ export function useSessionAnalytics() {
       captureEvent(ANALYTICS_EVENTS.sessionStarted, { voice_id: voiceId });
     } else if (!isConnected && wasConnectedRef.current) {
       wasConnectedRef.current = false;
+      // startMsRef is set on the connect edge before this runs; fallback is defensive.
       const start = startMsRef.current ?? Date.now();
       captureEvent(ANALYTICS_EVENTS.sessionEnded, {
         duration_seconds: computeDurationSeconds(start, Date.now()),
@@ -35,6 +36,7 @@ export function useSessionAnalytics() {
   useEffect(() => {
     if (isConnected && agent.state === 'failed' && !erroredRef.current) {
       erroredRef.current = true;
+      // startMsRef is set on the connect edge before this runs; fallback is defensive.
       const start = startMsRef.current ?? Date.now();
       captureEvent(ANALYTICS_EVENTS.agentError, {
         reasons: agent.failureReasons ?? [],
