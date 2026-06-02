@@ -120,6 +120,7 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
     const url = new URL(process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT!, window.location.origin);
     const sandboxId = appConfig.sandboxId ?? '';
     const roomConfig = buildRoomConfig(appConfig.agentName, voiceStore.getState().voiceId);
+    // Runs at connect time in the browser; IdentityGate has already stored the tester by now.
     const tester = readIdentity();
 
     try {
@@ -150,6 +151,7 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
 export function getLocalTokenSource(appConfig: AppConfig) {
   return TokenSource.custom(async () => {
     const roomConfig = buildRoomConfig(appConfig.agentName, voiceStore.getState().voiceId);
+    // Runs at connect time in the browser; IdentityGate has already stored the tester by now.
     const tester = readIdentity();
     try {
       const res = await fetch('/api/token', {
