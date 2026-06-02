@@ -152,6 +152,10 @@ use-view-analytics watches uiViewStore:
 
 - `initPostHog()` reads `process.env.NEXT_PUBLIC_POSTHOG_KEY` and
   `process.env.NEXT_PUBLIC_POSTHOG_HOST` (default `https://us.i.posthog.com`).
+- **Local dev ⇒ return early.** When `process.env.NODE_ENV === 'development'`
+  (what `next dev` sets) tracking never initializes — no events, no replay — even
+  if a key is present. The guard is `=== 'development'` (not `!== 'production'`)
+  so vitest (`NODE_ENV === 'test'`) still exercises the wrapper.
 - **No key ⇒ return early.** Every `capture*` / `identify*` helper also checks an
   `isInitialized` flag and no-ops. This keeps local dev, tests, and CI free of
   network calls and of a hard PostHog dependency at runtime.
