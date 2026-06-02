@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type ChatMessage, appendMessage } from './messages';
+import { type ChatMessage, appendMessage, streamMessageId } from './messages';
 
 const msg = (id: string, role: ChatMessage['role'], content: string): ChatMessage => ({
   id,
@@ -31,5 +31,22 @@ describe('appendMessage', () => {
     const next = appendMessage(list, { id: 'a', role: 'agent', content: 'hi', streaming: false });
     expect(next).not.toBe(list);
     expect(next[0]).toEqual({ id: 'a', role: 'agent', content: 'hi', streaming: false });
+  });
+});
+
+describe('streamMessageId', () => {
+  it('falls back to the stream id when there is no segment id (plain chat text)', () => {
+    expect(streamMessageId({ id: 'stream-1' })).toBe('stream-1');
+  });
+
+  it('uses lk.segment_id so interim transcriptions of one utterance share an id', () => {
+    // Each partial arrives as its own text stream (distinct info.id) but the
+    // same segment id, so they collapse onto a single, in-place updating line.
+    expect(streamMessageId({ id: 'stream-1', attributes: { 'lk.segment_id': 'seg-1' } })).toBe(
+      'seg-1'
+    );
+    expect(streamMessageId({ id: 'stream-2', attributes: { 'lk.segment_id': 'seg-1' } })).toBe(
+      'seg-1'
+    );
   });
 });
