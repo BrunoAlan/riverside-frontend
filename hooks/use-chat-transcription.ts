@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { TextStreamHandler } from 'livekit-client';
+import { RoomEvent, type TextStreamHandler } from 'livekit-client';
 import { useMaybeRoomContext } from '@livekit/components-react';
-import { type ChatMessage, appendMessage } from '@/lib/chat/messages';
+import { type ChatMessage, appendMessage, streamMessageId } from '@/lib/chat/messages';
 
 const CHAT_TOPIC = 'lk.chat';
 const TRANSCRIPTION_TOPIC = 'lk.transcription';
@@ -26,7 +26,7 @@ export function useChatTranscription(): UseChatTranscription {
       const localIdentity = room.localParticipant?.identity;
       const role: ChatMessage['role'] =
         participantInfo.identity === localIdentity ? 'user' : 'agent';
-      const id = reader.info.id;
+      const id = streamMessageId(reader.info);
       let content = '';
       for await (const chunk of reader) {
         content += chunk;
@@ -35,12 +35,18 @@ export function useChatTranscription(): UseChatTranscription {
       setMessages((list) => appendMessage(list, { id, role, content, streaming: false }));
     };
 
+    // The room instance is reused across conversations, so wipe the transcript
+    // when the session ends to start each conversation with a clean slate.
+    const handleDisconnected = () => setMessages([]);
+
     room.registerTextStreamHandler(CHAT_TOPIC, handler);
     room.registerTextStreamHandler(TRANSCRIPTION_TOPIC, handler);
+    room.on(RoomEvent.Disconnected, handleDisconnected);
 
     return () => {
       room.unregisterTextStreamHandler(CHAT_TOPIC);
       room.unregisterTextStreamHandler(TRANSCRIPTION_TOPIC);
+      room.off(RoomEvent.Disconnected, handleDisconnected);
     };
   }, [room]);
 

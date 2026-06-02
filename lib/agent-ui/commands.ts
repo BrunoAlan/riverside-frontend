@@ -72,13 +72,18 @@ const ShowDestinationDetail = Base.extend({
   }),
 });
 
+const LabelField = z.preprocess(
+  (v) => (v && typeof v === 'object' && (v as { label?: unknown }).label == null ? null : v),
+  z.object({ label: z.string() }).nullable()
+);
+
 export const BookingSummarySnapshot = z.object({
-  people: z.object({ label: z.string() }).nullable(),
-  month: z.object({ label: z.string() }).nullable(),
-  embarkation: z.object({ label: z.string() }).nullable(),
+  people: LabelField,
+  month: LabelField,
+  embarkation: LabelField,
   stops: z.object({ primary: z.string(), extra: z.number().int().min(0) }).nullable(),
-  duration: z.object({ label: z.string() }).nullable(),
-  price: z.object({ label: z.string() }).nullable(),
+  duration: LabelField,
+  price: LabelField,
   slots: z
     .array(
       z.object({
