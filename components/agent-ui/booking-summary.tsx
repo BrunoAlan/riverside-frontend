@@ -70,8 +70,8 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
   return (
     <div
       className={cn(
-        'border-border bg-card/95 pointer-events-auto rounded-2xl border px-5 py-3 shadow-lg backdrop-blur',
-        'flex w-fit max-w-[1100px] min-w-[640px] flex-col gap-2'
+        'bg-card/95 border-beige-300 pointer-events-auto rounded-3xl border p-6 backdrop-blur',
+        'flex w-full min-w-[640px] flex-col gap-2'
       )}
     >
       <div className="flex items-center justify-between gap-6">
@@ -143,7 +143,7 @@ export function BookingSummaryContainer() {
   if (summary === null) return null;
 
   return (
-    <div className="flex justify-end px-6 pt-2 pb-6">
+    <div className="flex justify-end pr-6 pb-6 pl-20">
       <BookingSummary summary={summary} />
     </div>
   );

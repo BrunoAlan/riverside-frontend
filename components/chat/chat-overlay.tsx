@@ -39,11 +39,11 @@ function ChatOverlay({
     <div
       data-slot="chat-overlay"
       className={cn(
-        'bg-background/40 pointer-events-auto flex w-[360px] flex-col overflow-hidden rounded-2xl border border-white/10 shadow-sm backdrop-blur-md',
+        'pointer-events-auto flex w-[360px] flex-col overflow-hidden rounded-2xl bg-[#FBF9F8] p-2 shadow-xl backdrop-blur-md',
         className
       )}
     >
-      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
+      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 pr-1">
         <span className="text-sm font-medium">Conversation history</span>
         <Button
           type="button"
@@ -53,7 +53,7 @@ function ChatOverlay({
           aria-label={transcriptCollapsed ? 'Expand transcript' : 'Collapse transcript'}
           aria-expanded={!transcriptCollapsed}
           aria-controls="chat-transcript"
-          className="size-7 rounded-full"
+          className="hover:bg-beige-300 size-8 cursor-pointer rounded-full"
         >
           {transcriptCollapsed ? <ChevronUp /> : <ChevronDown />}
         </Button>
@@ -79,10 +79,7 @@ function ChatOverlay({
         </div>
       ) : null}
 
-      <ChatInput
-        className="rounded-none border-0 border-t border-white/10 bg-transparent"
-        onSubmit={onSubmit}
-      />
+      <ChatInput className="rounded-lg border-0 bg-white" onSubmit={onSubmit} />
     </div>
   );
 }
