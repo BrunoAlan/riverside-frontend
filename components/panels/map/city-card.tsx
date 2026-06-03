@@ -17,7 +17,7 @@ type CityCardProps = {
 export function CityCard({ city, interactive = true, onExpand }: CityCardProps) {
   return (
     <Card
-      className="bg-beige-50 border-beige-400/50 gap-0 overflow-hidden rounded-2xl p-2.5 shadow-none"
+      className="bg-beige-50 border-beige-400/50 gap-0 overflow-hidden rounded-2xl p-2 shadow-none"
       style={{ width: CITY_CARD_WIDTH }}
     >
       <div className="relative">

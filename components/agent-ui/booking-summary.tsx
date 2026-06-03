@@ -71,10 +71,10 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
     <div
       className={cn(
         'bg-card/95 border-beige-300 pointer-events-auto rounded-3xl border p-6 backdrop-blur',
-        'm-[0_auto] flex w-full max-w-[1280px] min-w-[640px] flex-col gap-2'
+        'm-[0_auto] flex w-full max-w-[1280px] flex-col gap-4 md:min-w-[640px]'
       )}
     >
-      <div className="flex items-center justify-between gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
           <SummaryField
             icon={<Users className="size-4" />}
@@ -114,7 +114,7 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
         </Button>
       </div>
 
-      <div className="flex items-center justify-between gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {summary.slots.map((slot, i) => (
             <Slot key={`${slot.label}-${i}`} label={slot.label} state={slot.state} />
@@ -143,7 +143,7 @@ export function BookingSummaryContainer() {
   if (summary === null) return null;
 
   return (
-    <div className="flex justify-end pr-6 pb-6 pl-20">
+    <div className="flex justify-end px-18 pb-4">
       <BookingSummary summary={summary} />
     </div>
   );
