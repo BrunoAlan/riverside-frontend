@@ -1,3 +1,5 @@
+import type { Experience } from '@/lib/agent-ui/commands';
+
 export type AddOn = {
   id: string;
   day: string;
@@ -13,6 +15,7 @@ export type City = {
   lon: number;
   lat: number;
   addOns?: AddOn[];
+  experiences?: Experience[];
 };
 
 export const cities: City[] = [
