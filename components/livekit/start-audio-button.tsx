@@ -16,7 +16,7 @@ export interface StartAudioButtonProps extends ComponentProps<'button'> {
    * The variant of the button.
    * @defaultValue 'default'
    */
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  variant?: 'default' | 'destructive' | 'secondary' | 'ghost' | 'link';
   /**
    * The LiveKit room instance. If not provided, uses the room from context.
    */

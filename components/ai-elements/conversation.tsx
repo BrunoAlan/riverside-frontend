@@ -77,7 +77,7 @@ export const ConversationScrollButton = ({
         onClick={handleScrollToBottom}
         size="icon"
         type="button"
-        variant="outline"
+        variant="ghost"
         {...props}
       >
         <ArrowDownIcon className="size-4" />

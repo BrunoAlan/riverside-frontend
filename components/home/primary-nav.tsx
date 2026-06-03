@@ -17,7 +17,7 @@ export function PrimaryNav() {
         <div className="flex items-center gap-3">
           <Button
             asChild
-            variant="outline"
+            variant="ghost"
             className="rounded-full border-neutral-700 px-5 text-[11px] tracking-[0.1em] text-neutral-900 uppercase"
           >
             <Link href="/agent">Virtual Concierge</Link>

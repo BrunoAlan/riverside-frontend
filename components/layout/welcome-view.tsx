@@ -55,7 +55,7 @@ export const WelcomeView = ({
               <DropdownMenuTrigger asChild>
                 <Button
                   size="lg"
-                  variant="outline"
+                  variant="ghost"
                   aria-label="Select agent voice"
                   className="rounded-lg px-3 py-2"
                 >
