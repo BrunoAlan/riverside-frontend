@@ -33,7 +33,7 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
           height={130}
           className="h-[130px] w-full rounded-lg object-cover"
         />
-        <span className="bg-beige-200 text-primary absolute top-2 left-2 rounded-full px-3 py-1 text-sm whitespace-nowrap">
+        <span className="bg-beige-200 text-primary absolute top-1 left-1 rounded-md px-3 py-1 text-sm whitespace-nowrap">
           {city.days}
         </span>
       </div>
@@ -62,7 +62,7 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
         </div>
       )}
       <div className="mt-3 flex justify-center">
-        <span className="bg-beige-200 text-muted-foreground rounded-full px-3 py-1 text-xs whitespace-nowrap">
+        <span className="border-beige-300 text-muted-foreground rounded-full border px-3 py-1 text-xs whitespace-nowrap">
           {MOCK_ADD_ON_COUNT} excursions available
         </span>
       </div>
