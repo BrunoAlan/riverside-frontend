@@ -16,7 +16,7 @@ type CityDetailCardProps = {
 export function CityDetailCard({ city, onClose }: CityDetailCardProps) {
   return (
     <Card
-      className="bg-beige-50 border-beige-400/50 pointer-events-auto flex max-h-[85vh] flex-col gap-0 overflow-hidden rounded-3xl p-3 shadow-lg"
+      className="bg-beige-50 border-beige-400/50 pointer-events-auto flex max-h-full flex-col gap-0 overflow-hidden rounded-3xl p-3 shadow-lg"
       style={{ width: CARD_WIDTH }}
     >
       <div className="relative shrink-0">

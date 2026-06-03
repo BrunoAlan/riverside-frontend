@@ -15,7 +15,7 @@ export function CityExperiencesPanel({ experiences }: CityExperiencesPanelProps)
 
   return (
     <div
-      className="pointer-events-auto flex max-h-[85vh] flex-col gap-3"
+      className="pointer-events-auto flex max-h-full flex-col gap-3"
       style={{ width: PANEL_WIDTH }}
     >
       <p className="text-muted-foreground shrink-0 px-2 text-xs tracking-wide uppercase">
