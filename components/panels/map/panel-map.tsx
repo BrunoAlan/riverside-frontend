@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { CityDetailCard } from '@/components/panels/map/city-detail-card';
+import { CityExperiencesPanel } from '@/components/panels/map/city-experiences-panel';
 import { useFrontendIntent } from '@/hooks/use-frontend-intent';
 import { useSetViewFromUser } from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
@@ -59,7 +60,14 @@ export function PanelMap({ view }: PanelMapProps) {
         focusCity={detailCity ?? undefined}
         onCityExpand={handleCityExpand}
       />
-      {detailCity && <CityDetailCard city={detailCity} onClose={handleClose} />}
+      {detailCity && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-4 p-6">
+          <CityDetailCard city={detailCity} onClose={handleClose} />
+          {detailCity.experiences && detailCity.experiences.length > 0 && (
+            <CityExperiencesPanel experiences={detailCity.experiences} />
+          )}
+        </div>
+      )}
     </div>
   );
 }
