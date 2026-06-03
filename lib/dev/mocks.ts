@@ -58,7 +58,7 @@ const danubeLegends = {
   name: 'Danube Legends from Budapest to Vienna',
   duration: { days: 12, nights: 11 },
   match_score: 0.6667,
-  departure_dates: ['2026-04-22', '2026-05-06', '2026-05-20'],
+  departure_dates: ['2026-04-22', '2026-05-06', '2026-05-20', '2026-09-02', '2026-09-16'],
   center: [16.570283333333332, 48.15495000000001] as [number, number],
   zoom: 6,
   cities: [
@@ -78,6 +78,62 @@ const danubeLegends = {
         },
         { day: 'Day 02', description: 'Guided tour of Buda Castle and the Fisherman’s Bastion.' },
       ],
+      experiences: [
+        {
+          id: 'signature_hungary_national_day',
+          name: 'Signature Hungary: National Day Celebration',
+          type: 'national_day_fireworks_event',
+          venue: null,
+          description:
+            'Hungary National Day celebration with food, drinks, music and fireworks views from Vista Deck.',
+        },
+        {
+          id: 'signature_budapest_horse_railway',
+          name: 'Signature Budapest: Private Concert at Horse Railway Cultural Center',
+          type: 'private_concert',
+          venue: 'Horse Railway Cultural Center',
+          description:
+            "Private performance with champagne and hors d'oeuvres at reconstructed Zugliget Horse Railway terminal.",
+        },
+        {
+          id: 'signature_budapest_wenckheim_palace',
+          name: 'Signature Budapest: Private Concert at Wenckheim Palace',
+          type: 'private_concert',
+          venue: 'Wenckheim Palace',
+          description:
+            "Private concert at Neo-Baroque Wenckheim Palace in Budapest's Palace Quarter.",
+        },
+      ],
+    },
+    {
+      id: 'bratislava',
+      name: 'Bratislava',
+      country: 'Slovakia',
+      image:
+        'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+      days: 'Days 3 & 8',
+      lon: 17.1077,
+      lat: 48.1486,
+    },
+    {
+      id: 'tulln',
+      name: 'Tulln',
+      country: 'Austria',
+      image:
+        'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+      days: 'Days 4 & 9',
+      lon: 16.05,
+      lat: 48.33,
+    },
+    {
+      id: 'wachau_valley',
+      name: 'Wachau Valley',
+      country: 'Austria',
+      image:
+        'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676657/hiperfunnel/riverside_mozart_mvp/page_007_image_01.jpg',
+      days: 'Days 4 & 9',
+      lon: 15.33,
+      lat: 48.35,
     },
     {
       id: 'vienna',
@@ -99,6 +155,26 @@ const danubeLegends = {
           description: 'A day among palaces, cathedrals, museums and romantic coffee houses.',
         },
       ],
+      experiences: [
+        {
+          id: 'signature_vienna_belvedere_palace',
+          name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+          type: 'private_concert_and_museum_visit',
+          venue: 'Belvedere Palace',
+          description:
+            'After-hours or VIP-style experience at Belvedere Palace with palace visit, art viewing and private Mozart/Strauss concert.',
+        },
+      ],
+    },
+    {
+      id: 'durnstein',
+      name: 'Dürnstein',
+      country: 'Austria',
+      image:
+        'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+      days: 'Day 12',
+      lon: 15.52,
+      lat: 48.395,
     },
   ],
 };
