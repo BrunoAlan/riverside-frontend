@@ -24,6 +24,7 @@ export const Experience = z.object({
   type: z.string(),
   venue: z.string().nullable(),
   description: z.string(),
+  image: z.string().optional(),
   images: z.array(z.string()).optional(),
 });
 export type Experience = z.infer<typeof Experience>;

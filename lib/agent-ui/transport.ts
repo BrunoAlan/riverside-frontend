@@ -73,6 +73,7 @@ export function useUiCommandTransport(): void {
         timestamp: envelope.timestamp,
         count: Array.isArray(envelope.commands) ? envelope.commands.length : 0,
       });
+      console.log('[ui-commands] full envelope', envelope);
 
       dispatchEnvelope(envelope, uiViewStore.getState());
     };
