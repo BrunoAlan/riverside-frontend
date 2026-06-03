@@ -24,7 +24,7 @@ export function PanelMap({ view }: PanelMapProps) {
   const setViewFromUser = useSetViewFromUser();
   const sendIntent = useFrontendIntent();
 
-  const { itinerary, addOnDecisions, detailCityId } = view;
+  const { itinerary, detailCityId } = view;
 
   const detailCity =
     detailCityId && itinerary
@@ -33,22 +33,22 @@ export function PanelMap({ view }: PanelMapProps) {
 
   const handleCityExpand = useCallback(
     (city: City) => {
-      setViewFromUser({ type: 'itinerary', itinerary, addOnDecisions, detailCityId: city.id });
+      setViewFromUser({ type: 'itinerary', itinerary, detailCityId: city.id });
       void sendIntent('explore_destination', {
         entities: { destination_id: city.id },
         userMessage: `User opened ${city.name} detail`,
       });
     },
-    [setViewFromUser, sendIntent, itinerary, addOnDecisions]
+    [setViewFromUser, sendIntent, itinerary]
   );
 
   const handleClose = useCallback(() => {
-    setViewFromUser({ type: 'itinerary', itinerary, addOnDecisions });
+    setViewFromUser({ type: 'itinerary', itinerary });
     void sendIntent('view_itinerary', {
       entities: { itinerary_name: itinerary?.name },
       userMessage: 'User returned to the itinerary',
     });
-  }, [setViewFromUser, sendIntent, itinerary, addOnDecisions]);
+  }, [setViewFromUser, sendIntent, itinerary]);
 
   return (
     <div className="absolute inset-0">

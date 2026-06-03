@@ -6,8 +6,6 @@ import type {
   ItineraryFull,
 } from './commands';
 
-export type AddOnDecision = 'confirmed' | 'rejected';
-
 export type UiView =
   | { type: 'start' }
   | { type: 'presentation' }
@@ -15,7 +13,6 @@ export type UiView =
   | {
       type: 'itinerary';
       itinerary?: ItineraryFull;
-      addOnDecisions: Record<string, AddOnDecision>;
       detailCityId?: string;
     }
   | { type: 'compare_itinerary'; options: ItineraryFull[] }

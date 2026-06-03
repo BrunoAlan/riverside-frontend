@@ -226,14 +226,13 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
     {
       id: 'danube_legends',
       label: 'Danube Legends (agent payload)',
-      view: { type: 'itinerary', addOnDecisions: {}, itinerary: danubeLegends },
+      view: { type: 'itinerary', itinerary: danubeLegends },
     },
     {
       id: 'danube_legends_detail',
       label: 'Detail open (Vienna)',
       view: {
         type: 'itinerary',
-        addOnDecisions: {},
         itinerary: danubeLegends,
         detailCityId: 'vienna',
       },
