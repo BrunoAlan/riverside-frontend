@@ -327,6 +327,53 @@ describe('UiCommand schema', () => {
     ]);
   });
 
+  it('parses a per-city experience with images', () => {
+    const result = UiCommand.parse({
+      type: 'show_itinerary_options',
+      correlationId: 'c-exp-images',
+      payload: {
+        itinerary: {
+          id: 'danube_legends',
+          name: 'Danube Legends',
+          duration: { days: 12, nights: 11 },
+          match_score: 0.6667,
+          departure_dates: ['2026-04-22'],
+          center: [16.57, 48.15],
+          zoom: 6,
+          cities: [
+            {
+              id: 'vienna',
+              name: 'Vienna',
+              country: 'Austria',
+              image: 'https://example.com/vienna.jpg',
+              days: 'Days 5, 10 & 11',
+              lon: 16.3738,
+              lat: 48.2082,
+              experiences: [
+                {
+                  id: 'signature_vienna_belvedere_palace',
+                  name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+                  type: 'private_concert_and_museum_visit',
+                  venue: 'Belvedere Palace',
+                  description: 'After-hours VIP experience at Belvedere Palace.',
+                  images: [
+                    'https://example.com/belvedere-1.jpg',
+                    'https://example.com/belvedere-2.jpg',
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    if (result.type !== 'show_itinerary_options') throw new Error('discriminator failed');
+    expect(result.payload.itinerary.cities[0].experiences?.[0].images).toEqual([
+      'https://example.com/belvedere-1.jpg',
+      'https://example.com/belvedere-2.jpg',
+    ]);
+  });
+
   it('rejects a malformed experience entry', () => {
     const parsed = UiCommand.safeParse({
       type: 'show_itinerary_options',
