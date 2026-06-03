@@ -86,6 +86,10 @@ const danubeLegends = {
           venue: null,
           description:
             'Hungary National Day celebration with food, drinks, music and fireworks views from Vista Deck.',
+          images: [
+            'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+            'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676657/hiperfunnel/riverside_mozart_mvp/page_007_image_01.jpg',
+          ],
         },
         {
           id: 'signature_budapest_horse_railway',
@@ -94,6 +98,9 @@ const danubeLegends = {
           venue: 'Horse Railway Cultural Center',
           description:
             "Private performance with champagne and hors d'oeuvres at reconstructed Zugliget Horse Railway terminal.",
+          images: [
+            'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_005_image_01.jpg',
+          ],
         },
         {
           id: 'signature_budapest_wenckheim_palace',
@@ -102,6 +109,9 @@ const danubeLegends = {
           venue: 'Wenckheim Palace',
           description:
             "Private concert at Neo-Baroque Wenckheim Palace in Budapest's Palace Quarter.",
+          images: [
+            'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+          ],
         },
       ],
     },
@@ -163,6 +173,11 @@ const danubeLegends = {
           venue: 'Belvedere Palace',
           description:
             'After-hours or VIP-style experience at Belvedere Palace with palace visit, art viewing and private Mozart/Strauss concert.',
+          images: [
+            'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_004_image_01.jpg',
+            'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676651/hiperfunnel/riverside_mozart_mvp/page_005_image_01.jpg',
+            'https://res.cloudinary.com/dxcabwnx7/image/upload/v1778676657/hiperfunnel/riverside_mozart_mvp/page_007_image_01.jpg',
+          ],
         },
       ],
     },
