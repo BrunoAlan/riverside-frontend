@@ -52,7 +52,8 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
       {city.experiences && city.experiences.length > 0 && (
         <div className="mt-3 flex justify-center">
           <span className="border-beige-300 text-muted-foreground rounded-full border px-3 py-1 text-xs whitespace-nowrap">
-            {city.experiences.length} experiences available
+            {city.experiences.length} {city.experiences.length === 1 ? 'experience' : 'experiences'}{' '}
+            available
           </span>
         </div>
       )}
