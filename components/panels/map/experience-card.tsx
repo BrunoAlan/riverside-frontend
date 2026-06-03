@@ -10,11 +10,11 @@ import { cn } from '@/lib/shadcn/utils';
 
 type ExperienceCardProps = {
   experience: Experience;
-  defaultExpanded: boolean;
+  expanded: boolean;
+  onToggle: () => void;
 };
 
-export function ExperienceCard({ experience, defaultExpanded }: ExperienceCardProps) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
+export function ExperienceCard({ experience, expanded, onToggle }: ExperienceCardProps) {
   const images = experience.images ?? [];
 
   return (
@@ -37,7 +37,7 @@ export function ExperienceCard({ experience, defaultExpanded }: ExperienceCardPr
           className="shrink-0"
           aria-label={expanded ? `Collapse ${experience.name}` : `Expand ${experience.name}`}
           aria-expanded={expanded}
-          onClick={() => setExpanded((value) => !value)}
+          onClick={onToggle}
         >
           <CaretDownIcon
             weight="bold"
@@ -66,8 +66,8 @@ function ExperienceGallery({ images, alt }: { images: string[]; alt: string }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative h-48 w-full overflow-hidden rounded-2xl">
-        <Image src={activeSrc} alt={alt} fill sizes="380px" className="object-cover" />
+      <div className="relative h-36 w-full overflow-hidden rounded-2xl">
+        <Image src={activeSrc} alt={alt} fill sizes="440px" className="object-cover" />
       </div>
       {images.length > 1 && (
         <div className="flex gap-2">
