@@ -15,7 +15,7 @@ type ExperienceCardProps = {
 };
 
 export function ExperienceCard({ experience, expanded, onToggle }: ExperienceCardProps) {
-  const images = experience.images ?? [];
+  const images = experience.images ?? (experience.image ? [experience.image] : []);
 
   return (
     <Card className="bg-beige-50 border-beige-400/50 flex flex-col gap-0 overflow-hidden rounded-3xl p-3">
