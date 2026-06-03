@@ -18,7 +18,7 @@ export function ExperienceCard({ experience, expanded, onToggle }: ExperienceCar
   const images = experience.images ?? (experience.image ? [experience.image] : []);
 
   return (
-    <Card className="bg-beige-50 border-beige-400/50 flex flex-col gap-0 overflow-hidden rounded-3xl p-3">
+    <Card className="bg-beige-50 border-beige-400/50 flex shrink-0 flex-col gap-0 overflow-hidden rounded-3xl p-3">
       {expanded && images.length > 0 && <ExperienceGallery images={images} alt={experience.name} />}
       <div className="flex items-start justify-between gap-2 px-2 pt-3">
         <div>
