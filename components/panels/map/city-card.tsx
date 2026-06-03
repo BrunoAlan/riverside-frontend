@@ -10,6 +10,9 @@ import type { AddOn, City } from '@/lib/map/cities';
 // threshold stays in sync with the actual rendered card size.
 export const CITY_CARD_WIDTH = 220;
 
+// TODO: replace with the real add-on count once it's wired to data.
+const MOCK_ADD_ON_COUNT = 3;
+
 type CityCardProps = {
   city: City;
   interactive?: boolean;
@@ -58,6 +61,11 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
           ))}
         </div>
       )}
+      <div className="mt-3 flex justify-center">
+        <span className="bg-beige-200 text-muted-foreground rounded-full px-3 py-1 text-xs whitespace-nowrap">
+          {MOCK_ADD_ON_COUNT} excursions available
+        </span>
+      </div>
     </Card>
   );
 }
