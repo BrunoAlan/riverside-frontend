@@ -59,7 +59,21 @@ export function MapCanvas({
 
     mapInstance.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 
-    mapInstance.on('load', () => setMap(mapInstance));
+    mapInstance.on('load', () => {
+      // Inject the grain overlay into the canvas container so it textures the
+      // map tiles but stays below the city-card markers, which MapLibre appends
+      // to this same container after load. As a sibling of the map it would
+      // paint over the cards instead (the canvas and markers share one
+      // container, so an outside z-index can't slot between them).
+      const grain = document.createElement('div');
+      grain.setAttribute('aria-hidden', 'true');
+      grain.className = 'pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply';
+      grain.style.backgroundImage = GRAIN_IMAGE;
+      grain.style.backgroundRepeat = 'repeat';
+      mapInstance.getCanvasContainer().appendChild(grain);
+
+      setMap(mapInstance);
+    });
 
     return () => {
       setMap(null);
@@ -90,11 +104,6 @@ export function MapCanvas({
   return (
     <div className="bg-beige-200 relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_IMAGE, backgroundRepeat: 'repeat' }}
-      />
       <div
         aria-hidden
         className="from-beige-200 pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b to-transparent"
