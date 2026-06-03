@@ -147,7 +147,6 @@ export default function DesignSystemPage() {
                 <div className="flex flex-wrap gap-3">
                   <Button>Default</Button>
                   <Button variant="secondary">Secondary</Button>
-                  <Button variant="outline">Outline</Button>
                   <Button variant="ghost">Ghost</Button>
                   <Button variant="destructive">Destructive</Button>
                   <Button variant="link">Link</Button>
@@ -180,7 +179,7 @@ export default function DesignSystemPage() {
                     <Plus />
                     Add item
                   </Button>
-                  <Button variant="outline">
+                  <Button variant="secondary">
                     Continue
                     <ArrowRight />
                   </Button>
@@ -212,7 +211,7 @@ export default function DesignSystemPage() {
                   <Button size="icon" variant="secondary" aria-label="Filter">
                     <Filter />
                   </Button>
-                  <Button size="icon" variant="outline" aria-label="Filter">
+                  <Button size="icon" variant="secondary" aria-label="Filter">
                     <Filter />
                   </Button>
                   <Button size="icon" variant="ghost" aria-label="Filter">
@@ -302,7 +301,7 @@ export default function DesignSystemPage() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="outline">Hover me</Button>
+                      <Button variant="secondary">Hover me</Button>
                     </TooltipTrigger>
                     <TooltipContent>This is a tooltip.</TooltipContent>
                   </Tooltip>
@@ -312,19 +311,19 @@ export default function DesignSystemPage() {
               <div>
                 <h3 className="text-foreground mb-3 text-sm font-medium">Toasts (sonner)</h3>
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" onClick={() => toast('Default toast')}>
+                  <Button variant="secondary" onClick={() => toast('Default toast')}>
                     Default
                   </Button>
-                  <Button variant="outline" onClick={() => toast.success('Success!')}>
+                  <Button variant="secondary" onClick={() => toast.success('Success!')}>
                     Success
                   </Button>
-                  <Button variant="outline" onClick={() => toast.warning('Heads up')}>
+                  <Button variant="secondary" onClick={() => toast.warning('Heads up')}>
                     Warning
                   </Button>
-                  <Button variant="outline" onClick={() => toast.error('Something failed')}>
+                  <Button variant="secondary" onClick={() => toast.error('Something failed')}>
                     Error
                   </Button>
-                  <Button variant="outline" onClick={() => toast.info('FYI')}>
+                  <Button variant="secondary" onClick={() => toast.info('FYI')}>
                     Info
                   </Button>
                 </div>
@@ -337,7 +336,7 @@ export default function DesignSystemPage() {
                 <h3 className="text-foreground mb-3 text-sm font-medium">Dialog</h3>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline">Open dialog</Button>
+                    <Button variant="secondary">Open dialog</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -358,7 +357,7 @@ export default function DesignSystemPage() {
                 <h3 className="text-foreground mb-3 text-sm font-medium">Dropdown menu</h3>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline">Open menu</Button>
+                    <Button variant="secondary">Open menu</Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuLabel>My account</DropdownMenuLabel>
