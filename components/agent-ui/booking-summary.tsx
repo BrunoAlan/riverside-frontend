@@ -71,7 +71,7 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
     <div
       className={cn(
         'bg-card/95 border-beige-300 pointer-events-auto rounded-3xl border p-6 backdrop-blur',
-        'flex w-full min-w-[640px] flex-col gap-2'
+        'm-[0_auto] flex w-full max-w-[1280px] min-w-[640px] flex-col gap-2'
       )}
     >
       <div className="flex items-center justify-between gap-6">
