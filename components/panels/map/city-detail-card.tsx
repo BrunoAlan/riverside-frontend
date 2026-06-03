@@ -17,7 +17,7 @@ export function CityDetailCard({ city, onClose }: CityDetailCardProps) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">
       <Card
-        className="bg-beige-50 border-beige-400/50 pointer-events-auto flex max-h-[85vh] flex-col gap-0 overflow-hidden rounded-3xl p-3 shadow-lg"
+        className="bg-beige-50 border-beige-400/50 pointer-events-auto flex max-h-[85vh] flex-col gap-0 overflow-hidden rounded-2xl p-2 shadow-none"
         style={{ width: CARD_WIDTH }}
       >
         <div className="relative shrink-0">
@@ -26,9 +26,9 @@ export function CityDetailCard({ city, onClose }: CityDetailCardProps) {
             alt={city.name}
             width={CARD_WIDTH}
             height={200}
-            className="h-[200px] w-full rounded-2xl object-cover"
+            className="h-[200px] w-full rounded-lg object-cover"
           />
-          <span className="bg-beige-200 text-primary absolute top-3 left-3 rounded-full px-3 py-1 text-sm whitespace-nowrap">
+          <span className="bg-beige-200 text-primary absolute top-1 left-1 rounded-md px-3 py-1 text-sm whitespace-nowrap">
             {city.days}
           </span>
         </div>
@@ -50,8 +50,10 @@ export function CityDetailCard({ city, onClose }: CityDetailCardProps) {
         <div className="mt-4 flex flex-col gap-4 overflow-y-auto px-2 pb-2">
           {city.day_details?.map((detail, i) => (
             <div key={`${detail.day}-${i}`}>
-              <p className="text-muted-foreground text-xs tracking-wide uppercase">{detail.day}</p>
-              <p className="text-primary mt-2 text-sm leading-relaxed">{detail.description}</p>
+              <p className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
+                {detail.day}
+              </p>
+              <p className="text-primary mt-1 text-sm leading-relaxed">{detail.description}</p>
             </div>
           ))}
         </div>
