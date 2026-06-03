@@ -56,43 +56,9 @@ describe('ui-view-store', () => {
       payload: { itinerary },
     });
     const s = store.getState();
-    expect(s.view).toEqual({ type: 'itinerary', itinerary, addOnDecisions: {} });
+    expect(s.view).toEqual({ type: 'itinerary', itinerary });
     expect(s.source).toBe('agent');
     expect(s.lastCorrelationId).toBe('c2');
-  });
-
-  it('setAddOnDecision preserves the itinerary on the view', () => {
-    const itinerary = {
-      id: 'danube_legends',
-      name: 'Danube Legends',
-      duration: { days: 12, nights: 11 },
-      match_score: 0.6667,
-      departure_dates: ['2026-04-22'],
-      center: [16.57, 48.15] as [number, number],
-      zoom: 6,
-      cities: [
-        {
-          id: 'budapest',
-          name: 'Budapest',
-          country: 'Hungary',
-          image: 'https://res.cloudinary.com/demo/image/upload/budapest.jpg',
-          days: 'Days 1, 2, 6 & 7',
-          lon: 19.0402,
-          lat: 47.4979,
-        },
-      ],
-    };
-    store.getState().applyCommand({
-      type: 'show_itinerary_options',
-      correlationId: 'c2',
-      payload: { itinerary },
-    });
-    store.getState().setAddOnDecision('budapest-extra', 'confirmed');
-    expect(store.getState().view).toEqual({
-      type: 'itinerary',
-      itinerary,
-      addOnDecisions: { 'budapest-extra': 'confirmed' },
-    });
   });
 
   it('applyCommand(show_destination_detail) maps destination and images into view', () => {
@@ -295,7 +261,7 @@ describe('ui-view-store', () => {
         correlationId: 'b1',
         payload: snapshot,
       });
-      store.getState().setViewFromDev({ type: 'itinerary', addOnDecisions: {} });
+      store.getState().setViewFromDev({ type: 'itinerary' });
       expect(store.getState().bookingSummary).toEqual(snapshot);
     });
 
@@ -448,7 +414,6 @@ describe('ui-view-store', () => {
     if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
     expect(s.view.detailCityId).toBe('vienna');
     expect(s.view.itinerary?.id).toBe('danube_legends');
-    expect(s.view.addOnDecisions).toEqual({});
     expect(s.source).toBe('agent');
     expect(s.lastCorrelationId).toBe('c2');
   });
@@ -483,63 +448,5 @@ describe('ui-view-store', () => {
     const s = store.getState();
     expect(s.view).toEqual({ type: 'start' });
     expect(s.lastCorrelationId).toBe('c1');
-  });
-
-  it('setAddOnDecision preserves detailCityId', () => {
-    store.getState().applyCommand({
-      type: 'show_itinerary_options',
-      correlationId: 'c1',
-      payload: { itinerary: itineraryPayload },
-    });
-    store.getState().applyCommand({
-      type: 'show_city_detail',
-      correlationId: 'c2',
-      payload: { city_id: 'vienna' },
-    });
-    store.getState().setAddOnDecision('vienna-addon', 'confirmed');
-    const s = store.getState();
-    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
-    expect(s.view.detailCityId).toBe('vienna');
-    expect(s.view.addOnDecisions).toEqual({ 'vienna-addon': 'confirmed' });
-  });
-
-  describe('add-on decisions', () => {
-    it('setAddOnDecision writes confirmed into the active itinerary view', () => {
-      store.getState().setViewFromUser({ type: 'itinerary', addOnDecisions: {} });
-      store.getState().setAddOnDecision('vienna-chamber-music', 'confirmed');
-      expect(store.getState().view).toEqual({
-        type: 'itinerary',
-        addOnDecisions: { 'vienna-chamber-music': 'confirmed' },
-      });
-      expect(store.getState().source).toBe('user');
-    });
-
-    it('setAddOnDecision writes rejected and overwrites prior decisions', () => {
-      store.getState().setViewFromUser({
-        type: 'itinerary',
-        addOnDecisions: { 'vienna-chamber-music': 'confirmed' },
-      });
-      store.getState().setAddOnDecision('vienna-chamber-music', 'rejected');
-      expect(store.getState().view).toEqual({
-        type: 'itinerary',
-        addOnDecisions: { 'vienna-chamber-music': 'rejected' },
-      });
-    });
-
-    it('setAddOnDecision is a no-op when the active view is not itinerary', () => {
-      store.getState().setViewFromUser({ type: 'presentation' });
-      store.getState().setAddOnDecision('vienna-chamber-music', 'confirmed');
-      expect(store.getState().view).toEqual({ type: 'presentation' });
-    });
-
-    it('re-entering the itinerary view resets addOnDecisions', () => {
-      store.getState().setViewFromUser({
-        type: 'itinerary',
-        addOnDecisions: { 'vienna-chamber-music': 'confirmed' },
-      });
-      store.getState().setViewFromUser({ type: 'presentation' });
-      store.getState().setViewFromUser({ type: 'itinerary', addOnDecisions: {} });
-      expect(store.getState().view).toEqual({ type: 'itinerary', addOnDecisions: {} });
-    });
   });
 });

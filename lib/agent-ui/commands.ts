@@ -18,8 +18,18 @@ const SoftRedirect = Base.extend({
   }),
 });
 
+export const Experience = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.string(),
+  venue: z.string().nullable(),
+  description: z.string(),
+  images: z.array(z.string()).optional(),
+});
+export type Experience = z.infer<typeof Experience>;
+
 // A city as it travels inside an itinerary payload. Structurally a `City`
-// (lib/map/cities.ts) minus the local-only `addOns`.
+// (lib/map/cities.ts) plus the wire-only `day_details` and `experiences`.
 export const ItineraryCity = z.object({
   id: z.string(),
   name: z.string(),
@@ -29,6 +39,7 @@ export const ItineraryCity = z.object({
   lon: z.number(),
   lat: z.number(),
   day_details: z.array(z.object({ day: z.string(), description: z.string() })).optional(),
+  experiences: z.array(Experience).optional(),
 });
 export type ItineraryCity = z.infer<typeof ItineraryCity>;
 

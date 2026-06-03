@@ -4,12 +4,12 @@ import { getViewDetailId } from './view-detail';
 
 describe('getViewDetailId', () => {
   it('returns the city id when an itinerary detail is open', () => {
-    const view: UiView = { type: 'itinerary', addOnDecisions: {}, detailCityId: 'vienna' };
+    const view: UiView = { type: 'itinerary', detailCityId: 'vienna' };
     expect(getViewDetailId(view)).toBe('vienna');
   });
 
   it('returns null for an itinerary with no detail open', () => {
-    const view: UiView = { type: 'itinerary', addOnDecisions: {} };
+    const view: UiView = { type: 'itinerary' };
     expect(getViewDetailId(view)).toBeNull();
   });
 

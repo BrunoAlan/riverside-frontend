@@ -265,6 +265,146 @@ describe('UiCommand schema', () => {
     expect(parsed.success).toBe(false);
   });
 
+  it('parses show_itinerary_options with per-city experiences', () => {
+    const result = UiCommand.parse({
+      type: 'show_itinerary_options',
+      correlationId: 'c-experiences',
+      payload: {
+        itinerary: {
+          id: 'danube_legends',
+          name: 'Danube Legends',
+          duration: { days: 12, nights: 11 },
+          match_score: 0.6667,
+          departure_dates: ['2026-04-22'],
+          center: [16.57, 48.15],
+          zoom: 6,
+          cities: [
+            {
+              id: 'vienna',
+              name: 'Vienna',
+              country: 'Austria',
+              image: 'https://example.com/vienna.jpg',
+              days: 'Days 5, 10 & 11',
+              lon: 16.3738,
+              lat: 48.2082,
+              experiences: [
+                {
+                  id: 'signature_vienna_belvedere_palace',
+                  name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+                  type: 'private_concert_and_museum_visit',
+                  venue: 'Belvedere Palace',
+                  description: 'After-hours VIP experience at Belvedere Palace.',
+                },
+                {
+                  id: 'signature_hungary_national_day',
+                  name: 'Signature Hungary: National Day Celebration',
+                  type: 'national_day_fireworks_event',
+                  venue: null,
+                  description: 'National Day celebration with fireworks from Vista Deck.',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    if (result.type !== 'show_itinerary_options') throw new Error('discriminator failed');
+    expect(result.payload.itinerary.cities[0].experiences).toEqual([
+      {
+        id: 'signature_vienna_belvedere_palace',
+        name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+        type: 'private_concert_and_museum_visit',
+        venue: 'Belvedere Palace',
+        description: 'After-hours VIP experience at Belvedere Palace.',
+      },
+      {
+        id: 'signature_hungary_national_day',
+        name: 'Signature Hungary: National Day Celebration',
+        type: 'national_day_fireworks_event',
+        venue: null,
+        description: 'National Day celebration with fireworks from Vista Deck.',
+      },
+    ]);
+  });
+
+  it('parses a per-city experience with images', () => {
+    const result = UiCommand.parse({
+      type: 'show_itinerary_options',
+      correlationId: 'c-exp-images',
+      payload: {
+        itinerary: {
+          id: 'danube_legends',
+          name: 'Danube Legends',
+          duration: { days: 12, nights: 11 },
+          match_score: 0.6667,
+          departure_dates: ['2026-04-22'],
+          center: [16.57, 48.15],
+          zoom: 6,
+          cities: [
+            {
+              id: 'vienna',
+              name: 'Vienna',
+              country: 'Austria',
+              image: 'https://example.com/vienna.jpg',
+              days: 'Days 5, 10 & 11',
+              lon: 16.3738,
+              lat: 48.2082,
+              experiences: [
+                {
+                  id: 'signature_vienna_belvedere_palace',
+                  name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+                  type: 'private_concert_and_museum_visit',
+                  venue: 'Belvedere Palace',
+                  description: 'After-hours VIP experience at Belvedere Palace.',
+                  images: [
+                    'https://example.com/belvedere-1.jpg',
+                    'https://example.com/belvedere-2.jpg',
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    if (result.type !== 'show_itinerary_options') throw new Error('discriminator failed');
+    expect(result.payload.itinerary.cities[0].experiences?.[0].images).toEqual([
+      'https://example.com/belvedere-1.jpg',
+      'https://example.com/belvedere-2.jpg',
+    ]);
+  });
+
+  it('rejects a malformed experience entry', () => {
+    const parsed = UiCommand.safeParse({
+      type: 'show_itinerary_options',
+      correlationId: 'c-bad-exp',
+      payload: {
+        itinerary: {
+          id: 'x',
+          name: 'X',
+          duration: { days: 1, nights: 0 },
+          match_score: 1,
+          departure_dates: [],
+          center: [0, 0],
+          zoom: 1,
+          cities: [
+            {
+              id: 'a',
+              name: 'A',
+              country: 'C',
+              image: 'https://example.com/a.jpg',
+              days: 'Day 1',
+              lon: 0,
+              lat: 0,
+              experiences: [{ id: 'e1', name: 'No description' }],
+            },
+          ],
+        },
+      },
+    });
+    expect(parsed.success).toBe(false);
+  });
+
   it('parses show_city_detail with a string city_id', () => {
     const result = UiCommand.parse({
       type: 'show_city_detail',

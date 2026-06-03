@@ -342,3 +342,10 @@
 [data-sonner-toast][data-type='error'] [data-icon] {
   color: var(--error-600);
 }
+
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
