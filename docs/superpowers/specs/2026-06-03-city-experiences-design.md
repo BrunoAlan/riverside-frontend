@@ -85,8 +85,12 @@ components) gains an optional `experiences` field so the card can read the count
 ### 7. Mocks — `lib/dev/mocks.ts`
 
 - Remove `addOnDecisions: {}` from the two itinerary mocks.
-- Add real `experiences` to Budapest and Vienna in the `danubeLegends` mock
-  (from the backend payload) so the dev panel exercises the new UI.
+- Replace the `danubeLegends` mock with the **full backend payload**: all six
+  cities (Budapest, Bratislava, Tulln, Wachau Valley, Vienna, Dürnstein) with
+  their real coordinates, `days`, and `experiences` (Budapest ×3, Vienna ×1; the
+  rest have none). This makes the dev panel render the complete itinerary,
+  exercising both the populated and empty-experiences states.
+- Keep the existing `day_details` on the cities that have them.
 
 ### 8. Tests
 
