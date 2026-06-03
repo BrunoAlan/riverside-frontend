@@ -54,6 +54,22 @@ export function CityDetailCard({ city, onClose }: CityDetailCardProps) {
               <p className="text-primary mt-2 text-sm leading-relaxed">{detail.description}</p>
             </div>
           ))}
+          {city.experiences && city.experiences.length > 0 && (
+            <div className="border-beige-300 mt-2 border-t pt-4">
+              <p className="text-muted-foreground text-xs tracking-wide uppercase">Experiences</p>
+              <div className="mt-3 flex flex-col gap-4">
+                {city.experiences.map((exp) => (
+                  <div key={exp.id}>
+                    <p className="text-primary text-sm leading-snug">{exp.name}</p>
+                    {exp.venue && <p className="text-muted-foreground mt-1 text-xs">{exp.venue}</p>}
+                    <p className="text-primary/80 mt-1 text-sm leading-relaxed">
+                      {exp.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     </div>
