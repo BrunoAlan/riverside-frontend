@@ -15,18 +15,22 @@ export function CityExperiencesPanel({ experiences }: CityExperiencesPanelProps)
 
   return (
     <div
-      className="pointer-events-auto flex max-h-[85vh] flex-col gap-3 overflow-y-auto pr-1"
+      className="pointer-events-auto flex max-h-[85vh] flex-col gap-3"
       style={{ width: PANEL_WIDTH }}
     >
-      <p className="text-muted-foreground px-2 text-xs tracking-wide uppercase">Experiences</p>
-      {experiences.map((experience) => (
-        <ExperienceCard
-          key={experience.id}
-          experience={experience}
-          expanded={experience.id === openId}
-          onToggle={() => setOpenId((prev) => (prev === experience.id ? null : experience.id))}
-        />
-      ))}
+      <p className="text-muted-foreground shrink-0 px-2 text-xs tracking-wide uppercase">
+        Experiences
+      </p>
+      <div className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
+        {experiences.map((experience) => (
+          <ExperienceCard
+            key={experience.id}
+            experience={experience}
+            expanded={experience.id === openId}
+            onToggle={() => setOpenId((prev) => (prev === experience.id ? null : experience.id))}
+          />
+        ))}
+      </div>
     </div>
   );
 }
