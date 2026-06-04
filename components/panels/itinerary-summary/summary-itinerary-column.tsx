@@ -1,5 +1,5 @@
-import { PipeSeparatedList } from '@/components/panels/itinerary-summary/pipe-separated-list';
 import { SummaryCityCard } from '@/components/panels/itinerary-summary/summary-city-card';
+import { PipeSeparatedList } from '@/components/shared/pipe-separated-list';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 
 export function SummaryItineraryColumn({

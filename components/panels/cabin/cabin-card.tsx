@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { ArrowsOutSimpleIcon } from '@phosphor-icons/react';
+import { PipeSeparatedList } from '@/components/shared/pipe-separated-list';
 import { Button } from '@/components/ui/button';
 import type { Cabin } from '@/lib/agent-ui/commands';
 import { formatCabinPrice } from '@/lib/cabins';
@@ -43,14 +44,7 @@ export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProp
           </Button>
         )}
       </div>
-      <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-        {info.map((item, index) => (
-          <span key={index} className="flex items-center gap-3">
-            {index > 0 && <span className="bg-border h-3 w-px" aria-hidden />}
-            {item}
-          </span>
-        ))}
-      </div>
+      <PipeSeparatedList items={info} className="gap-x-3 gap-y-1" />
     </div>
   );
 }

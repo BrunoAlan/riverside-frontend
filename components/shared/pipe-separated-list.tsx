@@ -1,9 +1,9 @@
 import { Fragment } from 'react';
 import { cn } from '@/lib/shadcn/utils';
 
-// Inline list of short strings joined by a thin vertical pipe. Used for the
-// cabin meta row and the itinerary country list. Spacing on both sides of the
-// pipe is driven by the container gap, so callers pass it via `className`.
+// Inline list of short strings joined by a thin vertical pipe. Used for cabin
+// meta rows and the itinerary country list. Spacing on both sides of the pipe
+// is driven by the container gap, so callers pass it via `className`.
 export function PipeSeparatedList({
   items,
   className,

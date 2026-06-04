@@ -6,6 +6,7 @@ import { ArmchairIcon, BathtubIcon, BedIcon, XIcon } from '@phosphor-icons/react
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
 import { DetailSection } from '@/components/panels/cabin/cabin-detail-section';
+import { PipeSeparatedList } from '@/components/shared/pipe-separated-list';
 import type { Cabin } from '@/lib/agent-ui/commands';
 import { formatCabinPrice } from '@/lib/cabins';
 
@@ -44,19 +45,15 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
             <DialogPrimitive.Description className="sr-only">
               {cabin.name} cabin details
             </DialogPrimitive.Description>
-            <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-              {[
+            <PipeSeparatedList
+              items={[
                 `${cabin.guests} guests`,
                 `${cabin.area}m²`,
                 `from ${formatCabinPrice(cabin.price_from)} EUR`,
                 cabin.view,
-              ].map((item, index) => (
-                <span key={index} className="flex items-center gap-3">
-                  {index > 0 && <span className="bg-border h-3 w-px" aria-hidden />}
-                  {item}
-                </span>
-              ))}
-            </div>
+              ]}
+              className="mt-2 gap-x-3 gap-y-1"
+            />
             <div className="mt-6 flex flex-col gap-6">
               <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
               <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />

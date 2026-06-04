@@ -1,7 +1,7 @@
 import { ArmchairIcon, BathtubIcon, BedIcon } from '@phosphor-icons/react';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
 import { DetailSection } from '@/components/panels/cabin/cabin-detail-section';
-import { PipeSeparatedList } from '@/components/panels/itinerary-summary/pipe-separated-list';
+import { PipeSeparatedList } from '@/components/shared/pipe-separated-list';
 import type { Cabin } from '@/lib/agent-ui/commands';
 import { formatCabinPrice } from '@/lib/cabins';
 
