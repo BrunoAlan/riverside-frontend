@@ -488,6 +488,48 @@ describe('ui-view-store', () => {
     expect(s.lastCorrelationId).toBe('c-exp-3');
   });
 
+  it('applyCommand(add_experience_to_basket) appends an entry', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-1',
+      payload: { experience_id: 'belvedere', day: 'Day 3', passenger_count: 2 },
+    });
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 3' },
+    ]);
+  });
+
+  it('applyCommand(add_experience_to_basket) is idempotent for the same (id, day)', () => {
+    const add = () =>
+      store.getState().applyCommand({
+        type: 'add_experience_to_basket',
+        correlationId: 'c-exp-add-2',
+        payload: { experience_id: 'belvedere', day: 'Day 3', passenger_count: 2 },
+      });
+    add();
+    add();
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 3' },
+    ]);
+  });
+
+  it('applyCommand(add_experience_to_basket) keeps separate entries for different days', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-3',
+      payload: { experience_id: 'belvedere', day: 'Day 3', passenger_count: 2 },
+    });
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-4',
+      payload: { experience_id: 'belvedere', day: 'Day 5', passenger_count: 2 },
+    });
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 3' },
+      { experienceId: 'belvedere', day: 'Day 5' },
+    ]);
+  });
+
   it('applyCommand(add_cabin_to_basket) sets selectedCabinId', () => {
     store.getState().applyCommand({
       type: 'add_cabin_to_basket',

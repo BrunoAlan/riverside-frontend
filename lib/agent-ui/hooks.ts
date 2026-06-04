@@ -9,3 +9,4 @@ export const useSetViewFromUser = () => useUiViewStore((s) => s.setViewFromUser)
 export const useBookingSummary = () => useUiViewStore((s) => s.bookingSummary);
 export const useSetBookingSummaryFromDev = () => useUiViewStore((s) => s.setBookingSummaryFromDev);
 export const useSelectedCabinId = () => useUiViewStore((s) => s.selectedCabinId);
+export const useAddedExperiences = () => useUiViewStore((s) => s.addedExperiences);

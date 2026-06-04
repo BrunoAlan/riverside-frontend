@@ -679,6 +679,23 @@ describe('add_cabin_to_basket', () => {
   });
 });
 
+describe('add_experience_to_basket', () => {
+  it('parses add_experience_to_basket', () => {
+    const result = UiCommand.parse({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-1',
+      payload: {
+        experience_id: 'signature_vienna_belvedere_palace',
+        day: 'Day 3',
+        passenger_count: 2,
+      },
+    });
+    if (result.type !== 'add_experience_to_basket') throw new Error('discriminator failed');
+    expect(result.payload.day).toBe('Day 3');
+    expect(result.payload.passenger_count).toBe(2);
+  });
+});
+
 describe('show_cabin_options', () => {
   const validCabin = {
     id: 'owners-suite',

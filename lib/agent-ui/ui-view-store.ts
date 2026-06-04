@@ -11,6 +11,7 @@ interface UiViewState {
   lastError: { correlationId?: string; message: string } | null;
   bookingSummary: BookingSummary | null;
   selectedCabinId: string | null;
+  addedExperiences: Array<{ experienceId: string; day: string }>;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
@@ -30,6 +31,7 @@ export function createUiViewStore() {
     lastError: null,
     bookingSummary: null,
     selectedCabinId: null,
+    addedExperiences: [],
 
     applyCommand: (cmd) =>
       set((state) => {
@@ -121,6 +123,19 @@ export function createUiViewStore() {
               source: 'agent',
               lastCorrelationId: cmd.correlationId,
             };
+          case 'add_experience_to_basket': {
+            const { experience_id, day } = cmd.payload;
+            const exists = state.addedExperiences.some(
+              (e) => e.experienceId === experience_id && e.day === day
+            );
+            return {
+              addedExperiences: exists
+                ? state.addedExperiences
+                : [...state.addedExperiences, { experienceId: experience_id, day }],
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
+          }
           default: {
             const _exhaustive: never = cmd;
             void _exhaustive;
