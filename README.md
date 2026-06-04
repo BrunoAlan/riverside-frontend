@@ -126,6 +126,20 @@ Set `audioVisualizerType` to switch styles:
 
 Use `audioVisualizerColor` / `audioVisualizerColorDark` for a shared accent across modes.
 
+### LiveKit console logging
+
+LiveKit's client SDK is verbose by default. We keep it quiet so the console only shows
+the app's own `console.*` output. The level is wired in `components/layout/app.tsx`:
+
+```ts
+useDebugMode({ enabled: IN_DEVELOPMENT, logLevel: LogLevel.error });
+```
+
+To change how chatty LiveKit is, swap `LogLevel.error` for another level (most to least
+verbose): `trace`, `debug`, `info`, `warn`, `error`, `silent`. This only affects LiveKit's
+internal logger — your own `console.log` calls are never silenced. The hook lives in
+`hooks/use-debug.ts`.
+
 ## Agent-driven UI
 
 The agent doesn't render anything — it sends **UI commands** over LiveKit and the frontend translates them into **views**.

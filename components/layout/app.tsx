@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { LogLevel } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
 import { BookingSummaryContainer } from '@/components/agent-ui/booking-summary';
@@ -23,7 +24,7 @@ import { getLocalTokenSource, getSandboxTokenSource } from '@/lib/utils';
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
 function AppSetup() {
-  useDebugMode({ enabled: IN_DEVELOPMENT });
+  useDebugMode({ enabled: IN_DEVELOPMENT, logLevel: LogLevel.error });
   useAgentErrors();
   useUiCommandTransport();
   useSessionAnalytics();
