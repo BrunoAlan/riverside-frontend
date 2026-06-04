@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { ExperienceCard } from '@/components/panels/map/experience-card';
+import { useScrollFade } from '@/hooks/use-scroll-fade';
 import type { Experience } from '@/lib/agent-ui/commands';
 
 const PANEL_WIDTH = 440;
@@ -13,31 +14,7 @@ type CityExperiencesPanelProps = {
 export function CityExperiencesPanel({ experiences }: CityExperiencesPanelProps) {
   const [openId, setOpenId] = useState<string | null>(experiences[0]?.id ?? null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [showTopFade, setShowTopFade] = useState(false);
-  const [showBottomFade, setShowBottomFade] = useState(false);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const updateFadeState = () => {
-      const atTop = el.scrollTop <= 1;
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      setShowTopFade(!atTop);
-      setShowBottomFade(!atBottom);
-    };
-
-    updateFadeState();
-    el.addEventListener('scroll', updateFadeState);
-
-    const observer = new ResizeObserver(updateFadeState);
-    observer.observe(el);
-
-    return () => {
-      el.removeEventListener('scroll', updateFadeState);
-      observer.disconnect();
-    };
-  }, [experiences]);
+  const { showTopFade, showBottomFade } = useScrollFade(scrollRef, [experiences]);
 
   return (
     <div

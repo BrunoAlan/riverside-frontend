@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { ChatAgentMessage } from '@/components/chat/chat-agent-message';
 import { ChatInput } from '@/components/chat/chat-input';
 import { ChatUserMessage } from '@/components/chat/chat-user-message';
 import { Button } from '@/components/ui/button';
+import { useScrollFade } from '@/hooks/use-scroll-fade';
 import type { ChatMessage } from '@/lib/chat/messages';
 import { cn } from '@/lib/shadcn/utils';
 
@@ -25,29 +26,7 @@ function ChatOverlay({
   className,
 }: ChatOverlayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [showTopFade, setShowTopFade] = useState(false);
-  const [showBottomFade, setShowBottomFade] = useState(false);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const updateFadeState = () => {
-      const atTop = el.scrollTop <= 1;
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-
-      setShowTopFade(!atTop);
-      setShowBottomFade(!atBottom);
-    };
-
-    updateFadeState();
-
-    el.addEventListener('scroll', updateFadeState);
-
-    return () => {
-      el.removeEventListener('scroll', updateFadeState);
-    };
-  }, [messages, transcriptCollapsed]);
+  const { showTopFade, showBottomFade } = useScrollFade(scrollRef, [messages, transcriptCollapsed]);
 
   useEffect(() => {
     if (transcriptCollapsed) return;
