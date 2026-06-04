@@ -80,8 +80,13 @@ step needs `cwebp` (`brew install webp`).
 `<video>` markup:
 - Add `poster="/window-poster.jpg"`.
 - Keep `preload="auto"` (see preload timing below).
-- Two `<source>` elements: `window-video.webm` (`video/webm`) first, then
-  `window-video.mp4` (`video/mp4`) fallback.
+- Two `<source>` elements: `window-video.webm` first, then `window-video.mp4`
+  fallback. **The `type` includes the codec** (`video/webm; codecs="av01.0.05M.08"`
+  and `video/mp4; codecs="avc1.64001f"`), not just the container. Without the codec,
+  a browser that supports the WebM container but not the AV1 codec would select the
+  WebM by MIME, download it, fail to decode, and never fall back to the MP4 (source
+  selection is by type, one-shot — it does not retry on a later decode error). With
+  the codec declared, non-AV1 browsers skip the WebM and use the MP4 cleanly.
 
 **Preload timing.** The `<video>` mounts on the `start` view ("Welcome Aboard"),
 *before* the user clicks "Start the experience" which both connects the LiveKit

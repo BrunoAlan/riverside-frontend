@@ -33,8 +33,8 @@ export function WindowBackground({ isPlaying }: WindowBackgroundProps) {
         poster="/window-poster.jpg"
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="/window-video.webm" type="video/webm" />
-        <source src="/window-video.mp4" type="video/mp4" />
+        <source src="/window-video.webm" type='video/webm; codecs="av01.0.05M.08"' />
+        <source src="/window-video.mp4" type='video/mp4; codecs="avc1.64001f"' />
       </video>
       <Image src="/window-overlay.webp" alt="" fill priority className="object-cover" />
     </div>
