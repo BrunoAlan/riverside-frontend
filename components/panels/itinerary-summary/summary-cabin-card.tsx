@@ -31,10 +31,12 @@ export function SummaryCabinCard({ cabin }: { cabin: Cabin }) {
             ))}
           </div>
         </div>
-        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
+        <div className="grid gap-x-8 sm:grid-cols-2">
+          <div className="flex flex-col gap-6">
+            <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
+            <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
+          </div>
           <DetailSection icon={ArmchairIcon} title="Amenities" items={cabin.detail.amenities} />
-          <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
         </div>
       </div>
     </div>
