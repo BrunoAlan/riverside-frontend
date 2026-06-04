@@ -1,18 +1,11 @@
 import type { Cabin } from '@/lib/agent-ui/commands';
 
-export type SummaryAddOn = {
-  label: string; // e.g. "Add-On"
-  day: string; // e.g. "Day 1"
-  description: string;
-};
-
 export type SummaryItineraryCity = {
   id: string;
   name: string;
   country: string;
   days: string; // "Days 1, 2 & 8"
   image: string;
-  addOns?: SummaryAddOn[];
 };
 
 export type ItinerarySummaryDetails = {

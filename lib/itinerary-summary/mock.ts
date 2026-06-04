@@ -90,13 +90,6 @@ export const ITINERARY_SUMMARY_MOCK: ItinerarySummary = {
         country: 'Austria',
         days: 'Days 1, 2 & 8',
         image: VIENNA,
-        addOns: [
-          {
-            label: 'Add-On',
-            day: 'Day 1',
-            description: 'A private evening of chamber music at Palais Eschenbach.',
-          },
-        ],
       },
       {
         id: 'bratislava',
@@ -111,13 +104,6 @@ export const ITINERARY_SUMMARY_MOCK: ItinerarySummary = {
         country: 'Hungary',
         days: 'Days 4 & 5',
         image: BUDAPEST,
-        addOns: [
-          {
-            label: 'Add-On',
-            day: 'Day 4',
-            description: 'Private concert at the Wenckheim Palace with champagne reception.',
-          },
-        ],
       },
       {
         id: 'wachau_valley',
