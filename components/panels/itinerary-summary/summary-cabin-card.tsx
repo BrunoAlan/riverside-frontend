@@ -1,6 +1,7 @@
 import { ArmchairIcon, BathtubIcon, BedIcon } from '@phosphor-icons/react';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
 import { DetailSection } from '@/components/panels/cabin/cabin-detail-section';
+import { PipeSeparatedList } from '@/components/panels/itinerary-summary/pipe-separated-list';
 import type { Cabin } from '@/lib/agent-ui/commands';
 import { formatCabinPrice } from '@/lib/cabins';
 
@@ -22,14 +23,7 @@ export function SummaryCabinCard({ cabin }: { cabin: Cabin }) {
           <h3 className="font-display text-3xl leading-tight font-semibold text-neutral-700">
             {cabin.name}
           </h3>
-          <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            {meta.map((item, index) => (
-              <span key={index} className="flex items-center gap-3">
-                {index > 0 && <span className="bg-beige-300 h-3 w-px" aria-hidden />}
-                {item}
-              </span>
-            ))}
-          </div>
+          <PipeSeparatedList items={meta} className="mt-2 gap-x-3 gap-y-1" />
         </div>
         <div className="grid gap-x-8 sm:grid-cols-2">
           <div className="flex flex-col gap-6">

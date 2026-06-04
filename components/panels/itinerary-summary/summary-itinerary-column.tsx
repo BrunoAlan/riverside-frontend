@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { PipeSeparatedList } from '@/components/panels/itinerary-summary/pipe-separated-list';
 import { SummaryCityCard } from '@/components/panels/itinerary-summary/summary-city-card';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 
@@ -13,14 +13,7 @@ export function SummaryItineraryColumn({
         <h3 className="font-display text-3xl leading-tight font-semibold text-neutral-700">
           {itinerary.title}
         </h3>
-        <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-2 text-sm">
-          {itinerary.countries.map((country, i) => (
-            <Fragment key={country}>
-              {i > 0 && <span className="bg-beige-300 h-3 w-px" aria-hidden />}
-              <span>{country}</span>
-            </Fragment>
-          ))}
-        </div>
+        <PipeSeparatedList items={itinerary.countries} className="mt-2 gap-x-2" />
         <p className="text-foreground mt-4 text-base leading-relaxed">{itinerary.description}</p>
       </div>
       <div className="flex flex-col gap-8">

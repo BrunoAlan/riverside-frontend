@@ -22,8 +22,11 @@ export function SummaryDetailsRow({ details }: { details: ItinerarySummaryDetail
 
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-      {fields.map((field, i) => (
-        <span key={i} className="text-foreground inline-flex items-center gap-1.5 text-sm">
+      {fields.map((field) => (
+        <span
+          key={field.label}
+          className="text-foreground inline-flex items-center gap-1.5 text-sm"
+        >
           <span className="text-muted-foreground">{field.icon}</span>
           {field.label}
         </span>
