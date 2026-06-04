@@ -12,7 +12,7 @@ const WINDOW = WINDOW_HALF * 2 + 1;
 const VISIBLE_HALF = 2; // strips shown each side of the focus; outer nodes are off-screen buffer
 const MIN_PANELS = WINDOW; // ensure the window never shows duplicate panels
 const DWELL_MS = 2500; // focus rest time before sliding to the next image
-const SLIDE_MS = 600; // slide duration
+const SLIDE_MS = 1500; // slide duration
 const GAP = 8; // px between slots
 // width as a fraction of the container, by integer distance from the centre line.
 // index 0 = focus; distances 1 and 2 are the two visible strips per side; distances >= 3
