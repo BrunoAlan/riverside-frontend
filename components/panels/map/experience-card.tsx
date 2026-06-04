@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { CaretDownIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { Experience } from '@/lib/agent-ui/commands';
@@ -12,11 +12,22 @@ type ExperienceCardProps = {
   experience: Experience;
   expanded: boolean;
   onToggle: () => void;
+  dayOptions: string[];
+  addedDays: string[];
+  onConfirm: (day: string) => void;
 };
 
-export function ExperienceCard({ experience, expanded, onToggle }: ExperienceCardProps) {
+export function ExperienceCard({
+  experience,
+  expanded,
+  onToggle,
+  dayOptions,
+  addedDays,
+  onConfirm,
+}: ExperienceCardProps) {
   const images = experience.images ?? (experience.image ? [experience.image] : []);
   const cardRef = useRef<HTMLDivElement>(null);
+  const [selectedDay, setSelectedDay] = useState(dayOptions[0] ?? '');
 
   // On expand, nudge the scroll panel just enough to bring the now-taller card fully into view.
   useEffect(() => {
@@ -24,6 +35,8 @@ export function ExperienceCard({ experience, expanded, onToggle }: ExperienceCar
       cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [expanded]);
+
+  const isAdded = addedDays.includes(selectedDay);
 
   return (
     <Card
@@ -57,14 +70,44 @@ export function ExperienceCard({ experience, expanded, onToggle }: ExperienceCar
         )}
       </div>
       {expanded && (
-        <div className="mt-3 flex items-center justify-end gap-2 px-2 pb-1">
-          {/* TODO: wire Confirm/Reject to the agent — decision payload not yet defined */}
-          <Button type="button" variant="ghost" size="sm" onClick={() => {}}>
-            Reject
-          </Button>
-          <Button type="button" variant="secondary" size="sm" onClick={() => {}}>
-            Confirm
-          </Button>
+        <div className="mt-3 flex items-center justify-between gap-2 px-2 pb-1">
+          <label htmlFor={`day-${experience.id}`} className="sr-only">
+            Day for {experience.name}
+          </label>
+          <select
+            id={`day-${experience.id}`}
+            value={selectedDay}
+            onChange={(event) => setSelectedDay(event.target.value)}
+            disabled={dayOptions.length === 0}
+            className="bg-beige-50 border-beige-400/50 text-primary rounded-md border px-2 py-1 text-sm"
+          >
+            {dayOptions.map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
+          </select>
+          <div className="flex items-center gap-2">
+            {/* Reject is not yet wired — no intent defined for it. */}
+            <Button type="button" variant="ghost" size="sm" onClick={() => {}}>
+              Reject
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={isAdded || !selectedDay}
+              onClick={() => onConfirm(selectedDay)}
+            >
+              {isAdded ? (
+                <>
+                  <CheckIcon weight="bold" /> Added
+                </>
+              ) : (
+                'Confirm'
+              )}
+            </Button>
+          </div>
         </div>
       )}
     </Card>

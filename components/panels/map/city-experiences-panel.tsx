@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ExperienceCard } from '@/components/panels/map/experience-card';
 import { useScrollFade } from '@/hooks/use-scroll-fade';
 import type { Experience } from '@/lib/agent-ui/commands';
@@ -9,12 +9,30 @@ const PANEL_WIDTH = 440;
 
 type CityExperiencesPanelProps = {
   experiences: Experience[];
+  detailExperienceId: string | null;
+  dayOptions: string[];
+  addedExperiences: Array<{ experienceId: string; day: string }>;
+  onConfirm: (experience: Experience, day: string) => void;
 };
 
-export function CityExperiencesPanel({ experiences }: CityExperiencesPanelProps) {
+export function CityExperiencesPanel({
+  experiences,
+  detailExperienceId,
+  dayOptions,
+  addedExperiences,
+  onConfirm,
+}: CityExperiencesPanelProps) {
+  // Local open state with a first-card default; a show_experience_detail command
+  // from the backend overrides it via the effect below.
   const [openId, setOpenId] = useState<string | null>(experiences[0]?.id ?? null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { showTopFade, showBottomFade } = useScrollFade(scrollRef, [experiences]);
+
+  useEffect(() => {
+    if (detailExperienceId) {
+      setOpenId(detailExperienceId);
+    }
+  }, [detailExperienceId]);
 
   return (
     <div
@@ -37,6 +55,11 @@ export function CityExperiencesPanel({ experiences }: CityExperiencesPanelProps)
             experience={experience}
             expanded={experience.id === openId}
             onToggle={() => setOpenId((prev) => (prev === experience.id ? null : experience.id))}
+            dayOptions={dayOptions}
+            addedDays={addedExperiences
+              .filter((e) => e.experienceId === experience.id)
+              .map((e) => e.day)}
+            onConfirm={(day) => onConfirm(experience, day)}
           />
         ))}
       </div>
