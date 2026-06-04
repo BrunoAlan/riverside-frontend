@@ -15,7 +15,6 @@ export type ItinerarySummaryDetails = {
   stops: string; // "Budapest +3"
   dates: string; // "20 – 27 Sep 2026"
   pricePerPerson: string; // "€ 9,174 p.p."
-  dietary: string; // "Dietary Accommodation"
   cabinName: string; // "Owner's Suite"
 };
 

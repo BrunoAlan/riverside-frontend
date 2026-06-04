@@ -6,7 +6,6 @@ import {
   Euro,
   MapPin,
   Users,
-  Utensils,
 } from 'lucide-react';
 import type { ItinerarySummaryDetails } from '@/lib/itinerary-summary/types';
 
@@ -18,7 +17,6 @@ export function SummaryDetailsRow({ details }: { details: ItinerarySummaryDetail
     { icon: <BookOpen className="size-4" />, label: details.stops },
     { icon: <CalendarRange className="size-4" />, label: details.dates },
     { icon: <Euro className="size-4" />, label: details.pricePerPerson },
-    { icon: <Utensils className="size-4" />, label: details.dietary },
     { icon: <BedDouble className="size-4" />, label: details.cabinName },
   ];
 

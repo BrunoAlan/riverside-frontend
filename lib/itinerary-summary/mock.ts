@@ -61,7 +61,6 @@ export const ITINERARY_SUMMARY_MOCK: ItinerarySummary = {
     stops: 'Budapest +3',
     dates: '20 – 27 Sep 2026',
     pricePerPerson: '€ 9,174 p.p.',
-    dietary: 'Dietary Accommodation',
     cabinName: "Owner's Suite",
   },
   cabin: ownersSuite,
