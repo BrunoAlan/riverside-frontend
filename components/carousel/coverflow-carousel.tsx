@@ -13,11 +13,11 @@ const VISIBLE_HALF = 2; // strips shown each side of the focus; outer nodes are 
 const MIN_PANELS = WINDOW; // ensure the window never shows duplicate panels
 const DWELL_MS = 2500; // focus rest time before sliding to the next image
 const SLIDE_MS = 600; // slide duration
-const GAP = 12; // px between slots
+const GAP = 8; // px between slots
 // width as a fraction of the container, by integer distance from the centre line.
 // index 0 = focus; distances 1 and 2 are the two visible strips per side; distances >= 3
 // are off-screen buffer (clipped). Fractional distances interpolate linearly.
-const WIDTH_FRAC = [0.5, 0.17, 0.09, 0.07, 0.05];
+const WIDTH_FRAC = [0.6, 0.15, 0.09, 0.07, 0.05];
 
 function mod(n: number, m: number): number {
   return ((n % m) + m) % m;
@@ -206,7 +206,7 @@ export function CoverflowCarousel({ images }: CoverflowCarouselProps) {
             tabIndex={Math.abs(k) > VISIBLE_HALF ? -1 : 0}
             onClick={() => handleSlotClick(k)}
             aria-label={panel.caption ?? ''}
-            className="focus-visible:ring-beige-600 absolute top-1/2 h-[70%] overflow-hidden rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="focus-visible:ring-beige-600 absolute top-1/2 h-[80%] overflow-hidden rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{ left: 0, width: 0, transform: 'translate3d(0, -50%, 0)' }}
           >
             <Image
