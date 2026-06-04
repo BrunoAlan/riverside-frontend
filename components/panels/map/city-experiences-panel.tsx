@@ -12,6 +12,7 @@ type CityExperiencesPanelProps = {
   detailExperienceId: string | null;
   dayOptions: string[];
   addedExperiences: Array<{ experienceId: string; day: string }>;
+  onExplore: (experience: Experience) => void;
   onConfirm: (experience: Experience, day: string) => void;
 };
 
@@ -20,6 +21,7 @@ export function CityExperiencesPanel({
   detailExperienceId,
   dayOptions,
   addedExperiences,
+  onExplore,
   onConfirm,
 }: CityExperiencesPanelProps) {
   // Local open state with a first-card default; a show_experience_detail command
@@ -54,7 +56,11 @@ export function CityExperiencesPanel({
             key={experience.id}
             experience={experience}
             expanded={experience.id === openId}
-            onToggle={() => setOpenId((prev) => (prev === experience.id ? null : experience.id))}
+            onToggle={() => {
+              const willOpen = openId !== experience.id;
+              setOpenId(willOpen ? experience.id : null);
+              if (willOpen) onExplore(experience);
+            }}
             dayOptions={dayOptions}
             addedDays={addedExperiences
               .filter((e) => e.experienceId === experience.id)

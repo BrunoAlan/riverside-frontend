@@ -58,6 +58,16 @@ export function PanelMap({ view }: PanelMapProps) {
     });
   }, [setViewFromUser, sendIntent, itinerary]);
 
+  const handleExperienceExplore = useCallback(
+    (experience: Experience) => {
+      void sendIntent('explore_experience', {
+        entities: { experience_id: experience.id },
+        userMessage: `User opened ${experience.name} detail`,
+      });
+    },
+    [sendIntent]
+  );
+
   const handleExperienceConfirm = useCallback(
     (experience: Experience, day: string) => {
       void sendIntent('select_experience', {
@@ -86,6 +96,7 @@ export function PanelMap({ view }: PanelMapProps) {
               detailExperienceId={detailExperienceId ?? null}
               dayOptions={dayOptions}
               addedExperiences={addedExperiences}
+              onExplore={handleExperienceExplore}
               onConfirm={handleExperienceConfirm}
             />
           )}
