@@ -15,6 +15,10 @@
 - Props: destructure inline in the parameter list. No `props.foo` indirection.
 - Hooks live in `hooks/` if cross-cutting, or alongside the feature if local. Always `use-kebab-case.ts`.
 
+## Reuse & abstraction
+
+- Scroll containers with top/bottom fade overlays: use `useScrollFade` (`hooks/use-scroll-fade.ts`) for the edge detection — don't re-implement the scroll/resize listeners. Keep the gradient `<div>`s inline in each consumer, since their size, color, and offsets differ per layout.
+
 ## File naming
 
 - React components: `kebab-case.tsx`, default-export only if the file is a Next.js route entry; otherwise named exports.
