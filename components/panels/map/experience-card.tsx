@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { CaretDownIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,20 @@ type ExperienceCardProps = {
 
 export function ExperienceCard({ experience, expanded, onToggle }: ExperienceCardProps) {
   const images = experience.images ?? (experience.image ? [experience.image] : []);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // On expand, nudge the scroll panel just enough to bring the now-taller card fully into view.
+  useEffect(() => {
+    if (expanded) {
+      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [expanded]);
 
   return (
-    <Card className="bg-beige-50 border-beige-400/50 flex shrink-0 flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none">
+    <Card
+      ref={cardRef}
+      className="bg-beige-50 border-beige-400/50 flex shrink-0 flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none"
+    >
       {expanded && images.length > 0 && <ExperienceGallery images={images} alt={experience.name} />}
       <div>
         <div className="flex grow items-center justify-between gap-2">
