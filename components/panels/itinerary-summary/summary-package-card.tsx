@@ -4,7 +4,7 @@ import type { ItinerarySummaryPackage } from '@/lib/itinerary-summary/types';
 
 export function SummaryPackageCard({ pkg }: { pkg: ItinerarySummaryPackage }) {
   return (
-    <div className="bg-beige-50 flex flex-col gap-5 rounded-2xl p-6">
+    <div className="bg-beige-200 flex flex-col gap-5 rounded-2xl p-6">
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-display text-2xl font-semibold text-neutral-700">Package</h3>
         <Button variant="link" size="sm" className="gap-1 px-0">

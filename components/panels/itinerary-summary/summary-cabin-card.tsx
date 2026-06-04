@@ -13,7 +13,7 @@ export function SummaryCabinCard({ cabin }: { cabin: Cabin }) {
   ];
 
   return (
-    <div className="bg-beige-50 flex flex-col overflow-hidden rounded-2xl">
+    <div className="bg-beige-200 flex flex-col overflow-hidden rounded-2xl">
       <div className="h-72 sm:h-80">
         <CabinDetailGallery images={cabin.detail.gallery} alt={cabin.name} />
       </div>
