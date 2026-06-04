@@ -25,7 +25,7 @@ export function SummaryCabinCard({ cabin }: { cabin: Cabin }) {
           <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             {meta.map((item, index) => (
               <span key={index} className="flex items-center gap-3">
-                {index > 0 && <span className="bg-border h-3 w-px" aria-hidden />}
+                {index > 0 && <span className="bg-beige-300 h-3 w-px" aria-hidden />}
                 {item}
               </span>
             ))}

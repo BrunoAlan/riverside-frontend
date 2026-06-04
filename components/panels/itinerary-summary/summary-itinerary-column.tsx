@@ -16,7 +16,7 @@ export function SummaryItineraryColumn({
         <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-2 text-sm">
           {itinerary.countries.map((country, i) => (
             <Fragment key={country}>
-              {i > 0 && <span className="bg-border h-3 w-px" aria-hidden />}
+              {i > 0 && <span className="bg-beige-300 h-3 w-px" aria-hidden />}
               <span>{country}</span>
             </Fragment>
           ))}

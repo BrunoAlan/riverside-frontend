@@ -15,9 +15,9 @@ export function DetailSection({
         <SectionIcon className="text-neutral-700" size={20} />
         <h3 className="font-display text-lg font-semibold text-neutral-700">{title}</h3>
       </div>
-      <ul className="border-border border-t">
+      <ul className="border-beige-300 border-t">
         {items.map((item) => (
-          <li key={item} className="border-border text-muted-foreground border-b py-2 text-sm">
+          <li key={item} className="border-beige-300 text-muted-foreground border-b py-2 text-sm">
             {item}
           </li>
         ))}
