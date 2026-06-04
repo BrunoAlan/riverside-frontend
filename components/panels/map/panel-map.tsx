@@ -35,9 +35,9 @@ export function PanelMap({ view }: PanelMapProps) {
       ? (itinerary.cities.find((c) => c.id === detailCityId) ?? null)
       : null;
 
-  const dayOptions =
-    detailCity?.day_details?.map((d) => d.day) ??
-    (detailCity ? parseCityDays(detailCity.days) : []);
+  // `days` is the full day list (e.g. "Days 1, 2, 6 & 7"); `day_details` only
+  // carries descriptions for some of them, so it's not the source of options.
+  const dayOptions = detailCity ? parseCityDays(detailCity.days) : [];
 
   const handleCityExpand = useCallback(
     (city: City) => {
