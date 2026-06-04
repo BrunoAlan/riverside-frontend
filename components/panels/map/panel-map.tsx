@@ -9,6 +9,7 @@ import type { Experience } from '@/lib/agent-ui/commands';
 import { useAddedExperiences, useSetViewFromUser } from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import type { City } from '@/lib/map/cities';
+import { parseCityDays } from '@/lib/map/parse-city-days';
 
 const MapCanvas = dynamic(
   () => import('@/components/panels/map/map-canvas').then((m) => m.MapCanvas),
@@ -35,7 +36,8 @@ export function PanelMap({ view }: PanelMapProps) {
       : null;
 
   const dayOptions =
-    detailCity?.day_details?.map((d) => d.day) ?? (detailCity ? [detailCity.days] : []);
+    detailCity?.day_details?.map((d) => d.day) ??
+    (detailCity ? parseCityDays(detailCity.days) : []);
 
   const handleCityExpand = useCallback(
     (city: City) => {
