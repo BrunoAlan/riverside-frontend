@@ -30,11 +30,13 @@ export function WindowBackground({ isPlaying }: WindowBackgroundProps) {
         loop
         playsInline
         preload="auto"
+        poster="/window-poster.jpg"
         className="absolute inset-0 h-full w-full object-cover"
       >
+        <source src="/window-video.webm" type="video/webm" />
         <source src="/window-video.mp4" type="video/mp4" />
       </video>
-      <Image src="/window-overlay.png" alt="" fill priority className="object-cover" />
+      <Image src="/window-overlay.webp" alt="" fill priority className="object-cover" />
     </div>
   );
 }
