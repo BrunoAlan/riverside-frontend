@@ -10,6 +10,7 @@ interface UiViewState {
   lastCorrelationId: string | null;
   lastError: { correlationId?: string; message: string } | null;
   bookingSummary: BookingSummary | null;
+  selectedCabinId: string | null;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
@@ -28,6 +29,7 @@ export function createUiViewStore() {
     lastCorrelationId: null,
     lastError: null,
     bookingSummary: null,
+    selectedCabinId: null,
 
     applyCommand: (cmd) =>
       set((state) => {
@@ -113,6 +115,12 @@ export function createUiViewStore() {
               lastCorrelationId: cmd.correlationId,
             };
           }
+          case 'add_cabin_to_basket':
+            return {
+              selectedCabinId: cmd.payload.cabin_id,
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
           default: {
             const _exhaustive: never = cmd;
             void _exhaustive;

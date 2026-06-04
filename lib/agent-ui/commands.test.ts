@@ -642,6 +642,43 @@ describe('show_cabin_detail', () => {
   });
 });
 
+describe('add_cabin_to_basket', () => {
+  it('parses add_cabin_to_basket with a full payload', () => {
+    const result = UiCommand.parse({
+      type: 'add_cabin_to_basket',
+      correlationId: 'c-cab-1',
+      payload: {
+        cabin_id: 'mozart-suite',
+        name: 'Mozart Suite',
+        category: 'Mozart Suite',
+        guests: 2,
+        area: 62,
+        price_from: null,
+        view: 'French Balcony',
+      },
+    });
+    if (result.type !== 'add_cabin_to_basket') throw new Error('discriminator failed');
+    expect(result.payload.cabin_id).toBe('mozart-suite');
+    expect(result.payload.price_from).toBeNull();
+  });
+
+  it('rejects add_cabin_to_basket without cabin_id', () => {
+    const result = UiCommand.safeParse({
+      type: 'add_cabin_to_basket',
+      correlationId: 'c-cab-2',
+      payload: {
+        name: 'Mozart Suite',
+        category: 'x',
+        guests: 2,
+        area: 62,
+        price_from: null,
+        view: 'y',
+      },
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
 describe('show_cabin_options', () => {
   const validCabin = {
     id: 'owners-suite',

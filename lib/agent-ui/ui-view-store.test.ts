@@ -487,4 +487,24 @@ describe('ui-view-store', () => {
     expect(s.view).toEqual({ type: 'start' });
     expect(s.lastCorrelationId).toBe('c-exp-3');
   });
+
+  it('applyCommand(add_cabin_to_basket) sets selectedCabinId', () => {
+    store.getState().applyCommand({
+      type: 'add_cabin_to_basket',
+      correlationId: 'c-cab-1',
+      payload: {
+        cabin_id: 'mozart-suite',
+        name: 'Mozart Suite',
+        category: 'Mozart Suite',
+        guests: 2,
+        area: 62,
+        price_from: null,
+        view: 'French Balcony',
+      },
+    });
+    const s = store.getState();
+    expect(s.selectedCabinId).toBe('mozart-suite');
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('c-cab-1');
+  });
 });

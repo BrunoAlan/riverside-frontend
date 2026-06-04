@@ -152,6 +152,19 @@ const ShowExperienceDetail = Base.extend({
   payload: z.object({ experience_id: z.string().nullable() }),
 });
 
+const AddCabinToBasket = Base.extend({
+  type: z.literal('add_cabin_to_basket'),
+  payload: z.object({
+    cabin_id: z.string(),
+    name: z.string(),
+    category: z.string(),
+    guests: z.number().int(),
+    area: z.number(),
+    price_from: z.number().nullable(),
+    view: z.string(),
+  }),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
@@ -162,5 +175,6 @@ export const UiCommand = z.discriminatedUnion('type', [
   ShowCabinDetail,
   ShowCityDetail,
   ShowExperienceDetail,
+  AddCabinToBasket,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
