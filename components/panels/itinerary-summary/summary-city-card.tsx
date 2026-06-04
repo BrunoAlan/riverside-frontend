@@ -31,15 +31,6 @@ export function SummaryCityCard({ city }: { city: SummaryItineraryCity }) {
           </span>
         </div>
       </div>
-      {city.addOns?.map((addOn, i) => (
-        <div key={i} className="bg-beige-100 rounded-xl p-4">
-          <div className="text-muted-foreground flex items-center justify-between text-xs tracking-wide uppercase">
-            <span>{addOn.label}</span>
-            <span>{addOn.day}</span>
-          </div>
-          <p className="text-foreground mt-2 text-sm">{addOn.description}</p>
-        </div>
-      ))}
     </div>
   );
 }
