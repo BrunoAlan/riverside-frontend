@@ -58,7 +58,7 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
             </DialogPrimitive.Description>
 
             {/* Body (only this scrolls) */}
-            <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto px-4 pb-8 sm:px-6">
+            <div className="min-h-0 flex-1 space-y-8 overflow-y-auto px-4 pb-8 sm:px-6">
               <SummaryHeader header={data.header} />
               <SummaryDetailsRow details={data.details} />
               <div className="grid gap-8 lg:grid-cols-2">
