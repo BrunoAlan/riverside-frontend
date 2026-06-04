@@ -5,7 +5,7 @@ import { CabinCard } from '@/components/panels/cabin/cabin-card';
 import { CabinDetailModal } from '@/components/panels/cabin/cabin-detail-modal';
 import { useFrontendIntent } from '@/hooks/use-frontend-intent';
 import type { Cabin } from '@/lib/agent-ui/commands';
-import { useSetViewFromUser } from '@/lib/agent-ui/hooks';
+import { useSelectedCabinId, useSetViewFromUser } from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
 
 type PanelCabinSelectionProps = {
@@ -15,6 +15,7 @@ type PanelCabinSelectionProps = {
 export function PanelCabinSelection({ view }: PanelCabinSelectionProps) {
   const setViewFromUser = useSetViewFromUser();
   const sendIntent = useFrontendIntent();
+  const selectedCabinId = useSelectedCabinId();
 
   const { cabins } = view;
 
@@ -36,6 +37,16 @@ export function PanelCabinSelection({ view }: PanelCabinSelectionProps) {
     });
   }, [setViewFromUser, sendIntent, cabins]);
 
+  const handleSelect = useCallback(
+    (cabin: Cabin) => {
+      void sendIntent('select_cabin', {
+        entities: { cabin_id: cabin.id },
+        userMessage: `User selected ${cabin.name}`,
+      });
+    },
+    [sendIntent]
+  );
+
   const detailCabin = view.detailCabinId
     ? (cabins.find((cabin) => cabin.id === view.detailCabinId) ?? null)
     : null;
@@ -49,7 +60,12 @@ export function PanelCabinSelection({ view }: PanelCabinSelectionProps) {
           ))}
         </div>
       </div>
-      <CabinDetailModal cabin={detailCabin} onClose={handleClose} />
+      <CabinDetailModal
+        cabin={detailCabin}
+        onClose={handleClose}
+        onSelect={handleSelect}
+        selected={detailCabin != null && selectedCabinId === detailCabin.id}
+      />
     </div>
   );
 }

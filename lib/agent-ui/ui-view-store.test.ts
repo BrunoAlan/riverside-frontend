@@ -449,4 +449,104 @@ describe('ui-view-store', () => {
     expect(s.view).toEqual({ type: 'start' });
     expect(s.lastCorrelationId).toBe('c1');
   });
+
+  it('applyCommand(show_experience_detail) sets detailExperienceId on the itinerary view', () => {
+    store.getState().setViewFromUser({ type: 'itinerary', detailCityId: 'vienna' });
+    store.getState().applyCommand({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-1',
+      payload: { experience_id: 'belvedere' },
+    });
+    const s = store.getState();
+    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
+    expect(s.view.detailExperienceId).toBe('belvedere');
+    expect(s.view.detailCityId).toBe('vienna');
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('c-exp-1');
+  });
+
+  it('applyCommand(show_experience_detail) with null clears detailExperienceId', () => {
+    store.getState().setViewFromUser({ type: 'itinerary', detailExperienceId: 'belvedere' });
+    store.getState().applyCommand({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-2',
+      payload: { experience_id: null },
+    });
+    const s = store.getState();
+    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
+    expect(s.view.detailExperienceId).toBeUndefined();
+  });
+
+  it('applyCommand(show_experience_detail) is ignored when not on the itinerary view', () => {
+    store.getState().applyCommand({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-3',
+      payload: { experience_id: 'belvedere' },
+    });
+    const s = store.getState();
+    expect(s.view).toEqual({ type: 'start' });
+    expect(s.lastCorrelationId).toBe('c-exp-3');
+  });
+
+  it('applyCommand(add_experience_to_basket) appends an entry', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-1',
+      payload: { experience_id: 'belvedere', day: 'Day 3', passenger_count: 2 },
+    });
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 3' },
+    ]);
+  });
+
+  it('applyCommand(add_experience_to_basket) is idempotent for the same (id, day)', () => {
+    const add = () =>
+      store.getState().applyCommand({
+        type: 'add_experience_to_basket',
+        correlationId: 'c-exp-add-2',
+        payload: { experience_id: 'belvedere', day: 'Day 3', passenger_count: 2 },
+      });
+    add();
+    add();
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 3' },
+    ]);
+  });
+
+  it('applyCommand(add_experience_to_basket) keeps separate entries for different days', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-3',
+      payload: { experience_id: 'belvedere', day: 'Day 3', passenger_count: 2 },
+    });
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-4',
+      payload: { experience_id: 'belvedere', day: 'Day 5', passenger_count: 2 },
+    });
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 3' },
+      { experienceId: 'belvedere', day: 'Day 5' },
+    ]);
+  });
+
+  it('applyCommand(add_cabin_to_basket) sets selectedCabinId', () => {
+    store.getState().applyCommand({
+      type: 'add_cabin_to_basket',
+      correlationId: 'c-cab-1',
+      payload: {
+        cabin_id: 'mozart-suite',
+        name: 'Mozart Suite',
+        category: 'Mozart Suite',
+        guests: 2,
+        area: 62,
+        price_from: null,
+        view: 'French Balcony',
+      },
+    });
+    const s = store.getState();
+    expect(s.selectedCabinId).toBe('mozart-suite');
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('c-cab-1');
+  });
 });

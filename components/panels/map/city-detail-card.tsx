@@ -20,13 +20,13 @@ export function CityDetailCard({ city, onClose }: CityDetailCardProps) {
       className="bg-beige-50 border-beige-400/50 pointer-events-auto flex max-h-full flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none"
       style={{ width: CARD_WIDTH }}
     >
-      <div className="relative shrink-0">
+      <div className="relative h-[200px] w-full shrink-0">
         <Image
           src={city.image}
           alt={city.name}
-          width={CARD_WIDTH}
-          height={200}
-          className="h-[200px] w-full rounded-lg object-cover"
+          fill
+          sizes="356px"
+          className="rounded-lg object-cover"
         />
         <DaysBadge className="absolute top-1 left-1">{city.days}</DaysBadge>
       </div>

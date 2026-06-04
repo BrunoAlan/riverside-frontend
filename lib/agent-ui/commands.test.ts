@@ -476,6 +476,26 @@ describe('UiCommand schema', () => {
     });
     expect(parsed.success).toBe(false);
   });
+
+  it('parses show_experience_detail with an experience_id', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-1',
+      payload: { experience_id: 'signature_vienna_belvedere_palace' },
+    });
+    if (result.type !== 'show_experience_detail') throw new Error('discriminator failed');
+    expect(result.payload.experience_id).toBe('signature_vienna_belvedere_palace');
+  });
+
+  it('parses show_experience_detail with a null experience_id (close)', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-2',
+      payload: { experience_id: null },
+    });
+    if (result.type !== 'show_experience_detail') throw new Error('discriminator failed');
+    expect(result.payload.experience_id).toBeNull();
+  });
 });
 
 describe('set_booking_summary', () => {
@@ -619,6 +639,60 @@ describe('show_cabin_detail', () => {
       payload: { cabin_id: 42 },
     });
     expect(out.success).toBe(false);
+  });
+});
+
+describe('add_cabin_to_basket', () => {
+  it('parses add_cabin_to_basket with a full payload', () => {
+    const result = UiCommand.parse({
+      type: 'add_cabin_to_basket',
+      correlationId: 'c-cab-1',
+      payload: {
+        cabin_id: 'mozart-suite',
+        name: 'Mozart Suite',
+        category: 'Mozart Suite',
+        guests: 2,
+        area: 62,
+        price_from: null,
+        view: 'French Balcony',
+      },
+    });
+    if (result.type !== 'add_cabin_to_basket') throw new Error('discriminator failed');
+    expect(result.payload.cabin_id).toBe('mozart-suite');
+    expect(result.payload.price_from).toBeNull();
+  });
+
+  it('rejects add_cabin_to_basket without cabin_id', () => {
+    const result = UiCommand.safeParse({
+      type: 'add_cabin_to_basket',
+      correlationId: 'c-cab-2',
+      payload: {
+        name: 'Mozart Suite',
+        category: 'x',
+        guests: 2,
+        area: 62,
+        price_from: null,
+        view: 'y',
+      },
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('add_experience_to_basket', () => {
+  it('parses add_experience_to_basket', () => {
+    const result = UiCommand.parse({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-exp-add-1',
+      payload: {
+        experience_id: 'signature_vienna_belvedere_palace',
+        day: 'Day 3',
+        passenger_count: 2,
+      },
+    });
+    if (result.type !== 'add_experience_to_basket') throw new Error('discriminator failed');
+    expect(result.payload.day).toBe('Day 3');
+    expect(result.payload.passenger_count).toBe(2);
   });
 });
 

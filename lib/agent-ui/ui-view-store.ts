@@ -10,6 +10,8 @@ interface UiViewState {
   lastCorrelationId: string | null;
   lastError: { correlationId?: string; message: string } | null;
   bookingSummary: BookingSummary | null;
+  selectedCabinId: string | null;
+  addedExperiences: Array<{ experienceId: string; day: string }>;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
@@ -28,6 +30,8 @@ export function createUiViewStore() {
     lastCorrelationId: null,
     lastError: null,
     bookingSummary: null,
+    selectedCabinId: null,
+    addedExperiences: [],
 
     applyCommand: (cmd) =>
       set((state) => {
@@ -98,6 +102,36 @@ export function createUiViewStore() {
             return {
               view: { ...state.view, detailCityId: cmd.payload.city_id ?? undefined },
               hint: null,
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
+          }
+          case 'show_experience_detail': {
+            if (state.view.type !== 'itinerary') {
+              return { source: 'agent', lastCorrelationId: cmd.correlationId };
+            }
+            return {
+              view: { ...state.view, detailExperienceId: cmd.payload.experience_id ?? undefined },
+              hint: null,
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
+          }
+          case 'add_cabin_to_basket':
+            return {
+              selectedCabinId: cmd.payload.cabin_id,
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
+          case 'add_experience_to_basket': {
+            const { experience_id, day } = cmd.payload;
+            const exists = state.addedExperiences.some(
+              (e) => e.experienceId === experience_id && e.day === day
+            );
+            return {
+              addedExperiences: exists
+                ? state.addedExperiences
+                : [...state.addedExperiences, { experienceId: experience_id, day }],
               source: 'agent',
               lastCorrelationId: cmd.correlationId,
             };

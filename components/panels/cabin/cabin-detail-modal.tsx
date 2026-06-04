@@ -1,4 +1,4 @@
-import { ArmchairIcon, BathtubIcon, BedIcon, XIcon } from '@phosphor-icons/react';
+import { ArmchairIcon, BathtubIcon, BedIcon, CheckIcon, XIcon } from '@phosphor-icons/react';
 // Radix dialog primitives directly, not the shadcn Dialog wrapper: that wrapper
 // hardcodes a fixed, body-portaled, viewport-wide overlay. This detail view must
 // stay confined to the cabin panel, so it renders inline (no Portal) with
@@ -7,15 +7,18 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
 import { DetailSection } from '@/components/panels/cabin/cabin-detail-section';
 import { PipeSeparatedList } from '@/components/shared/pipe-separated-list';
+import { Button } from '@/components/ui/button';
 import type { Cabin } from '@/lib/agent-ui/commands';
 import { formatCabinPrice } from '@/lib/cabins';
 
 type CabinDetailModalProps = {
   cabin: Cabin | null;
   onClose: () => void;
+  onSelect: (cabin: Cabin) => void;
+  selected: boolean;
 };
 
-export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
+export function CabinDetailModal({ cabin, onClose, onSelect, selected }: CabinDetailModalProps) {
   return (
     <DialogPrimitive.Root
       open={cabin != null}
@@ -30,7 +33,7 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
           <div className="h-72 shrink-0 sm:h-80 lg:h-auto lg:flex-1">
             <CabinDetailGallery images={cabin.detail.gallery} alt={cabin.name} />
           </div>
-          <div className="p-6 lg:w-[400px] lg:shrink-0 lg:overflow-y-auto">
+          <div className="flex flex-col p-6 lg:w-[400px] lg:shrink-0 lg:overflow-y-auto">
             <div className="flex items-start justify-between gap-4">
               <DialogPrimitive.Title className="font-display text-3xl leading-tight font-semibold text-neutral-700">
                 {cabin.name}
@@ -59,6 +62,20 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
               <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
               <DetailSection icon={ArmchairIcon} title="Amenities" items={cabin.detail.amenities} />
             </div>
+            <Button
+              type="button"
+              className="mt-8"
+              disabled={selected}
+              onClick={() => onSelect(cabin)}
+            >
+              {selected ? (
+                <>
+                  <CheckIcon weight="bold" /> Selected
+                </>
+              ) : (
+                'Select this suite'
+              )}
+            </Button>
           </div>
         </DialogPrimitive.Content>
       )}

@@ -33,4 +33,22 @@ describe('buildFrontendIntent', () => {
     expect('user_message' in env).toBe(true);
     expect(env.user_message).toBe('');
   });
+
+  it('builds a select_cabin envelope with cabin_id', () => {
+    const env = buildFrontendIntent('select_cabin', {
+      entities: { cabin_id: 'mozart-suite' },
+      userMessage: 'User selected Mozart Suite',
+    });
+    expect(env.intent).toBe('select_cabin');
+    expect(env.entities).toEqual({ cabin_id: 'mozart-suite' });
+  });
+
+  it('builds a select_experience envelope with experience_id and day', () => {
+    const env = buildFrontendIntent('select_experience', {
+      entities: { experience_id: 'belvedere', day: 'Day 3' },
+      userMessage: 'User added Belvedere Palace for Day 3',
+    });
+    expect(env.intent).toBe('select_experience');
+    expect(env.entities).toEqual({ experience_id: 'belvedere', day: 'Day 3' });
+  });
 });

@@ -21,13 +21,13 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
       className="bg-beige-50 border-beige-400/50 gap-0 overflow-hidden rounded-2xl p-2 shadow-none"
       style={{ width: CITY_CARD_WIDTH }}
     >
-      <div className="relative">
+      <div className="relative h-[130px] w-full">
         <Image
           src={city.image}
           alt={city.name}
-          width={200}
-          height={130}
-          className="h-[130px] w-full rounded-lg object-cover"
+          fill
+          sizes="204px"
+          className="rounded-lg object-cover"
         />
         <DaysBadge className="absolute top-1 left-1">{city.days}</DaysBadge>
       </div>
