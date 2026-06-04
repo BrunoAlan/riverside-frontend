@@ -54,7 +54,8 @@ export function IdentityGate({ children }: IdentityGateProps) {
         <div className="text-center">
           <h1 className="text-foreground text-2xl font-medium">Welcome</h1>
           <p className="text-muted-foreground mt-2 text-sm leading-6">
-            Before we start, tell us who you are. This session is recorded for testing purposes.
+            Before we start, please enter your name and email. This session will be recorded for
+            testing and product improvement purposes.
           </p>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
