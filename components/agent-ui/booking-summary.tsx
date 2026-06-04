@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   BookOpen,
   CalendarDays,
@@ -11,9 +12,11 @@ import {
   Share,
   Users,
 } from 'lucide-react';
+import { ItinerarySummaryModal } from '@/components/panels/itinerary-summary/itinerary-summary-modal';
 import { Button } from '@/components/ui/button';
 import { useBookingSummary, useUiView } from '@/lib/agent-ui/hooks';
 import type { BookingSummary as BookingSummaryType } from '@/lib/agent-ui/ui-view-types';
+import { ITINERARY_SUMMARY_MOCK } from '@/lib/itinerary-summary/mock';
 import { cn } from '@/lib/shadcn/utils';
 
 interface BookingSummaryProps {
@@ -61,6 +64,8 @@ function Slot({ label, state }: SlotProps) {
 }
 
 export function BookingSummary({ summary }: BookingSummaryProps) {
+  const [summaryOpen, setSummaryOpen] = useState(false);
+
   const stopsLabel = summary.stops
     ? summary.stops.extra > 0
       ? `${summary.stops.primary} +${summary.stops.extra}`
@@ -108,7 +113,12 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
           />
         </div>
 
-        <Button variant="secondary" size="sm" className="gap-2">
+        <Button
+          variant="secondary"
+          size="sm"
+          className="gap-2"
+          onClick={() => setSummaryOpen(true)}
+        >
           <Maximize2 className="size-3.5" />
           Itinerary Summary
         </Button>
@@ -131,6 +141,12 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
           <Button disabled={!summary.cta.enabled}>{summary.cta.label}</Button>
         </div>
       </div>
+
+      <ItinerarySummaryModal
+        open={summaryOpen}
+        onOpenChange={setSummaryOpen}
+        data={ITINERARY_SUMMARY_MOCK}
+      />
     </div>
   );
 }

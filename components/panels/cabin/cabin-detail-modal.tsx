@@ -5,6 +5,8 @@ import { ArmchairIcon, BathtubIcon, BedIcon, XIcon } from '@phosphor-icons/react
 // modal={false} — keeping the bottom bar and voice input interactive.
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CabinDetailGallery } from '@/components/panels/cabin/cabin-detail-gallery';
+import { DetailSection } from '@/components/panels/cabin/cabin-detail-section';
+import { PipeSeparatedList } from '@/components/shared/pipe-separated-list';
 import type { Cabin } from '@/lib/agent-ui/commands';
 import { formatCabinPrice } from '@/lib/cabins';
 
@@ -12,32 +14,6 @@ type CabinDetailModalProps = {
   cabin: Cabin | null;
   onClose: () => void;
 };
-
-function DetailSection({
-  icon: SectionIcon,
-  title,
-  items,
-}: {
-  icon: typeof BedIcon;
-  title: string;
-  items: readonly string[];
-}) {
-  return (
-    <section className="flex flex-col">
-      <div className="flex items-center gap-2 pb-2">
-        <SectionIcon className="text-neutral-700" size={20} />
-        <h3 className="font-display text-lg font-semibold text-neutral-700">{title}</h3>
-      </div>
-      <ul className="border-border border-t">
-        {items.map((item) => (
-          <li key={item} className="border-border text-muted-foreground border-b py-2 text-sm">
-            {item}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
 
 export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
   return (
@@ -69,19 +45,15 @@ export function CabinDetailModal({ cabin, onClose }: CabinDetailModalProps) {
             <DialogPrimitive.Description className="sr-only">
               {cabin.name} cabin details
             </DialogPrimitive.Description>
-            <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-              {[
+            <PipeSeparatedList
+              items={[
                 `${cabin.guests} guests`,
                 `${cabin.area}m²`,
                 `from ${formatCabinPrice(cabin.price_from)} EUR`,
                 cabin.view,
-              ].map((item, index) => (
-                <span key={index} className="flex items-center gap-3">
-                  {index > 0 && <span className="bg-border h-3 w-px" aria-hidden />}
-                  {item}
-                </span>
-              ))}
-            </div>
+              ]}
+              className="mt-2 gap-x-3 gap-y-1"
+            />
             <div className="mt-6 flex flex-col gap-6">
               <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
               <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
