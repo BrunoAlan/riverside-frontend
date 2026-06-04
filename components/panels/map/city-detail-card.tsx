@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { XIcon } from '@phosphor-icons/react';
+import { DaysBadge } from '@/components/shared/days-badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { ItineraryCity } from '@/lib/agent-ui/commands';
@@ -27,9 +28,7 @@ export function CityDetailCard({ city, onClose }: CityDetailCardProps) {
           height={200}
           className="h-[200px] w-full rounded-lg object-cover"
         />
-        <span className="bg-beige-200 text-primary absolute top-1 left-1 rounded-md px-3 py-1 text-sm whitespace-nowrap">
-          {city.days}
-        </span>
+        <DaysBadge className="absolute top-1 left-1">{city.days}</DaysBadge>
       </div>
       <div className="flex shrink-0 items-start justify-between gap-2 px-2 pt-4">
         <div>

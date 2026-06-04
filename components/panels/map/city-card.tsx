@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { ArrowsOutSimpleIcon } from '@phosphor-icons/react';
+import { DaysBadge } from '@/components/shared/days-badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { City } from '@/lib/map/cities';
@@ -28,9 +29,7 @@ export function CityCard({ city, interactive = true, onExpand }: CityCardProps) 
           height={130}
           className="h-[130px] w-full rounded-lg object-cover"
         />
-        <span className="bg-beige-200 text-primary absolute top-1 left-1 rounded-md px-3 py-1 text-sm whitespace-nowrap">
-          {city.days}
-        </span>
+        <DaysBadge className="absolute top-1 left-1">{city.days}</DaysBadge>
       </div>
       <div className="flex items-start justify-between gap-2 px-1 pt-3">
         <div>

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
+import { DaysBadge } from '@/components/shared/days-badge';
 import type { SummaryItineraryCity } from '@/lib/itinerary-summary/types';
 
 export function SummaryCityCard({ city }: { city: SummaryItineraryCity }) {
@@ -22,9 +23,7 @@ export function SummaryCityCard({ city }: { city: SummaryItineraryCity }) {
           <p className="text-muted-foreground mt-1 text-base">{city.country}</p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <span className="bg-beige-200 text-primary rounded-md px-3 py-1 text-sm whitespace-nowrap">
-            {city.days}
-          </span>
+          <DaysBadge>{city.days}</DaysBadge>
           <span className="text-muted-foreground inline-flex items-center gap-1 text-sm">
             More information
             <ChevronDown className="size-4" />
