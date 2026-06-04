@@ -24,10 +24,7 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="bg-foreground/40 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 backdrop-blur-sm" />
-        <DialogPrimitive.Content
-          aria-describedby={undefined}
-          className="data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 flex justify-center overflow-y-auto p-3 outline-none sm:p-6"
-        >
+        <DialogPrimitive.Content className="data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 flex justify-center overflow-y-auto p-3 outline-none sm:p-6">
           <div className="bg-beige-100 relative my-auto flex w-full max-w-[1280px] flex-col rounded-3xl shadow-xl">
             {/* Top bar */}
             <div className="bg-beige-100/95 sticky top-0 z-10 flex items-center justify-between gap-3 rounded-t-3xl px-4 py-3 backdrop-blur sm:px-6">
@@ -56,6 +53,9 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
             </div>
 
             <DialogPrimitive.Title className="sr-only">{data.header.title}</DialogPrimitive.Title>
+            <DialogPrimitive.Description className="sr-only">
+              {data.details.guests} · {data.details.dates} · {data.details.embarkation}
+            </DialogPrimitive.Description>
 
             {/* Body */}
             <div className="flex flex-col gap-8 px-4 pb-8 sm:px-6">

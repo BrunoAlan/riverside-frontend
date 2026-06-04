@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 
 export function SummaryFooterBar({ total }: { total: string }) {
   return (
-    <div className="bg-beige-100/95 sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-b-3xl border-t px-4 py-4 backdrop-blur sm:px-6">
+    <div className="bg-beige-100/95 border-border sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-b-3xl border-t px-4 py-4 backdrop-blur sm:px-6">
       <p className="font-display text-2xl font-semibold text-neutral-700">Total: {total}</p>
       <div className="flex items-center gap-3">
         <Button variant="secondary">Talk to a Riverside Specialist</Button>
