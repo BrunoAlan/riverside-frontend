@@ -24,10 +24,10 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="bg-foreground/40 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 backdrop-blur-sm" />
-        <DialogPrimitive.Content className="data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 flex justify-center overflow-y-auto p-3 outline-none sm:p-6">
-          <div className="bg-beige-100 relative my-auto flex w-full max-w-[1280px] flex-col rounded-3xl shadow-xl">
-            {/* Top bar */}
-            <div className="bg-beige-100/95 sticky top-0 z-10 flex items-center justify-between gap-3 rounded-t-3xl px-4 py-3 backdrop-blur sm:px-6">
+        <DialogPrimitive.Content className="data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 flex items-center justify-center p-3 outline-none sm:p-6">
+          <div className="relative flex max-h-full w-full max-w-[1280px] flex-col overflow-hidden rounded-3xl bg-neutral-50 shadow-xl">
+            {/* Top bar (pinned) */}
+            <div className="z-10 flex shrink-0 items-center justify-between gap-3 rounded-t-3xl bg-neutral-50/95 px-4 py-3 backdrop-blur sm:px-6">
               <div className="flex items-center gap-2">
                 <DialogPrimitive.Close asChild>
                   <Button variant="secondary" size="icon-sm" aria-label="Close">
@@ -57,8 +57,8 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
               {data.details.guests} · {data.details.dates} · {data.details.embarkation}
             </DialogPrimitive.Description>
 
-            {/* Body */}
-            <div className="flex flex-col gap-8 px-4 pb-8 sm:px-6">
+            {/* Body (only this scrolls) */}
+            <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto px-4 pb-8 sm:px-6">
               <SummaryHeader header={data.header} />
               <SummaryDetailsRow details={data.details} />
               <div className="grid gap-8 lg:grid-cols-2">
