@@ -476,6 +476,26 @@ describe('UiCommand schema', () => {
     });
     expect(parsed.success).toBe(false);
   });
+
+  it('parses show_experience_detail with an experience_id', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-1',
+      payload: { experience_id: 'signature_vienna_belvedere_palace' },
+    });
+    if (result.type !== 'show_experience_detail') throw new Error('discriminator failed');
+    expect(result.payload.experience_id).toBe('signature_vienna_belvedere_palace');
+  });
+
+  it('parses show_experience_detail with a null experience_id (close)', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-2',
+      payload: { experience_id: null },
+    });
+    if (result.type !== 'show_experience_detail') throw new Error('discriminator failed');
+    expect(result.payload.experience_id).toBeNull();
+  });
 });
 
 describe('set_booking_summary', () => {

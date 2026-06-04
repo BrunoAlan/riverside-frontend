@@ -14,6 +14,7 @@ export type UiView =
       type: 'itinerary';
       itinerary?: ItineraryFull;
       detailCityId?: string;
+      detailExperienceId?: string;
     }
   | { type: 'compare_itinerary'; options: ItineraryFull[] }
   | { type: 'cabin_selection'; cabins: Cabin[]; detailCabinId?: string };

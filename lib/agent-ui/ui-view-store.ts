@@ -102,6 +102,17 @@ export function createUiViewStore() {
               lastCorrelationId: cmd.correlationId,
             };
           }
+          case 'show_experience_detail': {
+            if (state.view.type !== 'itinerary') {
+              return { source: 'agent', lastCorrelationId: cmd.correlationId };
+            }
+            return {
+              view: { ...state.view, detailExperienceId: cmd.payload.experience_id ?? undefined },
+              hint: null,
+              source: 'agent',
+              lastCorrelationId: cmd.correlationId,
+            };
+          }
           default: {
             const _exhaustive: never = cmd;
             void _exhaustive;

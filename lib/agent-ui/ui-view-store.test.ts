@@ -449,4 +449,42 @@ describe('ui-view-store', () => {
     expect(s.view).toEqual({ type: 'start' });
     expect(s.lastCorrelationId).toBe('c1');
   });
+
+  it('applyCommand(show_experience_detail) sets detailExperienceId on the itinerary view', () => {
+    store.getState().setViewFromUser({ type: 'itinerary', detailCityId: 'vienna' });
+    store.getState().applyCommand({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-1',
+      payload: { experience_id: 'belvedere' },
+    });
+    const s = store.getState();
+    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
+    expect(s.view.detailExperienceId).toBe('belvedere');
+    expect(s.view.detailCityId).toBe('vienna');
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('c-exp-1');
+  });
+
+  it('applyCommand(show_experience_detail) with null clears detailExperienceId', () => {
+    store.getState().setViewFromUser({ type: 'itinerary', detailExperienceId: 'belvedere' });
+    store.getState().applyCommand({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-2',
+      payload: { experience_id: null },
+    });
+    const s = store.getState();
+    if (s.view.type !== 'itinerary') throw new Error('expected itinerary view');
+    expect(s.view.detailExperienceId).toBeUndefined();
+  });
+
+  it('applyCommand(show_experience_detail) is ignored when not on the itinerary view', () => {
+    store.getState().applyCommand({
+      type: 'show_experience_detail',
+      correlationId: 'c-exp-3',
+      payload: { experience_id: 'belvedere' },
+    });
+    const s = store.getState();
+    expect(s.view).toEqual({ type: 'start' });
+    expect(s.lastCorrelationId).toBe('c-exp-3');
+  });
 });
