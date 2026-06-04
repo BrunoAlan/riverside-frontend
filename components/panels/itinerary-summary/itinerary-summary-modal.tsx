@@ -57,20 +57,21 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
               {data.details.guests} · {data.details.dates} · {data.details.embarkation}
             </DialogPrimitive.Description>
 
-            {/* Body (only this scrolls) */}
-            <div className="min-h-0 flex-1 space-y-8 overflow-y-auto px-4 pb-8 sm:px-6">
-              <SummaryHeader header={data.header} />
-              <SummaryDetailsRow details={data.details} />
-              <div className="grid gap-8 lg:grid-cols-2">
-                <div className="flex flex-col gap-8">
-                  <SummaryCabinCard cabin={data.cabin} />
-                  <SummaryPackageCard pkg={data.package} />
+            {/* Scroll area — top bar stays pinned, footer scrolls with content */}
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <div className="space-y-8 px-4 pb-8 sm:px-6">
+                <SummaryHeader header={data.header} />
+                <SummaryDetailsRow details={data.details} />
+                <div className="grid gap-8 lg:grid-cols-2">
+                  <div className="flex flex-col gap-8">
+                    <SummaryCabinCard cabin={data.cabin} />
+                    <SummaryPackageCard pkg={data.package} />
+                  </div>
+                  <SummaryItineraryColumn itinerary={data.itinerary} />
                 </div>
-                <SummaryItineraryColumn itinerary={data.itinerary} />
               </div>
+              <SummaryFooterBar total={data.total} />
             </div>
-
-            <SummaryFooterBar total={data.total} />
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
