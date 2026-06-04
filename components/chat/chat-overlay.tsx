@@ -60,7 +60,7 @@ function ChatOverlay({
     <div
       data-slot="chat-overlay"
       className={cn(
-        'pointer-events-auto relative flex w-[360px] flex-col overflow-hidden rounded-2xl bg-[#FBF9F8] p-2 shadow-xl backdrop-blur-md',
+        'bg-beige-50 pointer-events-auto relative flex w-[360px] flex-col overflow-hidden rounded-2xl p-2 shadow-xl backdrop-blur-md',
         className
       )}
     >
@@ -82,7 +82,7 @@ function ChatOverlay({
 
       {!transcriptCollapsed && (
         <div
-          className={`pointer-events-none absolute top-[50px] right-0 left-0 z-1 h-[45px] bg-gradient-to-b from-[#FBF9F8] transition-opacity duration-200 ${showTopFade ? 'opacity-100' : 'opacity-0'} `}
+          className={`from-beige-50 pointer-events-none absolute top-[50px] right-0 left-0 z-1 h-[45px] bg-gradient-to-b transition-opacity duration-200 ${showTopFade ? 'opacity-100' : 'opacity-0'} `}
         />
       )}
 
@@ -107,7 +107,7 @@ function ChatOverlay({
 
       {!transcriptCollapsed && (
         <div
-          className={`pointer-events-none absolute right-0 bottom-[60px] left-0 z-1 h-[45px] bg-gradient-to-t from-[#FBF9F8] transition-opacity duration-200 ${showBottomFade ? 'opacity-100' : 'opacity-0'} `}
+          className={`from-beige-50 pointer-events-none absolute right-0 bottom-[60px] left-0 z-1 h-[45px] bg-gradient-to-t transition-opacity duration-200 ${showBottomFade ? 'opacity-100' : 'opacity-0'} `}
         />
       )}
 
