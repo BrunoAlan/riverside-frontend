@@ -7,6 +7,7 @@ How we work in this codebase. Each file is short and focused — read the one th
 | [`code-style.md`](./code-style.md)             | Before writing any TypeScript/React in this repo.                                                               |
 | [`project-layout.md`](./project-layout.md)     | When deciding where a new file or component should live.                                                        |
 | [`agent-ui.md`](./agent-ui.md)                 | Before touching anything under `lib/agent-ui/` or `components/agent-ui/`. Explains how the agent drives the UI. |
+| [`message-flow.md`](./message-flow.md)         | When you need the end-to-end plumbing of a message in/out over LiveKit (decode, validate, record, apply).       |
 | [`adding-a-command.md`](./adding-a-command.md) | When the backend wants to send a new UI command over LiveKit.                                                   |
 | [`adding-a-view.md`](./adding-a-view.md)       | When you need a new agent-driven view (and its dev-panel mock).                                                 |
 | [`analytics.md`](./analytics.md)               | When tracking a PostHog event, adding a new one, or wiring up analytics.                                        |

@@ -3,41 +3,65 @@
 import { useEffect } from 'react';
 import { RoomEvent } from 'livekit-client';
 import { useMaybeRoomContext } from '@livekit/components-react';
-import { UiCommand } from './commands';
+import { recordDevEvent } from '../dev/record-dev-event';
+import { UiCommand, UiCommandEnvelope } from './commands';
 import { uiViewStore } from './ui-view-store';
+import { decodeText } from './wire';
 
 const TOPIC = 'ui-commands';
 
-interface EnvelopeLike {
-  correlationId?: unknown;
-  sessionId?: unknown;
-  timestamp?: unknown;
-  commands?: unknown;
-}
-
 type Store = Pick<ReturnType<typeof uiViewStore.getState>, 'applyCommand' | 'recordParseError'>;
 
-export function dispatchEnvelope(envelope: EnvelopeLike, store: Store): void {
-  const commands = Array.isArray(envelope.commands) ? envelope.commands : [];
-  for (const raw of commands) {
-    const result = UiCommand.safeParse(raw);
+// Validate the inbound envelope, then parse and apply each command in order.
+// Failures are recorded to the dev event log, never thrown: a malformed envelope
+// yields one `envelope-error` event; a malformed command yields one
+// `parse-error` event and is skipped.
+export function dispatchEnvelope(envelope: unknown, store: Store): void {
+  const parsed = UiCommandEnvelope.safeParse(envelope);
+  if (!parsed.success) {
+    console.warn('[ui-commands] envelope error', envelope);
+    recordDevEvent({
+      channel: 'ui-commands',
+      label: 'envelope-error',
+      ok: false,
+      payload: envelope,
+    });
+    return;
+  }
+
+  for (const rawCommand of parsed.data.commands) {
+    const result = UiCommand.safeParse(rawCommand);
     if (result.success) {
       store.applyCommand(result.data);
-      console.log('[ui-commands] applied', {
-        type: result.data.type,
+      recordDevEvent({
+        channel: 'ui-commands',
+        label: result.data.type,
         correlationId: result.data.correlationId,
-        payload: result.data.payload,
+        ok: true,
+        payload: result.data,
+        envelope,
       });
     } else {
-      const r = raw as { correlationId?: unknown };
-      const correlationId = typeof r.correlationId === 'string' ? r.correlationId : undefined;
-      const message = result.error.issues.map((i) => i.message).join('; ');
+      const rawId = (rawCommand as { correlationId?: unknown }).correlationId;
+      const correlationId = typeof rawId === 'string' ? rawId : undefined;
+      const message = result.error.issues.map((issue) => issue.message).join('; ');
       store.recordParseError({ correlationId, message });
-      console.warn('[ui-commands] parse error', { correlationId, message, raw });
+      console.warn('[ui-commands] parse error', { correlationId, message, rawCommand });
+      recordDevEvent({
+        channel: 'ui-commands',
+        label: 'parse-error',
+        correlationId,
+        ok: false,
+        payload: rawCommand,
+        envelope,
+      });
     }
   }
 }
 
+// Subscribe the current LiveKit room to `ui-commands` data messages and feed each
+// decoded envelope to `dispatchEnvelope`. Decode and JSON-parse failures (before
+// an envelope object exists) are recorded to the dev event log.
 export function useUiCommandTransport(): void {
   const room = useMaybeRoomContext();
   useEffect(() => {
@@ -53,27 +77,31 @@ export function useUiCommandTransport(): void {
 
       let text: string;
       try {
-        text = new TextDecoder().decode(payload);
-      } catch (e) {
-        console.warn('[ui-commands] decode error', e);
+        text = decodeText(payload);
+      } catch (err) {
+        console.warn('[ui-commands] decode error', err);
+        recordDevEvent({
+          channel: 'ui-commands',
+          label: 'decode-error',
+          ok: false,
+          payload: String(err),
+        });
         return;
       }
 
-      let envelope: EnvelopeLike;
+      let envelope: unknown;
       try {
-        envelope = JSON.parse(text) as EnvelopeLike;
-      } catch (e) {
-        console.warn('[ui-commands] JSON parse error', { error: e, text });
+        envelope = JSON.parse(text);
+      } catch (err) {
+        console.warn('[ui-commands] JSON parse error', { error: err, text });
+        recordDevEvent({
+          channel: 'ui-commands',
+          label: 'json-error',
+          ok: false,
+          payload: { error: String(err), text },
+        });
         return;
       }
-
-      console.log('[ui-commands] envelope', {
-        correlationId: envelope.correlationId,
-        sessionId: envelope.sessionId,
-        timestamp: envelope.timestamp,
-        count: Array.isArray(envelope.commands) ? envelope.commands.length : 0,
-      });
-      console.log('[ui-commands] full envelope', envelope);
 
       dispatchEnvelope(envelope, uiViewStore.getState());
     };
