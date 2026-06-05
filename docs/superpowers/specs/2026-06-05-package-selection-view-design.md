@@ -116,7 +116,7 @@ No change to `lib/dev/dev-panel.tsx` is needed. The panel derives its view-type 
 
 ## Testing
 
-Per `conventions/testing.md`, tests live next to the code. A small unit test for the panel's cell rendering / price formatting (`panel-package-selection.test.tsx`) covering: a check cell, a cross cell, a text cell, and the formatted price. Verify `pnpm lint` and `pnpm test` pass before any push.
+Per `conventions/testing.md`, React components are **not** unit-tested (only `lib/**/*.test.ts` is collected; UI is verified in the dev panel). So the only unit-tested piece is the extracted price helper `lib/packages.ts` (`formatPackagePrice`), tested in `lib/packages.test.ts`, mirroring the `formatCabinPrice` precedent. The view itself is verified visually via the dev panel. Verify `pnpm lint` and `pnpm test` pass before any push.
 
 ## Build sequence
 
