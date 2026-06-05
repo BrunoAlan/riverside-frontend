@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { RoomEvent } from 'livekit-client';
 import { useMaybeRoomContext } from '@livekit/components-react';
+import { recordDevEvent } from '../dev/record-dev-event';
 import { UiCommand } from './commands';
 import { uiViewStore } from './ui-view-store';
 
@@ -28,12 +29,28 @@ export function dispatchEnvelope(envelope: EnvelopeLike, store: Store): void {
         correlationId: result.data.correlationId,
         payload: result.data.payload,
       });
+      recordDevEvent({
+        channel: 'ui-commands',
+        label: result.data.type,
+        correlationId: result.data.correlationId,
+        ok: true,
+        payload: result.data,
+        envelope,
+      });
     } else {
       const r = raw as { correlationId?: unknown };
       const correlationId = typeof r.correlationId === 'string' ? r.correlationId : undefined;
       const message = result.error.issues.map((i) => i.message).join('; ');
       store.recordParseError({ correlationId, message });
       console.warn('[ui-commands] parse error', { correlationId, message, raw });
+      recordDevEvent({
+        channel: 'ui-commands',
+        label: 'parse-error',
+        correlationId,
+        ok: false,
+        payload: raw,
+        envelope,
+      });
     }
   }
 }

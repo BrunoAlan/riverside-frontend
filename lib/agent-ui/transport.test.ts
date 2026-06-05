@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { eventLogStore } from '../dev/event-log-store';
 import { dispatchEnvelope } from './transport';
 import { createUiViewStore } from './ui-view-store';
 
@@ -108,5 +109,46 @@ describe('dispatchEnvelope', () => {
       dispatchEnvelope({ correlationId: 'env-6', commands: 'not-an-array' }, store.getState())
     ).not.toThrow();
     expect(store.getState().view).toEqual({ type: 'start' });
+  });
+});
+
+describe('dispatchEnvelope dev event logging', () => {
+  beforeEach(() => {
+    eventLogStore.getState().clear();
+  });
+
+  it('records an applied command with the parsed payload and raw envelope', () => {
+    const store = createUiViewStore();
+    const envelope = {
+      correlationId: 'env-1',
+      sessionId: 'sess-1',
+      commands: [validDestinationDetail],
+    };
+    dispatchEnvelope(envelope, store.getState());
+    const events = eventLogStore.getState().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      channel: 'ui-commands',
+      label: 'show_destination_detail',
+      correlationId: 'cmd-1',
+      ok: true,
+    });
+    expect(events[0].envelope).toBe(envelope);
+  });
+
+  it('records a parse error event with ok:false', () => {
+    const store = createUiViewStore();
+    dispatchEnvelope(
+      { correlationId: 'env-2', commands: [{ type: 'nope', correlationId: 'cmd-2', payload: {} }] },
+      store.getState()
+    );
+    const events = eventLogStore.getState().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      channel: 'ui-commands',
+      label: 'parse-error',
+      ok: false,
+      correlationId: 'cmd-2',
+    });
   });
 });
