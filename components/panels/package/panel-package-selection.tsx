@@ -25,46 +25,50 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
   const gridTemplateColumns = `minmax(160px, 220px) repeat(${packages.length}, minmax(180px, 1fr))`;
 
   return (
-    <div className="bg-beige-200 relative h-full w-full overflow-hidden">
-      <div className="h-full overflow-y-auto">
+    <div className="bg-beige-200 relative flex h-full w-full flex-col overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-[1400px] p-6 pt-16">
           {/* Back button — visual only, not wired */}
           <Button type="button" variant="secondary" size="sm" className="mb-10">
             <CaretLeftIcon weight="bold" aria-hidden="true" /> Back
           </Button>
 
-          <div className="grid items-start gap-x-6 gap-y-8" style={{ gridTemplateColumns }}>
+          <div className="grid items-start gap-x-6" style={{ gridTemplateColumns }}>
             {/* Header row: package names */}
             <div />
             {packages.map((pkg) => (
               <p
                 key={pkg.id}
-                className="font-display text-xl leading-tight font-medium text-neutral-700"
+                className="font-display pb-4 text-base leading-tight font-medium text-neutral-700"
               >
                 {pkg.name}
               </p>
             ))}
 
-            {/* Dark separator under the header */}
             <Separator className="col-span-full bg-green-700" />
 
-            {/* Feature rows, separated from one another */}
             {features.map((feature, index) => (
               <Fragment key={feature.id}>
                 {index > 0 && <Separator className="bg-beige-300 col-span-full" />}
-                <p className="text-sm text-neutral-500">{feature.label}</p>
+                <p className="p-4 text-sm text-neutral-500">{feature.label}</p>
                 {packages.map((pkg) => (
-                  <div key={pkg.id} className="flex min-h-6 items-start">
+                  <div key={pkg.id} className="flex min-h-6 items-start p-4">
                     <Cell cell={pkg.cells[feature.id]} />
                   </div>
                 ))}
               </Fragment>
             ))}
+          </div>
+        </div>
+      </div>
 
-            {/* Price + Select row */}
+      {/* Price + Select row — pinned to the bottom, grid mirrors the columns above */}
+      <div className="border-beige-300 shrink-0 border-t">
+        <div className="mx-auto max-w-[1400px] px-6 py-4">
+          <div className="grid items-center gap-x-6" style={{ gridTemplateColumns }}>
             <div />
             {packages.map((pkg) => (
-              <div key={pkg.id} className="flex items-center justify-between gap-3 pt-4">
+              <div key={pkg.id} className="flex items-center justify-between gap-3">
                 <div>
                   <p className="font-display text-2xl leading-none text-neutral-700">
                     {formatPackagePrice(pkg.price, pkg.currency)}
