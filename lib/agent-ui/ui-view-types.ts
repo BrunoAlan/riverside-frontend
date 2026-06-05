@@ -6,6 +6,19 @@ import type {
   ItineraryFull,
 } from './commands';
 
+export type PackageCell =
+  | { kind: 'included' }
+  | { kind: 'excluded' }
+  | { kind: 'text'; text: string };
+
+export interface PackageOption {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  cells: Record<string, PackageCell>; // keyed by feature.id
+}
+
 export type UiView =
   | { type: 'start' }
   | { type: 'presentation' }
@@ -17,7 +30,12 @@ export type UiView =
       detailExperienceId?: string;
     }
   | { type: 'compare_itinerary'; options: ItineraryFull[] }
-  | { type: 'cabin_selection'; cabins: Cabin[]; detailCabinId?: string };
+  | { type: 'cabin_selection'; cabins: Cabin[]; detailCabinId?: string }
+  | {
+      type: 'package_selection';
+      features: { id: string; label: string }[];
+      packages: PackageOption[];
+    };
 
 export type UiHint = { type: 'soft_redirect'; reasonCode: string; missing?: string[] };
 
