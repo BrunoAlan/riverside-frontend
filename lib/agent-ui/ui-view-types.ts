@@ -11,13 +11,15 @@ export type PackageCell =
   | { kind: 'excluded' }
   | { kind: 'text'; text: string };
 
-export interface PackageOption {
+export type PackageFeature = { id: string; label: string };
+
+export type PackageOption = {
   id: string;
   name: string;
   price: number;
   currency: string;
   cells: Record<string, PackageCell>; // keyed by feature.id
-}
+};
 
 export type UiView =
   | { type: 'start' }
@@ -33,7 +35,7 @@ export type UiView =
   | { type: 'cabin_selection'; cabins: Cabin[]; detailCabinId?: string }
   | {
       type: 'package_selection';
-      features: { id: string; label: string }[];
+      features: PackageFeature[];
       packages: PackageOption[];
     };
 

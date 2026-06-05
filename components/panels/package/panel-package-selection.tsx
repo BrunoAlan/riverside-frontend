@@ -26,7 +26,7 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
       <div className="mx-auto max-w-[1400px] p-6 pt-16">
         {/* Back button — visual only, not wired */}
         <Button type="button" variant="secondary" size="sm" className="mb-10">
-          <CaretLeftIcon weight="bold" /> Back
+          <CaretLeftIcon weight="bold" aria-hidden="true" /> Back
         </Button>
 
         <div className="grid items-start gap-x-6 gap-y-8" style={{ gridTemplateColumns }}>
