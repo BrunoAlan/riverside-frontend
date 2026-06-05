@@ -1,7 +1,11 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { eventLogStore } from '../dev/event-log-store';
 import { dispatchEnvelope } from './transport';
 import { createUiViewStore } from './ui-view-store';
+
+afterEach(() => {
+  eventLogStore.getState().clear();
+});
 
 const validDestinationDetail = {
   type: 'show_destination_detail',
@@ -113,10 +117,6 @@ describe('dispatchEnvelope', () => {
 });
 
 describe('dispatchEnvelope dev event logging', () => {
-  beforeEach(() => {
-    eventLogStore.getState().clear();
-  });
-
   it('records an applied command with the parsed payload and raw envelope', () => {
     const store = createUiViewStore();
     const envelope = {
@@ -150,5 +150,6 @@ describe('dispatchEnvelope dev event logging', () => {
       ok: false,
       correlationId: 'cmd-2',
     });
+    expect(events[0].payload).toEqual({ type: 'nope', correlationId: 'cmd-2', payload: {} });
   });
 });
