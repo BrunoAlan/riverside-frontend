@@ -1,4 +1,5 @@
 import { useStore } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 export type DevEvent = {
@@ -24,22 +25,33 @@ interface EventLogState {
   clear: () => void;
 }
 
+const DEVTOOLS_ENABLED = process.env.NODE_ENV !== 'production';
+
 export function createEventLogStore() {
-  return createStore<EventLogState>()((set) => ({
-    events: [],
-    nextSeq: 0,
-    record: (input) =>
-      set((s) => {
-        const seq = s.nextSeq;
-        const event: DevEvent = { ...input, seq, id: String(seq) };
-        const next = [...s.events, event];
-        return {
-          events: next.length > CAP ? next.slice(next.length - CAP) : next,
-          nextSeq: seq + 1,
-        };
+  return createStore<EventLogState>()(
+    devtools(
+      (set) => ({
+        events: [],
+        nextSeq: 0,
+        record: (input) =>
+          set(
+            (s) => {
+              const seq = s.nextSeq;
+              const event: DevEvent = { ...input, seq, id: String(seq) };
+              const next = [...s.events, event];
+              return {
+                events: next.length > CAP ? next.slice(next.length - CAP) : next,
+                nextSeq: seq + 1,
+              };
+            },
+            false,
+            'record'
+          ),
+        clear: () => set({ events: [] }, false, 'clear'),
       }),
-    clear: () => set({ events: [] }),
-  }));
+      { name: 'event-log-store', enabled: DEVTOOLS_ENABLED }
+    )
+  );
 }
 
 // Singleton used by the running app.
