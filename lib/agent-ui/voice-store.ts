@@ -1,4 +1,5 @@
 import { useStore } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface VoiceState {
@@ -6,11 +7,18 @@ interface VoiceState {
   setVoiceId: (id: string) => void;
 }
 
+const DEVTOOLS_ENABLED = process.env.NODE_ENV !== 'production';
+
 export function createVoiceStore() {
-  return createStore<VoiceState>()((set) => ({
-    voiceId: null,
-    setVoiceId: (id) => set({ voiceId: id }),
-  }));
+  return createStore<VoiceState>()(
+    devtools(
+      (set) => ({
+        voiceId: null,
+        setVoiceId: (id) => set({ voiceId: id }, false, 'setVoiceId'),
+      }),
+      { name: 'voice-store', enabled: DEVTOOLS_ENABLED }
+    )
+  );
 }
 
 // Singleton used by the running app.
