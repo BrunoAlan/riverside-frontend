@@ -152,4 +152,17 @@ describe('dispatchEnvelope dev event logging', () => {
     });
     expect(events[0].payload).toEqual({ type: 'nope', correlationId: 'cmd-2', payload: {} });
   });
+
+  it('records an envelope-error for a malformed envelope', () => {
+    const store = createUiViewStore();
+    dispatchEnvelope({ correlationId: 'env-bad', commands: 'not-an-array' }, store.getState());
+    const events = eventLogStore.getState().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      channel: 'ui-commands',
+      label: 'envelope-error',
+      ok: false,
+    });
+    expect(store.getState().view).toEqual({ type: 'start' });
+  });
 });
