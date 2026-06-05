@@ -165,4 +165,24 @@ describe('dispatchEnvelope dev event logging', () => {
     });
     expect(store.getState().view).toEqual({ type: 'start' });
   });
+
+  it('dispatches commands even when envelope metadata has unexpected types', () => {
+    const store = createUiViewStore();
+    dispatchEnvelope(
+      {
+        correlationId: 12345,
+        sessionId: null,
+        timestamp: null,
+        commands: [validDestinationDetail],
+      },
+      store.getState()
+    );
+    const events = eventLogStore.getState().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      channel: 'ui-commands',
+      label: 'show_destination_detail',
+      ok: true,
+    });
+  });
 });
