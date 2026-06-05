@@ -1,5 +1,10 @@
 import type { Cabin } from '@/lib/agent-ui/commands';
-import type { BookingSummary, UiView } from '@/lib/agent-ui/ui-view-types';
+import type {
+  BookingSummary,
+  PackageCell,
+  PackageOption,
+  UiView,
+} from '@/lib/agent-ui/ui-view-types';
 
 export interface ViewMock {
   id: string;
@@ -194,6 +199,87 @@ const danubeLegends = {
   ],
 };
 
+const inc: PackageCell = { kind: 'included' };
+const exc: PackageCell = { kind: 'excluded' };
+const txt = (text: string): PackageCell => ({ kind: 'text', text });
+
+const packageFeatures = [
+  { id: 'wifi', label: 'Wifi' },
+  { id: 'cakes', label: 'Cakes, Waffles & Ice Cream' },
+  { id: 'excursions', label: 'Pre-selected Excursions' },
+  { id: 'minibar', label: 'Minibar' },
+  { id: 'room_service', label: 'Room Service' },
+  { id: 'welcome_package', label: 'Welcome package' },
+  { id: 'dinner_atelier', label: 'Dinner in "The Atelier"' },
+];
+
+const premiumWelcome = 'Premium Wine, Cocktails, Spirits and French Champagne';
+const fullBoardWelcome = 'Water, Coffee and Tea during meals';
+const limitedRoomService = 'During opening hours & According to the menu';
+
+const samplePackages: PackageOption[] = [
+  {
+    id: 'premium_all_inclusive_excursions',
+    name: 'Premium All Inclusive Including Excursions',
+    price: 9174,
+    currency: 'EUR',
+    cells: {
+      wifi: inc,
+      cakes: inc,
+      excursions: inc,
+      minibar: inc,
+      room_service: txt('24h'),
+      welcome_package: txt(premiumWelcome),
+      dinner_atelier: inc,
+    },
+  },
+  {
+    id: 'full_board_excursions',
+    name: 'Full Board Including Excursions',
+    price: 9174,
+    currency: 'EUR',
+    cells: {
+      wifi: inc,
+      cakes: inc,
+      excursions: inc,
+      minibar: exc,
+      room_service: txt(limitedRoomService),
+      welcome_package: txt(fullBoardWelcome),
+      dinner_atelier: txt('€40,- p.p. cover charge applies'),
+    },
+  },
+  {
+    id: 'premium_all_inclusive',
+    name: 'Premium All Inclusive',
+    price: 9174,
+    currency: 'EUR',
+    cells: {
+      wifi: inc,
+      cakes: inc,
+      excursions: inc,
+      minibar: inc,
+      room_service: txt('24h'),
+      welcome_package: txt(premiumWelcome),
+      dinner_atelier: inc,
+    },
+  },
+  {
+    id: 'full_board',
+    name: 'Full Board',
+    price: 8850,
+    currency: 'EUR',
+    cells: {
+      wifi: inc,
+      cakes: inc,
+      excursions: inc,
+      minibar: exc,
+      room_service: txt(limitedRoomService),
+      welcome_package: txt(fullBoardWelcome),
+      dinner_atelier: txt('€25,- p.p. cover charge applies'),
+    },
+  },
+];
+
 export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
   start: [{ id: 'default', label: 'Default', view: { type: 'start' } }],
   presentation: [{ id: 'default', label: 'Video playing', view: { type: 'presentation' } }],
@@ -346,6 +432,22 @@ export const VIEW_MOCKS: Record<UiView['type'], ViewMock[]> = {
       id: 'with_detail',
       label: "Detail open (Owner's Suite)",
       view: { type: 'cabin_selection', cabins: sampleCabins, detailCabinId: 'owners-suite' },
+    },
+  ],
+  package_selection: [
+    {
+      id: 'default',
+      label: 'Four boards (matches Figma)',
+      view: { type: 'package_selection', features: packageFeatures, packages: samplePackages },
+    },
+    {
+      id: 'two_packages',
+      label: 'Two boards',
+      view: {
+        type: 'package_selection',
+        features: packageFeatures,
+        packages: samplePackages.slice(0, 2),
+      },
     },
   ],
 };
