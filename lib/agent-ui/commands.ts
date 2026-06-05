@@ -188,3 +188,16 @@ export const UiCommand = z.discriminatedUnion('type', [
   AddExperienceToBasket,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
+
+// The inbound data-channel envelope that wraps a batch of UI commands. Permissive
+// by design: it only guarantees `commands` is an array (defaulting to empty), so a
+// malformed envelope can be recorded as an error rather than silently dropped.
+// Named `UiCommandEnvelope` to stay distinct from the outbound `FrontendIntent`
+// envelope in frontend-intent.ts.
+export const UiCommandEnvelope = z.object({
+  correlationId: z.string().optional(),
+  sessionId: z.string().optional(),
+  timestamp: z.union([z.string(), z.number()]).optional(),
+  commands: z.array(z.unknown()).default([]),
+});
+export type UiCommandEnvelope = z.infer<typeof UiCommandEnvelope>;
