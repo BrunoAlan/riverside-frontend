@@ -1,5 +1,6 @@
 import type { LocalParticipant } from 'livekit-client';
 import { recordDevEvent } from '../dev/record-dev-event';
+import { encodeJson } from './wire';
 
 export const FRONTEND_INTENT_TOPIC = 'frontend-intent';
 
@@ -35,7 +36,7 @@ export async function publishFrontendIntent(
   participant: LocalParticipant,
   envelope: FrontendIntent
 ): Promise<void> {
-  const bytes = new TextEncoder().encode(JSON.stringify(envelope));
+  const bytes = encodeJson(envelope);
   await participant.publishData(bytes, { topic: envelope.topic, reliable: true });
   recordDevEvent({
     channel: 'frontend-intent',
