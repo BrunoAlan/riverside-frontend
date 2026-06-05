@@ -12,8 +12,10 @@ type PanelPackageSelectionProps = {
 
 function Cell({ cell }: { cell: PackageCell | undefined }) {
   if (!cell) return null;
-  if (cell.kind === 'included') return <CheckIcon size={20} className="text-neutral-600" />;
-  if (cell.kind === 'excluded') return <XIcon size={20} className="text-neutral-400" />;
+  if (cell.kind === 'included')
+    return <CheckIcon size={20} className="text-neutral-600" aria-label="Included" />;
+  if (cell.kind === 'excluded')
+    return <XIcon size={20} className="text-neutral-400" aria-label="Excluded" />;
   return <p className="text-sm leading-snug text-neutral-600">{cell.text}</p>;
 }
 
@@ -63,7 +65,7 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
                 </p>
                 <p className="pt-1 text-xs text-neutral-500">per person</p>
               </div>
-              <Button type="button" variant="secondary" size="sm">
+              <Button type="button" variant="secondary" size="sm" aria-label={`Select ${pkg.name}`}>
                 Select
               </Button>
             </div>
