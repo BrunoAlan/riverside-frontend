@@ -26,7 +26,7 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
 
   return (
     <div className="bg-beige-200 relative flex h-full w-full flex-col overflow-hidden">
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
         <div className="mx-auto max-w-[1400px] p-6 pt-16">
           {/* Back button — visual only, not wired */}
           <Button type="button" variant="secondary" size="sm" className="mb-10">
@@ -45,11 +45,11 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
               </p>
             ))}
 
-            <Separator className="col-span-full bg-green-700" />
+            <Separator className="bg-primary col-span-full" />
 
             {features.map((feature, index) => (
               <Fragment key={feature.id}>
-                {index > 0 && <Separator className="bg-beige-300 col-span-full" />}
+                {index > 0 && <Separator className="bg-accent col-span-full" />}
                 <p className="p-4 text-sm text-neutral-500">{feature.label}</p>
                 {packages.map((pkg) => (
                   <div key={pkg.id} className="flex min-h-6 items-start p-4">
