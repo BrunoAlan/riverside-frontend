@@ -1,4 +1,5 @@
 import type { LocalParticipant } from 'livekit-client';
+import { recordDevEvent } from '../dev/record-dev-event';
 
 export const FRONTEND_INTENT_TOPIC = 'frontend-intent';
 
@@ -41,5 +42,12 @@ export async function publishFrontendIntent(
     entities: envelope.entities,
     user_message: envelope.user_message,
     correlationId: envelope.correlationId,
+  });
+  recordDevEvent({
+    channel: 'frontend-intent',
+    label: envelope.intent,
+    correlationId: envelope.correlationId,
+    ok: true,
+    payload: envelope,
   });
 }
