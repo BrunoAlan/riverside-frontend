@@ -46,7 +46,7 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
             ))}
 
             {/* Dark separator under the header */}
-            <Separator className="bg-beige-400 col-span-full" />
+            <Separator className="col-span-full bg-green-700" />
 
             {/* Feature rows, separated from one another */}
             {features.map((feature, index) => (
