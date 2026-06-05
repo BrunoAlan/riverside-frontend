@@ -46,12 +46,12 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
             ))}
 
             {/* Dark separator under the header */}
-            <Separator className="col-span-full bg-neutral-400" />
+            <Separator className="bg-beige-400 col-span-full" />
 
             {/* Feature rows, separated from one another */}
             {features.map((feature, index) => (
               <Fragment key={feature.id}>
-                {index > 0 && <Separator className="col-span-full" />}
+                {index > 0 && <Separator className="bg-beige-300 col-span-full" />}
                 <p className="text-sm text-neutral-500">{feature.label}</p>
                 {packages.map((pkg) => (
                   <div key={pkg.id} className="flex min-h-6 items-start">
