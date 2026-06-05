@@ -4,6 +4,7 @@ import { CabinSelectionView } from './views/cabin-selection-view';
 import { CompareItineraryView } from './views/compare-itinerary-view';
 import { DreamStageView } from './views/dream-stage-view';
 import { ItineraryView } from './views/itinerary-view';
+import { PackageSelectionView } from './views/package-selection-view';
 import { PresentationView } from './views/presentation-view';
 import { StartView } from './views/start-view';
 
@@ -22,4 +23,5 @@ export const VIEW_REGISTRY: ViewRegistry = {
   itinerary: ItineraryView,
   compare_itinerary: CompareItineraryView,
   cabin_selection: CabinSelectionView,
+  package_selection: PackageSelectionView,
 };
