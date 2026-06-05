@@ -3,6 +3,7 @@
 import { Fragment } from 'react';
 import { CaretLeftIcon, CheckIcon, XIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import type { PackageCell, UiView } from '@/lib/agent-ui/ui-view-types';
 import { formatPackagePrice } from '@/lib/packages';
 
@@ -24,52 +25,63 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
   const gridTemplateColumns = `minmax(160px, 220px) repeat(${packages.length}, minmax(180px, 1fr))`;
 
   return (
-    <div className="bg-beige-200 h-full w-full overflow-auto">
-      <div className="mx-auto max-w-[1400px] p-6 pt-16">
-        {/* Back button — visual only, not wired */}
-        <Button type="button" variant="secondary" size="sm" className="mb-10">
-          <CaretLeftIcon weight="bold" aria-hidden="true" /> Back
-        </Button>
+    <div className="bg-beige-200 relative h-full w-full overflow-hidden">
+      <div className="h-full overflow-y-auto">
+        <div className="mx-auto max-w-[1400px] p-6 pt-16">
+          {/* Back button — visual only, not wired */}
+          <Button type="button" variant="secondary" size="sm" className="mb-10">
+            <CaretLeftIcon weight="bold" aria-hidden="true" /> Back
+          </Button>
 
-        <div className="grid items-start gap-x-6 gap-y-8" style={{ gridTemplateColumns }}>
-          {/* Header row: package names */}
-          <div />
-          {packages.map((pkg) => (
-            <p
-              key={pkg.id}
-              className="font-display text-xl leading-tight font-medium text-neutral-700"
-            >
-              {pkg.name}
-            </p>
-          ))}
+          <div className="grid items-start gap-x-6 gap-y-8" style={{ gridTemplateColumns }}>
+            {/* Header row: package names */}
+            <div />
+            {packages.map((pkg) => (
+              <p
+                key={pkg.id}
+                className="font-display text-xl leading-tight font-medium text-neutral-700"
+              >
+                {pkg.name}
+              </p>
+            ))}
 
-          {/* Feature rows */}
-          {features.map((feature) => (
-            <Fragment key={feature.id}>
-              <p className="text-sm text-neutral-500">{feature.label}</p>
-              {packages.map((pkg) => (
-                <div key={pkg.id} className="flex min-h-6 items-start">
-                  <Cell cell={pkg.cells[feature.id]} />
+            {/* Dark separator under the header */}
+            <Separator className="col-span-full bg-neutral-400" />
+
+            {/* Feature rows, separated from one another */}
+            {features.map((feature, index) => (
+              <Fragment key={feature.id}>
+                {index > 0 && <Separator className="col-span-full" />}
+                <p className="text-sm text-neutral-500">{feature.label}</p>
+                {packages.map((pkg) => (
+                  <div key={pkg.id} className="flex min-h-6 items-start">
+                    <Cell cell={pkg.cells[feature.id]} />
+                  </div>
+                ))}
+              </Fragment>
+            ))}
+
+            {/* Price + Select row */}
+            <div />
+            {packages.map((pkg) => (
+              <div key={pkg.id} className="flex items-center justify-between gap-3 pt-4">
+                <div>
+                  <p className="font-display text-2xl leading-none text-neutral-700">
+                    {formatPackagePrice(pkg.price, pkg.currency)}
+                  </p>
+                  <p className="pt-1 text-xs text-neutral-500">per person</p>
                 </div>
-              ))}
-            </Fragment>
-          ))}
-
-          {/* Price + Select row */}
-          <div />
-          {packages.map((pkg) => (
-            <div key={pkg.id} className="flex items-center justify-between gap-3 pt-4">
-              <div>
-                <p className="font-display text-2xl leading-none text-neutral-700">
-                  {formatPackagePrice(pkg.price, pkg.currency)}
-                </p>
-                <p className="pt-1 text-xs text-neutral-500">per person</p>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  aria-label={`Select ${pkg.name}`}
+                >
+                  Select
+                </Button>
               </div>
-              <Button type="button" variant="secondary" size="sm" aria-label={`Select ${pkg.name}`}>
-                Select
-              </Button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
