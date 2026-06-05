@@ -2,6 +2,7 @@ import type { Cabin } from '@/lib/agent-ui/commands';
 import type {
   BookingSummary,
   PackageCell,
+  PackageFeature,
   PackageOption,
   UiView,
 } from '@/lib/agent-ui/ui-view-types';
@@ -199,11 +200,12 @@ const danubeLegends = {
   ],
 };
 
+// Singletons are safe: PackageCell is read-only in the UI layer.
 const inc: PackageCell = { kind: 'included' };
 const exc: PackageCell = { kind: 'excluded' };
 const txt = (text: string): PackageCell => ({ kind: 'text', text });
 
-const packageFeatures = [
+const packageFeatures: PackageFeature[] = [
   { id: 'wifi', label: 'Wifi' },
   { id: 'cakes', label: 'Cakes, Waffles & Ice Cream' },
   { id: 'excursions', label: 'Pre-selected Excursions' },
