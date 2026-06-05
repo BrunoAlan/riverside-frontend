@@ -19,6 +19,7 @@ type Store = Pick<ReturnType<typeof uiViewStore.getState>, 'applyCommand' | 'rec
 export function dispatchEnvelope(envelope: unknown, store: Store): void {
   const parsed = UiCommandEnvelope.safeParse(envelope);
   if (!parsed.success) {
+    console.warn('[ui-commands] envelope error', envelope);
     recordDevEvent({
       channel: 'ui-commands',
       label: 'envelope-error',
@@ -45,6 +46,7 @@ export function dispatchEnvelope(envelope: unknown, store: Store): void {
       const correlationId = typeof rawId === 'string' ? rawId : undefined;
       const message = result.error.issues.map((issue) => issue.message).join('; ');
       store.recordParseError({ correlationId, message });
+      console.warn('[ui-commands] parse error', { correlationId, message, rawCommand });
       recordDevEvent({
         channel: 'ui-commands',
         label: 'parse-error',
@@ -77,6 +79,7 @@ export function useUiCommandTransport(): void {
       try {
         text = decodeText(payload);
       } catch (err) {
+        console.warn('[ui-commands] decode error', err);
         recordDevEvent({
           channel: 'ui-commands',
           label: 'decode-error',
@@ -90,6 +93,7 @@ export function useUiCommandTransport(): void {
       try {
         envelope = JSON.parse(text);
       } catch (err) {
+        console.warn('[ui-commands] JSON parse error', { error: err, text });
         recordDevEvent({
           channel: 'ui-commands',
           label: 'json-error',
