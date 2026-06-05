@@ -105,6 +105,26 @@ export function dispatchEnvelope(envelope: unknown, store: Store): void {
 `json-error` recording for failures that happen before an envelope object even
 exists.
 
+### 4. Naming & documentation
+
+Honoring `conventions/code-style.md` ("Default: no comments. Write one only when
+the *why* is non-obvious. Don't restate what the code does."), documentation is
+a **concise header comment per public function** — purpose/contract, not a
+line-by-line restatement — matching the existing style in
+`record-dev-event.ts` and `frontend-intent.ts`. No verbose `@param`/`@returns`
+JSDoc. Functions to document: `encodeJson`, `decodeText` (`wire.ts`),
+`dispatchEnvelope`, `useUiCommandTransport` (`transport.ts`). The
+`frontend-intent.ts` functions already carry header comments.
+
+Rename non-meaningful locals in `transport.ts` (no behavior change):
+
+- `raw` → `rawCommand` (the unparsed command in the loop).
+- `r` (the `raw as { correlationId?: unknown }` cast) → removed; read
+  `correlationId` directly from the cast expression without the intermediate
+  variable.
+- `i` → `issue` in `result.error.issues.map((i) => i.message)`.
+- `e` → `err` in the `decode` / `json` `catch` blocks.
+
 ### What stays untouched
 
 - `lib/agent-ui/commands.ts` command schemas and the `UiCommand` union (only the
