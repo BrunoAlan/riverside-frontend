@@ -9,13 +9,15 @@ type ChatMockState = {
   setMessages: (next: ChatMessage[] | null) => void;
 };
 
+const DEVTOOLS_ENABLED = process.env.NODE_ENV !== 'production';
+
 export const useChatMockStore = create<ChatMockState>()(
   devtools(
     (set) => ({
       messages: null,
       setMessages: (next) => set({ messages: next }, false, 'setMessages'),
     }),
-    { name: 'chat-mock-store', enabled: process.env.NODE_ENV !== 'production' }
+    { name: 'chat-mock-store', enabled: DEVTOOLS_ENABLED }
   )
 );
 
