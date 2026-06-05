@@ -14,6 +14,7 @@ This file is the entry point for AI coding agents (Claude Code, Cursor, Copilot,
 | Code style & patterns | [`conventions/code-style.md`](./conventions/code-style.md)             |
 | Project layout        | [`conventions/project-layout.md`](./conventions/project-layout.md)     |
 | Agent-driven UI flow  | [`conventions/agent-ui.md`](./conventions/agent-ui.md)                 |
+| Message flow (in/out) | [`conventions/message-flow.md`](./conventions/message-flow.md)         |
 | Adding a UI command   | [`conventions/adding-a-command.md`](./conventions/adding-a-command.md) |
 | Adding a view + mock  | [`conventions/adding-a-view.md`](./conventions/adding-a-view.md)       |
 | Analytics events      | [`conventions/analytics.md`](./conventions/analytics.md)               |
