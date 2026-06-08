@@ -21,15 +21,21 @@ describe('routeFeatureCollection', () => {
     expect(routeFeatureCollection([city('only', 0, 0)]).features).toEqual([]);
   });
 
-  it('connects every city in order with one straight LineString', () => {
-    const fc = routeFeatureCollection([city('a', 0, 0), city('b', 1, 2), city('c', 3, 4)]);
+  it('connects the cities west-to-east by longitude with one LineString', () => {
+    const fc = routeFeatureCollection([city('east', 3, 0), city('west', 0, 1), city('mid', 1, 2)]);
     expect(fc.type).toBe('FeatureCollection');
     expect(fc.features).toHaveLength(1);
     expect(fc.features[0].geometry.type).toBe('LineString');
     expect(fc.features[0].geometry.coordinates).toEqual([
-      [0, 0],
-      [1, 2],
-      [3, 4],
+      [0, 1], // west
+      [1, 2], // mid
+      [3, 0], // east
     ]);
+  });
+
+  it('does not mutate the input array', () => {
+    const cities = [city('east', 3, 0), city('west', 0, 1)];
+    routeFeatureCollection(cities);
+    expect(cities.map((c) => c.id)).toEqual(['east', 'west']);
   });
 });

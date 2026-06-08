@@ -7,8 +7,8 @@
 ## Objetivo
 
 Dibujar el recorrido sobre el mapa MapLibre del itinerario como **una sola línea
-recta que conecta las ciudades en el orden en que vienen** (cada una una vez).
-Sin loops de ida y vuelta, sin flechas.
+recta que conecta las ciudades ordenadas de oeste a este** (cada una una vez).
+Sin loops de ida y vuelta, sin flechas, sin depender de los días.
 
 > **Nota de alcance.** La primera exploración proponía arcos por día con las
 > revisitas visibles (el barco vuelve a una ciudad → su propio arco). Tras verlo
@@ -20,7 +20,8 @@ Sin loops de ida y vuelta, sin flechas.
 
 | Decisión | Elección |
 | --- | --- |
-| Forma | **Una línea recta** que une las ciudades en orden del array |
+| Forma | **Una línea recta** que une las ciudades ordenadas oeste→este (por longitud) |
+| Orden | **Geográfico** (longitud), no por día — así la línea no vuelve atrás |
 | Revisitas / loops | **No** — cada ciudad se conecta una vez, sin volver |
 | Flechas de dirección | **No** |
 | Animación | **No** (estática) |
@@ -29,8 +30,9 @@ Sin loops de ida y vuelta, sin flechas.
 ## Implementación
 
 - **`lib/map/route-path.ts`** — `routeFeatureCollection(cities)`: arma un GeoJSON
-  `FeatureCollection` con **un solo `LineString`** cuyas coordenadas son
-  `cities.map(c => [c.lon, c.lat])`, en orden del array. Con menos de dos ciudades
+  `FeatureCollection` con **un solo `LineString`** cuyas coordenadas son las
+  ciudades **ordenadas oeste→este por longitud** (`[...cities].sort((a, b) =>
+  a.lon - b.lon)` — ordena una copia, no muta el input). Con menos de dos ciudades
   no hay línea (colección vacía). Tipo GeoJSON local, sin dependencias nuevas.
 - **`components/panels/map/route-layer.tsx`** — espeja `CityCardLayer`: recibe
   `{ map, cities }`, agrega una capa `line` (`route-line`, green-700 `#39473c`,
@@ -47,8 +49,8 @@ Sin loops de ida y vuelta, sin flechas.
 
 | Archivo | Cambio |
 | --- | --- |
-| `lib/map/route-path.ts` | **Nuevo** — `routeFeatureCollection`: un `LineString` por las ciudades en orden. Puro, sin MapLibre. |
-| `lib/map/route-path.test.ts` | **Nuevo** — tests: vacío / una ciudad → sin línea; ≥2 → `LineString` con las coordenadas en orden. |
+| `lib/map/route-path.ts` | **Nuevo** — `routeFeatureCollection`: un `LineString` por las ciudades ordenadas oeste→este (por longitud). Puro, sin MapLibre. |
+| `lib/map/route-path.test.ts` | **Nuevo** — tests: vacío / una ciudad → sin línea; ≥2 → `LineString` ordenado oeste→este; no muta el input. |
 | `components/panels/map/route-layer.tsx` | **Nuevo** — capa de línea sobre el mapa, espeja `CityCardLayer`. |
 | `components/panels/map/map-canvas.tsx` | **Editar** — prop `showRoute` (default off) + render con `map && showRoute && !focusCity`. |
 | `components/panels/map/panel-map.tsx` | **Editar** — pasar `showRoute` (activa la línea solo en `itinerary`). |
