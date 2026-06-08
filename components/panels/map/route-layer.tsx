@@ -26,42 +26,47 @@ type RouteLayerProps = {
  * after the map's style has loaded, so addSource/addLayer are safe immediately.
  */
 export function RouteLayer({ map, cities }: RouteLayerProps) {
+  // Set up the source + layers once per map instance and tear them down on
+  // unmount (e.g. when the view switches to a focused city). Keeping this off
+  // the `cities` dep means a changing itinerary updates the data (effect below)
+  // instead of flashing the whole layer away and back.
   useEffect(() => {
-    const data = routeFeatureCollection(cities);
     ensureArrowImage(map);
-
-    const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
-    if (source) {
-      source.setData(data);
-    } else {
-      map.addSource(SOURCE_ID, { type: 'geojson', data });
-      map.addLayer({
-        id: LINE_LAYER_ID,
-        type: 'line',
-        source: SOURCE_ID,
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': ROUTE_COLOR, 'line-width': 2.5, 'line-opacity': 0.7 },
-      });
-      map.addLayer({
-        id: ARROW_LAYER_ID,
-        type: 'symbol',
-        source: SOURCE_ID,
-        layout: {
-          'symbol-placement': 'line-center',
-          'icon-image': ARROW_IMAGE_ID,
-          'icon-size': 0.5,
-          'icon-rotation-alignment': 'map',
-          'icon-allow-overlap': true,
-          'icon-ignore-placement': true,
-        },
-      });
-    }
+    map.addSource(SOURCE_ID, { type: 'geojson', data: routeFeatureCollection(cities) });
+    map.addLayer({
+      id: LINE_LAYER_ID,
+      type: 'line',
+      source: SOURCE_ID,
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': ROUTE_COLOR, 'line-width': 2.5, 'line-opacity': 0.7 },
+    });
+    map.addLayer({
+      id: ARROW_LAYER_ID,
+      type: 'symbol',
+      source: SOURCE_ID,
+      layout: {
+        'symbol-placement': 'line-center',
+        'icon-image': ARROW_IMAGE_ID,
+        'icon-size': 0.5,
+        'icon-rotation-alignment': 'map',
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
+      },
+    });
 
     return () => {
       if (map.getLayer(ARROW_LAYER_ID)) map.removeLayer(ARROW_LAYER_ID);
       if (map.getLayer(LINE_LAYER_ID)) map.removeLayer(LINE_LAYER_ID);
       if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- set up once per map; data syncs below
+  }, [map]);
+
+  // Keep the route geometry in sync when the itinerary's cities change, without
+  // rebuilding the layers.
+  useEffect(() => {
+    const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    source?.setData(routeFeatureCollection(cities));
   }, [map, cities]);
 
   return null;
