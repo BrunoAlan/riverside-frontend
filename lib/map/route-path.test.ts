@@ -17,6 +17,7 @@ const city = (id: string, lon: number, lat: number): City => ({
 const wachau = city('wachau', 15.4214, 48.3797);
 const vienna = city('vienna', 16.3738, 48.2082);
 const bratislava = city('bratislava', 17.1077, 48.1486);
+const budapest = city('budapest', 19.0402, 47.4979);
 
 describe('routeFeatureCollection', () => {
   it('returns an empty collection for fewer than two cities', () => {
@@ -56,5 +57,17 @@ describe('routeFeatureCollection', () => {
     for (const p of interior) {
       expect(DANUBE_COORDINATES.some(([lo, la]) => lo === p[0] && la === p[1])).toBe(true);
     }
+  });
+
+  it('follows the Danube Bend south into Budapest instead of cutting straight', () => {
+    // The bend's southward descent has longitudes (~19.05) east of Budapest's
+    // marker (19.04), so a longitude-based clip would drop it. Path-index
+    // clipping must keep those southern vertices in the body.
+    const fc = routeFeatureCollection([wachau, vienna, bratislava, budapest]);
+    const coords = fc.features[0].geometry.coordinates;
+    const interior = coords.slice(1, -1);
+    // Vertices well south of the bend's elbow (lat ~47.8) only exist on the
+    // descent to Budapest; their presence proves the route follows the river down.
+    expect(interior.some(([, lat]) => lat < 47.6)).toBe(true);
   });
 });
