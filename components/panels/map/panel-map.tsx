@@ -86,6 +86,7 @@ export function PanelMap({ view }: PanelMapProps) {
         zoom={itinerary?.zoom}
         focusCity={detailCity ?? undefined}
         onCityExpand={handleCityExpand}
+        showRoute
       />
       {detailCity && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-4 p-6">

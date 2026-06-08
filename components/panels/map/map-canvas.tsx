@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { CityCardLayer } from '@/components/panels/map/city-card-layer';
+import { RouteLayer } from '@/components/panels/map/route-layer';
 import { type City, cities } from '@/lib/map/cities';
 import { cityBounds } from '@/lib/map/city-bounds';
 import { parchmentStyle } from '@/lib/map/parchment-style';
@@ -31,6 +32,9 @@ type MapCanvasProps = {
   zoom?: number;
   focusCity?: City;
   onCityExpand?: (city: City) => void;
+  // MapCanvas is shared with compare_itinerary; the voyage route is opt-in so it
+  // only renders for the single itinerary view that asks for it.
+  showRoute?: boolean;
 };
 
 export function MapCanvas({
@@ -39,6 +43,7 @@ export function MapCanvas({
   zoom = DEFAULT_ZOOM,
   focusCity,
   onCityExpand,
+  showRoute,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
@@ -112,6 +117,7 @@ export function MapCanvas({
         aria-hidden
         className="from-beige-200 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent"
       />
+      {map && showRoute && !focusCity && <RouteLayer map={map} cities={cityList} />}
       {map && !focusCity && (
         <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />
       )}
