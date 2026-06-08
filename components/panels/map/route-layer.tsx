@@ -7,7 +7,7 @@ import { routeFeatureCollection } from '@/lib/map/route-path';
 
 // green-700 (styles/globals.css). MapLibre paint needs a hex literal — same as
 // the parchment style's palette — so it lives beside the layer that uses it.
-const ROUTE_COLOR = '#39473c';
+const ROUTE_COLOR = '#4b5a4f';
 
 const SOURCE_ID = 'route';
 const LINE_LAYER_ID = 'route-line';
