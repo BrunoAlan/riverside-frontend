@@ -48,6 +48,25 @@ describe('buildRouteLegs', () => {
     ]);
   });
 
+  it('reconstructs a real revisit pattern: the boat loops back to budapest', () => {
+    // Budapest and Vienna each span days across the whole voyage, so the boat
+    // sails out, returns to Budapest mid-trip, and sails the same corridors a
+    // second time — the shipping "Danube Legends" shape. The Vienna→Budapest
+    // return is a fresh corridor (repeatIndex 0); the second outbound pass repeats.
+    const legs = buildRouteLegs([
+      city('budapest', 'Days 1, 2, 6 & 7', 19.04, 47.5),
+      city('bratislava', 'Days 3 & 8', 17.11, 48.15),
+      city('vienna', 'Days 4, 5 & 9', 16.37, 48.21),
+    ]);
+    expect(legs.map((l) => [l.fromId, l.toId, l.repeatIndex])).toEqual([
+      ['budapest', 'bratislava', 0],
+      ['bratislava', 'vienna', 0],
+      ['vienna', 'budapest', 0],
+      ['budapest', 'bratislava', 1],
+      ['bratislava', 'vienna', 1],
+    ]);
+  });
+
   it('orders cities that share a day by their position in the array', () => {
     const legs = buildRouteLegs([
       city('start', 'Day 1', 0, 0),

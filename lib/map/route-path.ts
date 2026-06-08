@@ -32,10 +32,14 @@ export function buildRouteLegs(cities: City[]): RouteLeg[] {
 
   occurrences.sort((a, b) => a.day - b.day || a.cityIndex - b.cityIndex);
 
+  // Collapse a city repeated on back-to-back visits into a single stop (no
+  // self-loop). Assumes cities arrive in roughly route order; a multi-day city
+  // that also shares a later day with an earlier-listed one could still emit a
+  // small extra hop, which real itineraries don't hit.
   const visits: Visit[] = [];
   for (const occ of occurrences) {
     const prev = visits[visits.length - 1];
-    if (prev && prev.id === occ.id) continue; // same city two days running = one stop
+    if (prev && prev.id === occ.id) continue;
     visits.push(occ);
   }
 
@@ -76,9 +80,11 @@ export type RouteFeatureCollection = {
 
 // Points sampled along each Bézier arc.
 const ARC_SAMPLES = 28;
-// Bow of a single arc, as a fraction of the leg's straight length…
+// Bow of one pass over a leg, as a fraction of its straight length…
 const BASE_OFFSET_RATIO = 0.18;
-// …clamped (degrees) so short legs still curve and the long return leg doesn't balloon.
+// …clamped (degrees) so short legs still curve and a single pass doesn't
+// balloon. Corridors sailed 3+ times (step > 1) fan wider by design, so the
+// total spread there is MAX_OFFSET × step — fine for the handful of legs we draw.
 const MIN_OFFSET = 0.04;
 const MAX_OFFSET = 0.6;
 
