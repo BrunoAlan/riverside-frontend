@@ -39,7 +39,14 @@ export function RouteLayer({ map, cities }: RouteLayerProps) {
       type: 'line',
       source: SOURCE_ID,
       layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: { 'line-color': ROUTE_COLOR, 'line-width': 2.5, 'line-opacity': 0.7 },
+      paint: {
+        'line-color': ROUTE_COLOR,
+        'line-width': 5,
+        'line-opacity': 0.7,
+        // Round dots: a zero-length dash with the round line-cap renders each
+        // segment as a dot; the gap is in line-width multiples.
+        'line-dasharray': [0, 2],
+      },
     });
 
     return () => {
