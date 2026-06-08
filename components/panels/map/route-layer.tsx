@@ -28,6 +28,11 @@ export function RouteLayer({ map, cities }: RouteLayerProps) {
   // unmount. Keeping this off the `cities` dep means a changing itinerary
   // updates the data (effect below) instead of flashing the layer away and back.
   useEffect(() => {
+    // Idempotent: under dev Fast Refresh the effect can re-run on a map that
+    // already has our source/layer, so clear them first.
+    if (map.getLayer(LINE_LAYER_ID)) map.removeLayer(LINE_LAYER_ID);
+    if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+
     map.addSource(SOURCE_ID, { type: 'geojson', data: routeFeatureCollection(cities) });
     map.addLayer({
       id: LINE_LAYER_ID,
@@ -38,8 +43,15 @@ export function RouteLayer({ map, cities }: RouteLayerProps) {
     });
 
     return () => {
-      if (map.getLayer(LINE_LAYER_ID)) map.removeLayer(LINE_LAYER_ID);
-      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      // The map may already be torn down (e.g. Fast Refresh removed it before
+      // this runs), which makes getLayer/removeLayer throw on a gone style.
+      // RouteLayer doesn't own the map's lifecycle, so guard against that.
+      try {
+        if (map.getLayer(LINE_LAYER_ID)) map.removeLayer(LINE_LAYER_ID);
+        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      } catch {
+        // Map already removed; its source/layer went with it.
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- set up once per map; data syncs below
   }, [map]);
