@@ -28,54 +28,52 @@ export function CabinDetailModal({ cabin, onClose, onSelect, selected }: CabinDe
       {cabin && (
         <DialogPrimitive.Content
           onInteractOutside={(event) => event.preventDefault()}
-          className="bg-beige-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 absolute inset-0 flex flex-col overflow-y-auto pt-16 outline-none lg:flex-row lg:overflow-hidden"
+          className="bg-beige-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 absolute inset-0 flex flex-col overflow-y-auto p-6 pt-16 outline-none lg:flex-row lg:overflow-hidden"
         >
           <div className="h-72 shrink-0 sm:h-80 lg:h-auto lg:flex-1">
             <CabinDetailGallery images={cabin.detail.gallery} alt={cabin.name} />
           </div>
-          <div className="flex flex-col p-6 lg:w-[400px] lg:shrink-0 lg:overflow-y-auto">
-            <div className="flex items-start justify-between gap-4">
-              <DialogPrimitive.Title className="font-display text-3xl leading-tight font-semibold text-neutral-700">
-                {cabin.name}
-              </DialogPrimitive.Title>
-              <DialogPrimitive.Close
-                aria-label="Close"
-                className="text-muted-foreground hover:bg-beige-300 focus-visible:ring-ring/50 -mt-1 -mr-1 flex size-8 shrink-0 items-center justify-center rounded-full transition-colors outline-none hover:text-neutral-700 focus-visible:ring-[3px]"
-              >
-                <XIcon size={18} />
-              </DialogPrimitive.Close>
+          <div className="flex flex-col lg:w-[400px] lg:shrink-0 lg:overflow-y-auto">
+            <div className="from-beige-200 sticky top-0 bg-gradient-to-b from-80% p-6 pt-0">
+              <div className="flex items-start justify-between gap-4">
+                <DialogPrimitive.Title className="font-display text-3xl leading-tight font-semibold text-neutral-700">
+                  {cabin.name}
+                </DialogPrimitive.Title>
+                <DialogPrimitive.Close
+                  aria-label="Close"
+                  className="bg-beige-300 hover:bg-beige-400/40 text-primary flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-sm transition-colors outline-none"
+                >
+                  <XIcon size={18} />
+                </DialogPrimitive.Close>
+              </div>
+              <DialogPrimitive.Description className="sr-only">
+                {cabin.name} cabin details
+              </DialogPrimitive.Description>
+              <PipeSeparatedList
+                items={[`${cabin.guests} guests`, `${cabin.area}m²`, cabin.view]}
+                className="mt-1 gap-x-3 gap-y-1"
+              />
             </div>
-            <DialogPrimitive.Description className="sr-only">
-              {cabin.name} cabin details
-            </DialogPrimitive.Description>
-            <PipeSeparatedList
-              items={[
-                `${cabin.guests} guests`,
-                `${cabin.area}m²`,
-                `from ${formatCabinPrice(cabin.price_from)} EUR`,
-                cabin.view,
-              ]}
-              className="mt-2 gap-x-3 gap-y-1"
-            />
-            <div className="mt-6 flex flex-col gap-6">
+            <div className="flex flex-col gap-6 pr-6 pl-6">
               <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
               <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
               <DetailSection icon={ArmchairIcon} title="Amenities" items={cabin.detail.amenities} />
             </div>
-            <Button
-              type="button"
-              className="mt-8"
-              disabled={selected}
-              onClick={() => onSelect(cabin)}
-            >
-              {selected ? (
-                <>
-                  <CheckIcon weight="bold" /> Selected
-                </>
-              ) : (
-                'Select this suite'
-              )}
-            </Button>
+            <div className="from-beige-200 sticky bottom-0 flex items-center justify-between bg-gradient-to-t from-70% p-6 pb-0">
+              <div className="flex flex-col">
+                <div className="text-sm">From</div>
+                <div className="text-lg font-bold">${formatCabinPrice(cabin.price_from)} EUR</div>
+              </div>
+              <Button type="button" disabled={selected} onClick={() => onSelect(cabin)}>
+                {selected ? (
+                  <>
+                    <CheckIcon weight="bold" /> Selected
+                  </>
+                ) : (
+                  'Select'
+                )}
+              </Button>
+            </div>
           </div>
         </DialogPrimitive.Content>
       )}

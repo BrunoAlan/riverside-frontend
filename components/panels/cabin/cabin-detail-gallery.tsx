@@ -14,7 +14,7 @@ export function CabinDetailGallery({ images, alt }: CabinDetailGalleryProps) {
   const activeSrc = images[activeIndex] ?? images[0];
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-3">
+    <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl">
         <Image
           src={activeSrc}
