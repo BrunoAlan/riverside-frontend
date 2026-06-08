@@ -1,5 +1,11 @@
 # Recorrido del barco en el itinerario — Implementation Plan
 
+> **Superseded (2026-06-08):** este plan construía el recorrido como **arcos por
+> día con revisitas**. Tras revisarlo, el feature se simplificó a **una línea
+> recta que conecta las ciudades** (sin loops ni flechas). El diseño vigente está
+> en `docs/superpowers/specs/2026-06-08-itinerary-route-path-design.md`; las tasks
+> de abajo quedan como registro del enfoque original.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Dibujar el viaje del barco sobre el mapa del itinerario como arcos curvos en orden de día, con flechas de dirección, mostrando las revisitas (cuando el barco vuelve a una ciudad).

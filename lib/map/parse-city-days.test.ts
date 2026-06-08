@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCityDays, parseDayNumbers } from './parse-city-days';
+import { parseCityDays } from './parse-city-days';
 
 describe('parseCityDays', () => {
   it('splits a comma + ampersand day string into individual days', () => {
@@ -24,23 +24,5 @@ describe('parseCityDays', () => {
 
   it('returns an empty list for an empty string', () => {
     expect(parseCityDays('')).toEqual([]);
-  });
-});
-
-describe('parseDayNumbers', () => {
-  it('pulls the day numbers out of a multi-day string', () => {
-    expect(parseDayNumbers('Days 1, 2, 6 & 7')).toEqual([1, 2, 6, 7]);
-  });
-
-  it('handles a single day', () => {
-    expect(parseDayNumbers('Day 12')).toEqual([12]);
-  });
-
-  it('returns an empty array when there are no numbers', () => {
-    expect(parseDayNumbers('Flexible')).toEqual([]);
-  });
-
-  it('returns an empty array for an empty string', () => {
-    expect(parseDayNumbers('')).toEqual([]);
   });
 });
