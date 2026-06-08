@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { City } from './cities';
-import { buildRouteLegs } from './route-path';
+import { buildRouteLegs, routeFeatureCollection } from './route-path';
 
 const city = (id: string, days: string, lon: number, lat: number): City => ({
   id,
@@ -56,5 +56,30 @@ describe('buildRouteLegs', () => {
       city('end', 'Day 3', 3, 0),
     ]);
     expect(legs.map((l) => l.toId)).toEqual(['tulln', 'wachau', 'end']);
+  });
+});
+
+describe('routeFeatureCollection', () => {
+  it('builds one LineString feature per leg', () => {
+    const fc = routeFeatureCollection([
+      city('a', 'Day 1', 0, 0),
+      city('b', 'Day 2', 2, 1),
+      city('c', 'Day 3', 4, 0),
+    ]);
+    expect(fc.type).toBe('FeatureCollection');
+    expect(fc.features).toHaveLength(2);
+    expect(fc.features[0].geometry.type).toBe('LineString');
+  });
+
+  it('starts and ends each arc exactly on the leg endpoints', () => {
+    const fc = routeFeatureCollection([city('a', 'Day 1', 0, 0), city('b', 'Day 2', 2, 1)]);
+    const coords = fc.features[0].geometry.coordinates;
+    expect(coords[0]).toEqual([0, 0]);
+    expect(coords[coords.length - 1]).toEqual([2, 1]);
+  });
+
+  it('carries the leg repeatIndex onto the feature properties', () => {
+    const fc = routeFeatureCollection([city('a', 'Days 1 & 3', 0, 0), city('b', 'Day 2', 2, 0)]);
+    expect(fc.features.map((f) => f.properties.repeatIndex)).toEqual([0, 1]);
   });
 });
