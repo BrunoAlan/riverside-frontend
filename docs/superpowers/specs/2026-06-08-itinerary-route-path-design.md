@@ -144,13 +144,17 @@ forma imperativa en un `useEffect` keyed en `[map, cities]`, devuelve `null`.
   solo según el tramo; `icon-keep-upright` queda en `false` (default) para que no
   invierta el sentido. Sin assets nuevos en `public/`.
 
-### Enganche — `map-canvas.tsx` (editar)
+### Enganche — `map-canvas.tsx` + `panel-map.tsx` (editar)
 
-Junto al `CityCardLayer` existente, con la **misma condición** para que en modo
-detalle (foco en una ciudad) la ruta se oculte igual que las tarjetas:
+`MapCanvas` es compartido con `compare_itinerary`, así que la ruta es **opt-in**
+vía un prop nuevo `showRoute` (default off): solo la activa `PanelMap` (vista
+`itinerary`). El gate suma `!focusCity` para ocultarla en modo detalle, igual que
+las tarjetas. En `compare-itinerary-view.tsx` no se pasa `showRoute` → ruta off.
 
 ```tsx
-{map && !focusCity && <RouteLayer map={map} cities={cityList} />}
+// map-canvas.tsx (prop showRoute?: boolean, default off)
+{map && showRoute && !focusCity && <RouteLayer map={map} cities={cityList} />}
+// panel-map.tsx pasa `showRoute`; compare-itinerary-view.tsx no lo pasa.
 ```
 
 ## Archivos
@@ -161,7 +165,8 @@ detalle (foco en una ciudad) la ruta se oculte igual que las tarjetas:
 | `lib/map/route-path.test.ts` | **Nuevo** — tests de la reconstrucción. |
 | `lib/map/parse-city-days.ts` | **Editar** — agregar `parseDayNumbers(): number[]`; `parseCityDays` lo reusa (refactor mínimo, sin cambiar su salida). |
 | `components/panels/map/route-layer.tsx` | **Nuevo** — capa imperativa de ruta sobre el mapa, espeja `CityCardLayer`. |
-| `components/panels/map/map-canvas.tsx` | **Editar** — renderizar `<RouteLayer>` con `map && !focusCity`. |
+| `components/panels/map/map-canvas.tsx` | **Editar** — prop `showRoute` (default off) + renderizar `<RouteLayer>` con `map && showRoute && !focusCity`. |
+| `components/panels/map/panel-map.tsx` | **Editar** — pasar `showRoute` al `MapCanvas` (activa la ruta solo en la vista `itinerary`). |
 
 ## Testing
 
