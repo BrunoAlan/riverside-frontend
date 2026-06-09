@@ -496,6 +496,93 @@ describe('UiCommand schema', () => {
     if (result.type !== 'show_experience_detail') throw new Error('discriminator failed');
     expect(result.payload.experience_id).toBeNull();
   });
+
+  it('parses show_itinerary_summary with a full payload', () => {
+    const result = UiCommand.parse({
+      type: 'show_itinerary_summary',
+      correlationId: 'c1',
+      payload: {
+        header: { title: 'Danube', subtitle: 'Anniversary', image: '/h.jpg' },
+        details: {
+          guests: '2 people',
+          month: 'September',
+          embarkation: 'Vienna',
+          stops: 'Budapest +3',
+          dates: '20 – 27 Sep 2026',
+          price_per_person: '€ 9,174 p.p.',
+          cabin_name: "Owner's Suite",
+        },
+        cabin: {
+          id: 'owners-suite',
+          name: "Owner's Suite",
+          image: '/cabin/1.png',
+          guests: 2,
+          area: 80,
+          price_from: 12229,
+          view: 'Balcony',
+          detail: { gallery: ['/g1.png'], bedroom: [], bathroom: [], amenities: [] },
+        },
+        package: {
+          price_per_person: '€ 9,174 p.p.',
+          name: 'Premium All Inclusive',
+          inclusions: ['Free Wifi'],
+        },
+        itinerary: {
+          title: 'Vienna – Vienna',
+          countries: ['Austria'],
+          description: 'A week on the Danube',
+          cities: [
+            {
+              id: 'vienna',
+              name: 'Vienna',
+              country: 'Austria',
+              days: 'Days 1, 2 & 8',
+              image: '/v.jpg',
+            },
+          ],
+        },
+        total: '€ 27,240',
+      },
+    });
+    if (result.type !== 'show_itinerary_summary') throw new Error('discriminator failed');
+    expect(result.payload.cabin?.price_from).toBe(12229);
+    expect(result.payload.details.cabin_name).toBe("Owner's Suite");
+  });
+
+  it('parses show_itinerary_summary with an all-null partial payload', () => {
+    const result = UiCommand.parse({
+      type: 'show_itinerary_summary',
+      correlationId: 'c2',
+      payload: {
+        header: { title: null, subtitle: null, image: null },
+        details: {
+          guests: null,
+          month: null,
+          embarkation: null,
+          stops: null,
+          dates: null,
+          price_per_person: null,
+          cabin_name: null,
+        },
+        cabin: null,
+        package: null,
+        itinerary: null,
+        total: null,
+      },
+    });
+    if (result.type !== 'show_itinerary_summary') throw new Error('discriminator failed');
+    expect(result.payload.cabin).toBeNull();
+    expect(result.payload.total).toBeNull();
+  });
+
+  it('rejects show_itinerary_summary missing the details object', () => {
+    const parsed = UiCommand.safeParse({
+      type: 'show_itinerary_summary',
+      correlationId: 'c3',
+      payload: { header: { title: null, subtitle: null, image: null } },
+    });
+    expect(parsed.success).toBe(false);
+  });
 });
 
 describe('set_booking_summary', () => {
