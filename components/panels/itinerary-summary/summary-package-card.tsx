@@ -1,8 +1,12 @@
 import { ChevronRight } from 'lucide-react';
+import { SummaryPlaceholderCard } from '@/components/panels/itinerary-summary/summary-cabin-card';
 import { Button } from '@/components/ui/button';
+import { SUMMARY_PLACEHOLDER } from '@/lib/itinerary-summary/copy';
 import type { ItinerarySummaryPackage } from '@/lib/itinerary-summary/types';
 
-export function SummaryPackageCard({ pkg }: { pkg: ItinerarySummaryPackage }) {
+export function SummaryPackageCard({ pkg }: { pkg: ItinerarySummaryPackage | null }) {
+  if (!pkg) return <SummaryPlaceholderCard label={SUMMARY_PLACEHOLDER.package} />;
+
   return (
     <div className="bg-beige-200 flex flex-col gap-5 rounded-2xl p-6">
       <div className="flex items-center justify-between gap-3">
@@ -13,12 +17,14 @@ export function SummaryPackageCard({ pkg }: { pkg: ItinerarySummaryPackage }) {
         </Button>
       </div>
       <div className="border-beige-300 rounded-2xl border p-5">
-        <div className="flex items-center gap-2">
-          <span className="bg-primary size-2.5 rounded-full" aria-hidden />
-          <span className="text-foreground text-sm">{pkg.pricePerPerson}</span>
-        </div>
+        {pkg.pricePerPerson && (
+          <div className="flex items-center gap-2">
+            <span className="bg-primary size-2.5 rounded-full" aria-hidden />
+            <span className="text-foreground text-sm">{pkg.pricePerPerson}</span>
+          </div>
+        )}
         <p className="font-display mt-4 text-2xl leading-snug font-semibold text-neutral-700">
-          {pkg.name}
+          {pkg.name ?? SUMMARY_PLACEHOLDER.package}
         </p>
         <ul className="border-beige-300 mt-4 border-t">
           {pkg.inclusions.map((item) => (

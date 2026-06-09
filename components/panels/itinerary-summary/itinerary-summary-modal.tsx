@@ -27,9 +27,13 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
             {/* Top bar (pinned) */}
             <SummaryTopBar />
 
-            <DialogPrimitive.Title className="sr-only">{data.header.title}</DialogPrimitive.Title>
+            <DialogPrimitive.Title className="sr-only">
+              {data.header.title ?? 'Itinerary summary'}
+            </DialogPrimitive.Title>
             <DialogPrimitive.Description className="sr-only">
-              {data.details.guests} · {data.details.dates} · {data.details.embarkation}
+              {[data.details.guests, data.details.dates, data.details.embarkation]
+                .filter(Boolean)
+                .join(' · ')}
             </DialogPrimitive.Description>
 
             {/* Scroll area — top bar stays pinned, footer scrolls with content */}
