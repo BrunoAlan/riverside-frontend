@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   BookOpen,
   CalendarDays,
@@ -14,9 +13,14 @@ import {
 } from 'lucide-react';
 import { ItinerarySummaryModal } from '@/components/panels/itinerary-summary/itinerary-summary-modal';
 import { Button } from '@/components/ui/button';
-import { useBookingSummary, useUiView } from '@/lib/agent-ui/hooks';
+import { useFrontendIntent } from '@/hooks/use-frontend-intent';
+import {
+  useBookingSummary,
+  useCloseItinerarySummary,
+  useItinerarySummary,
+  useUiView,
+} from '@/lib/agent-ui/hooks';
 import type { BookingSummary as BookingSummaryType } from '@/lib/agent-ui/ui-view-types';
-import { ITINERARY_SUMMARY_MOCK } from '@/lib/itinerary-summary/mock';
 import { cn } from '@/lib/shadcn/utils';
 
 interface BookingSummaryProps {
@@ -64,7 +68,9 @@ function Slot({ label, state }: SlotProps) {
 }
 
 export function BookingSummary({ summary }: BookingSummaryProps) {
-  const [summaryOpen, setSummaryOpen] = useState(false);
+  const sendIntent = useFrontendIntent();
+  const itinerarySummary = useItinerarySummary();
+  const closeItinerarySummary = useCloseItinerarySummary();
 
   const stopsLabel = summary.stops
     ? summary.stops.extra > 0
@@ -117,7 +123,7 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
           variant="secondary"
           size="sm"
           className="gap-2"
-          onClick={() => setSummaryOpen(true)}
+          onClick={() => sendIntent('view_itinerary_summary')}
         >
           <Maximize2 className="size-3.5" />
           Itinerary Summary
@@ -142,11 +148,15 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
         </div>
       </div>
 
-      <ItinerarySummaryModal
-        open={summaryOpen}
-        onOpenChange={setSummaryOpen}
-        data={ITINERARY_SUMMARY_MOCK}
-      />
+      {itinerarySummary && (
+        <ItinerarySummaryModal
+          open
+          onOpenChange={(o) => {
+            if (!o) closeItinerarySummary();
+          }}
+          data={itinerarySummary}
+        />
+      )}
     </div>
   );
 }
