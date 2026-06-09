@@ -607,6 +607,20 @@ describe('ui-view-store', () => {
     ]);
   });
 
+  it('applyCommand(sync_itinerary_experiences) with an empty array is a no-op', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-add',
+      payload: { experience_id: 'keepme', day: 'Day 1', passenger_count: 2 },
+    });
+    store.getState().applyCommand({
+      type: 'sync_itinerary_experiences',
+      correlationId: 'c-empty',
+      payload: { experiences: [] },
+    });
+    expect(store.getState().addedExperiences).toEqual([{ experienceId: 'keepme', day: 'Day 1' }]);
+  });
+
   it('clearAddedExperiencesFromDev empties addedExperiences and marks source dev', () => {
     const store = createUiViewStore();
     store.getState().applyCommand({

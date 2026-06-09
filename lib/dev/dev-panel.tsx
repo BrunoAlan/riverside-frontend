@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import {
   useApplyCommand,
   useClearAddedExperiencesFromDev,
@@ -71,15 +72,16 @@ export function DevPanel() {
     if (chosen) applyCommand(chosen.command);
   };
 
-  // Clear then re-apply so the card replays its add animation. The re-apply is
-  // deferred a tick: clearing and applying in the same render batch would leave
-  // the card "added" the whole time (no false→true flip), so nothing animates.
+  // Clear then re-apply so the card replays its add animation. flushSync forces
+  // the cleared (isAdded=false) render to commit before re-applying, so the card
+  // sees a real false→true flip and plays the pop/pulse. Without it, both updates
+  // batch into one render and nothing animates.
   const replayExperiences = () => {
     const chosen =
       SYNC_EXPERIENCES_MOCKS.find((m) => m.id === syncMockId) ?? SYNC_EXPERIENCES_MOCKS[0];
     if (!chosen) return;
-    clearAddedExperiences();
-    setTimeout(() => applyCommand(chosen.command), 50);
+    flushSync(() => clearAddedExperiences());
+    applyCommand(chosen.command);
   };
 
   const reset = () => {
