@@ -71,6 +71,17 @@ export function DevPanel() {
     if (chosen) applyCommand(chosen.command);
   };
 
+  // Clear then re-apply so the card replays its add animation. The re-apply is
+  // deferred a tick: clearing and applying in the same render batch would leave
+  // the card "added" the whole time (no false→true flip), so nothing animates.
+  const replayExperiences = () => {
+    const chosen =
+      SYNC_EXPERIENCES_MOCKS.find((m) => m.id === syncMockId) ?? SYNC_EXPERIENCES_MOCKS[0];
+    if (!chosen) return;
+    clearAddedExperiences();
+    setTimeout(() => applyCommand(chosen.command), 50);
+  };
+
   const reset = () => {
     setViewFromDev({ type: 'start' });
     setDevChatMessages(null);
@@ -234,6 +245,13 @@ export function DevPanel() {
                   className="flex-1 rounded bg-white text-black"
                 >
                   Apply experiences
+                </button>
+                <button
+                  type="button"
+                  onClick={replayExperiences}
+                  className="rounded bg-white/20 px-2 text-white"
+                >
+                  Replay
                 </button>
                 <button
                   type="button"
