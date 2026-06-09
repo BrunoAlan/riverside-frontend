@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { motion } from 'motion/react';
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -39,14 +40,37 @@ export function ExperienceCard({
   const isAdded = addedDays.length > 0;
   const isSelectedDayAdded = addedDays.includes(selectedDay);
 
+  // Play the "added" pop/pulse only on the real false→true flip, not when the
+  // card re-mounts already-added (e.g. navigating back to this section).
+  const wasAddedRef = useRef(isAdded);
+  const [justAdded, setJustAdded] = useState(false);
+  useEffect(() => {
+    if (isAdded && !wasAddedRef.current) {
+      setJustAdded(true);
+      const timer = setTimeout(() => setJustAdded(false), 650);
+      wasAddedRef.current = isAdded;
+      return () => clearTimeout(timer);
+    }
+    wasAddedRef.current = isAdded;
+  }, [isAdded]);
+
   return (
     <Card
       ref={cardRef}
       className={cn(
-        'bg-beige-50 border-beige-400/50 flex shrink-0 flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none',
-        isAdded && 'border-primary/40 bg-primary/5'
+        'bg-beige-50 border-beige-400/50 relative flex shrink-0 flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none',
+        isAdded && 'border-l-primary border-l-4'
       )}
     >
+      {justAdded && (
+        <motion.div
+          aria-hidden="true"
+          className="bg-primary/20 pointer-events-none absolute inset-0 z-10 rounded-2xl"
+          initial={{ opacity: 0.5 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        />
+      )}
       {expanded && images.length > 0 && <ExperienceGallery images={images} alt={experience.name} />}
       <div>
         <div className="flex grow items-center justify-between gap-2">
@@ -55,9 +79,18 @@ export function ExperienceCard({
               {experience.name}
             </span>
             {isAdded && (
-              <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+              <motion.span
+                initial={false}
+                animate={
+                  justAdded
+                    ? { scale: [0.8, 1.12, 1], opacity: [0, 1, 1] }
+                    : { scale: 1, opacity: 1 }
+                }
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="bg-primary/10 text-primary z-20 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+              >
                 <CheckIcon weight="bold" aria-hidden="true" /> Added · {addedDays.join(', ')}
-              </span>
+              </motion.span>
             )}
           </div>
           <Button
