@@ -530,6 +530,122 @@ describe('ui-view-store', () => {
     ]);
   });
 
+  it('applyCommand(sync_itinerary_experiences) merges new entries', () => {
+    store.getState().applyCommand({
+      type: 'sync_itinerary_experiences',
+      correlationId: 'c-sync-1',
+      payload: {
+        experiences: [
+          {
+            experience_id: 'belvedere',
+            name: 'Belvedere',
+            day: 'Day 5',
+            destination: '',
+            passenger_count: 2,
+          },
+        ],
+      },
+    });
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 5' },
+    ]);
+    expect(store.getState().lastCorrelationId).toBe('c-sync-1');
+  });
+
+  it('applyCommand(sync_itinerary_experiences) dedups against existing entries', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-add',
+      payload: { experience_id: 'belvedere', day: 'Day 5', passenger_count: 2 },
+    });
+    store.getState().applyCommand({
+      type: 'sync_itinerary_experiences',
+      correlationId: 'c-sync-2',
+      payload: {
+        experiences: [
+          {
+            experience_id: 'belvedere',
+            day: 'Day 5',
+            name: 'B',
+            destination: '',
+            passenger_count: 2,
+          },
+          {
+            experience_id: 'schonbrunn',
+            day: 'Day 6',
+            name: 'S',
+            destination: '',
+            passenger_count: 2,
+          },
+        ],
+      },
+    });
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'belvedere', day: 'Day 5' },
+      { experienceId: 'schonbrunn', day: 'Day 6' },
+    ]);
+  });
+
+  it('applyCommand(sync_itinerary_experiences) does not remove entries absent from the payload', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-add',
+      payload: { experience_id: 'keepme', day: 'Day 1', passenger_count: 2 },
+    });
+    store.getState().applyCommand({
+      type: 'sync_itinerary_experiences',
+      correlationId: 'c-sync-3',
+      payload: {
+        experiences: [
+          { experience_id: 'other', day: 'Day 2', name: 'O', destination: '', passenger_count: 2 },
+        ],
+      },
+    });
+    expect(store.getState().addedExperiences).toEqual([
+      { experienceId: 'keepme', day: 'Day 1' },
+      { experienceId: 'other', day: 'Day 2' },
+    ]);
+  });
+
+  it('applyCommand(sync_itinerary_experiences) with an empty array is a no-op', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'c-add',
+      payload: { experience_id: 'keepme', day: 'Day 1', passenger_count: 2 },
+    });
+    store.getState().applyCommand({
+      type: 'sync_itinerary_experiences',
+      correlationId: 'c-empty',
+      payload: { experiences: [] },
+    });
+    expect(store.getState().addedExperiences).toEqual([{ experienceId: 'keepme', day: 'Day 1' }]);
+  });
+
+  it('clearAddedExperiencesFromDev empties addedExperiences and marks source dev', () => {
+    const store = createUiViewStore();
+    store.getState().applyCommand({
+      type: 'sync_itinerary_experiences',
+      payload: {
+        experiences: [
+          {
+            experience_id: 'signature_vienna_belvedere_palace',
+            name: 'X',
+            day: 'Day 5',
+            destination: '',
+            passenger_count: 2,
+          },
+        ],
+      },
+      correlationId: 'c1',
+    });
+    expect(store.getState().addedExperiences).toHaveLength(1);
+
+    store.getState().clearAddedExperiencesFromDev();
+
+    expect(store.getState().addedExperiences).toEqual([]);
+    expect(store.getState().source).toBe('dev');
+  });
+
   it('applyCommand(add_cabin_to_basket) sets selectedCabinId', () => {
     store.getState().applyCommand({
       type: 'add_cabin_to_basket',

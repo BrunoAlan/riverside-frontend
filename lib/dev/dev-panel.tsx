@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import {
+  useApplyCommand,
+  useClearAddedExperiencesFromDev,
   useSetBookingSummaryFromDev,
   useSetViewFromDev,
   useUiLastError,
@@ -12,7 +15,7 @@ import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import { useSetDevChatMessages } from './chat-mock-store';
 import { CHAT_MOCKS } from './chat-mocks';
 import { EventLogList } from './event-log-list';
-import { BOOKING_SUMMARY_MOCKS, VIEW_MOCKS } from './mocks';
+import { BOOKING_SUMMARY_MOCKS, SYNC_EXPERIENCES_MOCKS, VIEW_MOCKS } from './mocks';
 
 const VIEW_TYPES = Object.keys(VIEW_MOCKS) as UiView['type'][];
 const CHAT_DOCK_OPEN_KEY = 'chat:dock:open';
@@ -26,6 +29,8 @@ export function DevPanel() {
   const setViewFromDev = useSetViewFromDev();
   const setBookingSummaryFromDev = useSetBookingSummaryFromDev();
   const setDevChatMessages = useSetDevChatMessages();
+  const applyCommand = useApplyCommand();
+  const clearAddedExperiences = useClearAddedExperiencesFromDev();
 
   const [type, setType] = useState<UiView['type']>(view.type);
   const mocks = VIEW_MOCKS[type];
@@ -33,6 +38,7 @@ export function DevPanel() {
 
   const [summaryMockId, setSummaryMockId] = useState(BOOKING_SUMMARY_MOCKS[0]?.id ?? '');
   const [chatMockId, setChatMockId] = useState(CHAT_MOCKS[0]?.id ?? '');
+  const [syncMockId, setSyncMockId] = useState(SYNC_EXPERIENCES_MOCKS[0]?.id ?? '');
 
   useEffect(() => {
     setType(view.type);
@@ -58,6 +64,24 @@ export function DevPanel() {
     try {
       window.sessionStorage.setItem(CHAT_DOCK_OPEN_KEY, JSON.stringify(true));
     } catch {}
+  };
+
+  const applyExperiences = () => {
+    const chosen =
+      SYNC_EXPERIENCES_MOCKS.find((m) => m.id === syncMockId) ?? SYNC_EXPERIENCES_MOCKS[0];
+    if (chosen) applyCommand(chosen.command);
+  };
+
+  // Clear then re-apply so the card replays its add animation. flushSync forces
+  // the cleared (isAdded=false) render to commit before re-applying, so the card
+  // sees a real false→true flip and plays the pop/pulse. Without it, both updates
+  // batch into one render and nothing animates.
+  const replayExperiences = () => {
+    const chosen =
+      SYNC_EXPERIENCES_MOCKS.find((m) => m.id === syncMockId) ?? SYNC_EXPERIENCES_MOCKS[0];
+    if (!chosen) return;
+    flushSync(() => clearAddedExperiences());
+    applyCommand(chosen.command);
   };
 
   const reset = () => {
@@ -200,6 +224,45 @@ export function DevPanel() {
               >
                 Apply chat
               </button>
+
+              <div className="mt-2 border-t border-white/20 pt-2">itinerary experiences</div>
+              <label className="block">
+                mock
+                <select
+                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                  value={syncMockId}
+                  onChange={(e) => setSyncMockId(e.target.value)}
+                >
+                  {SYNC_EXPERIENCES_MOCKS.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={applyExperiences}
+                  className="flex-1 rounded bg-white text-black"
+                >
+                  Apply experiences
+                </button>
+                <button
+                  type="button"
+                  onClick={replayExperiences}
+                  className="rounded bg-white/20 px-2 text-white"
+                >
+                  Replay
+                </button>
+                <button
+                  type="button"
+                  onClick={clearAddedExperiences}
+                  className="rounded bg-white/20 px-2 text-white"
+                >
+                  Clear
+                </button>
+              </div>
 
               {lastError && (
                 <div className="rounded bg-red-900/60 p-1">last error: {lastError.message}</div>

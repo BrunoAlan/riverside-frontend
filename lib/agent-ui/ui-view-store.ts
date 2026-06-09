@@ -19,6 +19,7 @@ interface UiViewState {
   setViewFromUser: (view: UiView) => void;
   setBookingSummaryFromDev: (summary: BookingSummary | null) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
+  clearAddedExperiencesFromDev: () => void;
 }
 
 const INITIAL_VIEW: UiView = { type: 'start' };
@@ -145,6 +146,20 @@ export function createUiViewStore() {
                     lastCorrelationId: cmd.correlationId,
                   };
                 }
+                case 'sync_itinerary_experiences': {
+                  const next = [...state.addedExperiences];
+                  for (const e of cmd.payload.experiences) {
+                    const exists = next.some(
+                      (a) => a.experienceId === e.experience_id && a.day === e.day
+                    );
+                    if (!exists) next.push({ experienceId: e.experience_id, day: e.day });
+                  }
+                  return {
+                    addedExperiences: next,
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                }
                 default: {
                   const _exhaustive: never = cmd;
                   void _exhaustive;
@@ -178,6 +193,13 @@ export function createUiViewStore() {
           ),
 
         recordParseError: (err) => set({ lastError: err }, false, 'recordParseError'),
+
+        clearAddedExperiencesFromDev: () =>
+          set(
+            { addedExperiences: [], source: 'dev', lastCorrelationId: null },
+            false,
+            'clearAddedExperiencesFromDev'
+          ),
       }),
       { name: 'ui-view-store', enabled: DEVTOOLS_ENABLED }
     )

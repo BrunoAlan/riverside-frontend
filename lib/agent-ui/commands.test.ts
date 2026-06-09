@@ -760,4 +760,48 @@ describe('show_cabin_options', () => {
     });
     expect(out.success).toBe(false);
   });
+
+  it('parses sync_itinerary_experiences with a list of experiences', () => {
+    const result = UiCommand.parse({
+      type: 'sync_itinerary_experiences',
+      correlationId: '33154a65-61ab-4519-989d-ca9e2c07336a',
+      payload: {
+        experiences: [
+          {
+            experience_id: 'signature_vienna_belvedere_palace',
+            name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+            day: 'Day 5',
+            destination: '',
+            passenger_count: 2,
+          },
+        ],
+      },
+    });
+    if (result.type !== 'sync_itinerary_experiences') throw new Error('discriminator failed');
+    expect(result.payload.experiences).toHaveLength(1);
+    expect(result.payload.experiences[0].experience_id).toBe('signature_vienna_belvedere_palace');
+    expect(result.payload.experiences[0].day).toBe('Day 5');
+  });
+
+  it('rejects sync_itinerary_experiences with a non-numeric passenger_count', () => {
+    const parsed = UiCommand.safeParse({
+      type: 'sync_itinerary_experiences',
+      correlationId: 'c1',
+      payload: {
+        experiences: [
+          { experience_id: 'x', name: 'X', day: 'Day 1', destination: '', passenger_count: 'two' },
+        ],
+      },
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it('rejects sync_itinerary_experiences when experiences is not an array', () => {
+    const parsed = UiCommand.safeParse({
+      type: 'sync_itinerary_experiences',
+      correlationId: 'c1',
+      payload: { experiences: 'nope' },
+    });
+    expect(parsed.success).toBe(false);
+  });
 });
