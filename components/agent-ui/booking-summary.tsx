@@ -123,7 +123,7 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
           variant="secondary"
           size="sm"
           className="gap-2"
-          onClick={() => sendIntent('view_itinerary_summary')}
+          onClick={() => void sendIntent('view_itinerary_summary')}
         >
           <Maximize2 className="size-3.5" />
           Itinerary Summary
