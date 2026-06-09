@@ -1,4 +1,4 @@
-import type { Cabin } from '@/lib/agent-ui/commands';
+import type { Cabin, UiCommand } from '@/lib/agent-ui/commands';
 import type {
   BookingSummary,
   PackageCell,
@@ -511,5 +511,52 @@ export const BOOKING_SUMMARY_MOCKS: readonly BookingSummaryMock[] = [
       ],
       cta: { label: 'Continue to booking', enabled: true },
     },
+  },
+];
+
+export interface SyncExperiencesMock {
+  id: string;
+  label: string;
+  command: Extract<UiCommand, { type: 'sync_itinerary_experiences' }>;
+}
+
+const syncCommand = (
+  id: string,
+  experiences: Array<{ experience_id: string; name: string; day: string }>
+): SyncExperiencesMock['command'] => ({
+  type: 'sync_itinerary_experiences',
+  correlationId: `dev-${id}`,
+  payload: {
+    experiences: experiences.map((e) => ({ ...e, destination: '', passenger_count: 2 })),
+  },
+});
+
+export const SYNC_EXPERIENCES_MOCKS: readonly SyncExperiencesMock[] = [
+  {
+    id: 'belvedere',
+    label: 'Belvedere · Day 5',
+    command: syncCommand('belvedere', [
+      {
+        experience_id: 'signature_vienna_belvedere_palace',
+        name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+        day: 'Day 5',
+      },
+    ]),
+  },
+  {
+    id: 'belvedere_wenckheim',
+    label: 'Belvedere · Day 5 + Wenckheim · Day 2',
+    command: syncCommand('belvedere_wenckheim', [
+      {
+        experience_id: 'signature_vienna_belvedere_palace',
+        name: 'Signature Vienna: VIP Evening at Belvedere Palace',
+        day: 'Day 5',
+      },
+      {
+        experience_id: 'signature_budapest_wenckheim_palace',
+        name: 'Signature Budapest: Private Concert at Wenckheim Palace',
+        day: 'Day 2',
+      },
+    ]),
   },
 ];
