@@ -38,14 +38,14 @@ export function RouteLayer({ map, cities }: RouteLayerProps) {
       id: LINE_LAYER_ID,
       type: 'line',
       source: SOURCE_ID,
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      layout: { 'line-cap': 'square', 'line-join': 'miter' },
       paint: {
         'line-color': ROUTE_COLOR,
-        'line-width': 5,
-        'line-opacity': 0.7,
+        'line-width': 3,
+        'line-opacity': 1,
         // Round dots: a zero-length dash with the round line-cap renders each
         // segment as a dot; the gap is in line-width multiples.
-        'line-dasharray': [0, 2],
+        'line-dasharray': [2, 2],
       },
     });
 
