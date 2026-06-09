@@ -9,31 +9,33 @@ export type SummaryItineraryCity = {
 };
 
 export type ItinerarySummaryDetails = {
-  guests: string; // "2 people"
-  month: string; // "September"
-  embarkation: string; // "Vienna"
-  stops: string; // "Budapest +3"
-  dates: string; // "20 – 27 Sep 2026"
-  pricePerPerson: string; // "€ 9,174 p.p."
-  cabinName: string; // "Owner's Suite"
+  guests: string | null;
+  month: string | null;
+  embarkation: string | null;
+  stops: string | null;
+  dates: string | null;
+  pricePerPerson: string | null;
+  cabinName: string | null;
 };
 
 export type ItinerarySummaryPackage = {
-  pricePerPerson: string; // "€ 9,174 p.p."
-  name: string; // "Premium All Inclusive Including Excursions"
+  pricePerPerson: string | null;
+  name: string | null;
   inclusions: string[];
 };
 
+export type ItinerarySummaryItinerary = {
+  title: string | null;
+  countries: string[];
+  description: string | null;
+  cities: SummaryItineraryCity[];
+};
+
 export type ItinerarySummary = {
-  header: { title: string; subtitle: string; image: string };
+  header: { title: string | null; subtitle: string | null; image: string | null };
   details: ItinerarySummaryDetails;
-  cabin: Cabin;
-  package: ItinerarySummaryPackage;
-  itinerary: {
-    title: string; // "Vienna – Vienna"
-    countries: string[]; // ["Austria", "Hungary", "Slovakia"]
-    description: string;
-    cities: SummaryItineraryCity[];
-  };
-  total: string; // "€ 27,240"
+  cabin: Cabin | null;
+  package: ItinerarySummaryPackage | null;
+  itinerary: ItinerarySummaryItinerary | null;
+  total: string | null;
 };
