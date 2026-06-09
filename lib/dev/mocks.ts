@@ -6,6 +6,8 @@ import type {
   PackageOption,
   UiView,
 } from '@/lib/agent-ui/ui-view-types';
+import { ITINERARY_SUMMARY_MOCK } from '@/lib/itinerary-summary/mock';
+import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 
 export interface ViewMock {
   id: string;
@@ -512,6 +514,35 @@ export const BOOKING_SUMMARY_MOCKS: readonly BookingSummaryMock[] = [
       cta: { label: 'Continue to booking', enabled: true },
     },
   },
+];
+
+export interface ItinerarySummaryMock {
+  id: string;
+  label: string;
+  summary: ItinerarySummary | null;
+}
+
+const EMPTY_ITINERARY_SUMMARY: ItinerarySummary = {
+  header: { title: 'Your itinerary', subtitle: null, image: null },
+  details: {
+    guests: null,
+    month: null,
+    embarkation: null,
+    stops: null,
+    dates: null,
+    pricePerPerson: null,
+    cabinName: null,
+  },
+  cabin: null,
+  package: null,
+  itinerary: null,
+  total: null,
+};
+
+export const ITINERARY_SUMMARY_MOCKS: readonly ItinerarySummaryMock[] = [
+  { id: 'clear', label: 'Closed (null)', summary: null },
+  { id: 'empty', label: 'All placeholders', summary: EMPTY_ITINERARY_SUMMARY },
+  { id: 'full', label: 'Full', summary: ITINERARY_SUMMARY_MOCK },
 ];
 
 export interface SyncExperiencesMock {

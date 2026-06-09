@@ -6,6 +6,7 @@ import {
   useApplyCommand,
   useClearAddedExperiencesFromDev,
   useSetBookingSummaryFromDev,
+  useSetItinerarySummaryFromDev,
   useSetViewFromDev,
   useUiLastError,
   useUiSource,
@@ -15,7 +16,12 @@ import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import { useSetDevChatMessages } from './chat-mock-store';
 import { CHAT_MOCKS } from './chat-mocks';
 import { EventLogList } from './event-log-list';
-import { BOOKING_SUMMARY_MOCKS, SYNC_EXPERIENCES_MOCKS, VIEW_MOCKS } from './mocks';
+import {
+  BOOKING_SUMMARY_MOCKS,
+  ITINERARY_SUMMARY_MOCKS,
+  SYNC_EXPERIENCES_MOCKS,
+  VIEW_MOCKS,
+} from './mocks';
 
 const VIEW_TYPES = Object.keys(VIEW_MOCKS) as UiView['type'][];
 const CHAT_DOCK_OPEN_KEY = 'chat:dock:open';
@@ -28,6 +34,7 @@ export function DevPanel() {
   const lastError = useUiLastError();
   const setViewFromDev = useSetViewFromDev();
   const setBookingSummaryFromDev = useSetBookingSummaryFromDev();
+  const setItinerarySummaryFromDev = useSetItinerarySummaryFromDev();
   const setDevChatMessages = useSetDevChatMessages();
   const applyCommand = useApplyCommand();
   const clearAddedExperiences = useClearAddedExperiencesFromDev();
@@ -37,6 +44,9 @@ export function DevPanel() {
   const [mockId, setMockId] = useState(mocks[0]?.id ?? '');
 
   const [summaryMockId, setSummaryMockId] = useState(BOOKING_SUMMARY_MOCKS[0]?.id ?? '');
+  const [itinerarySummaryMockId, setItinerarySummaryMockId] = useState(
+    ITINERARY_SUMMARY_MOCKS[0]?.id ?? ''
+  );
   const [chatMockId, setChatMockId] = useState(CHAT_MOCKS[0]?.id ?? '');
   const [syncMockId, setSyncMockId] = useState(SYNC_EXPERIENCES_MOCKS[0]?.id ?? '');
 
@@ -54,6 +64,13 @@ export function DevPanel() {
     const chosen =
       BOOKING_SUMMARY_MOCKS.find((m) => m.id === summaryMockId) ?? BOOKING_SUMMARY_MOCKS[0];
     if (chosen) setBookingSummaryFromDev(chosen.summary);
+  };
+
+  const applyItinerarySummary = () => {
+    const chosen =
+      ITINERARY_SUMMARY_MOCKS.find((m) => m.id === itinerarySummaryMockId) ??
+      ITINERARY_SUMMARY_MOCKS[0];
+    if (chosen) setItinerarySummaryFromDev(chosen.summary);
   };
 
   const applyChat = () => {
@@ -197,6 +214,29 @@ export function DevPanel() {
               <button
                 type="button"
                 onClick={applySummary}
+                className="w-full rounded bg-white text-black"
+              >
+                Apply summary
+              </button>
+
+              <div className="mt-2 border-t border-white/20 pt-2">itinerary summary</div>
+              <label className="block">
+                mock
+                <select
+                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                  value={itinerarySummaryMockId}
+                  onChange={(e) => setItinerarySummaryMockId(e.target.value)}
+                >
+                  {ITINERARY_SUMMARY_MOCKS.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                onClick={applyItinerarySummary}
                 className="w-full rounded bg-white text-black"
               >
                 Apply summary
