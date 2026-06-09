@@ -607,6 +607,31 @@ describe('ui-view-store', () => {
     ]);
   });
 
+  it('clearAddedExperiencesFromDev empties addedExperiences and marks source dev', () => {
+    const store = createUiViewStore();
+    store.getState().applyCommand({
+      type: 'sync_itinerary_experiences',
+      payload: {
+        experiences: [
+          {
+            experience_id: 'signature_vienna_belvedere_palace',
+            name: 'X',
+            day: 'Day 5',
+            destination: '',
+            passenger_count: 2,
+          },
+        ],
+      },
+      correlationId: 'c1',
+    });
+    expect(store.getState().addedExperiences).toHaveLength(1);
+
+    store.getState().clearAddedExperiencesFromDev();
+
+    expect(store.getState().addedExperiences).toEqual([]);
+    expect(store.getState().source).toBe('dev');
+  });
+
   it('applyCommand(add_cabin_to_basket) sets selectedCabinId', () => {
     store.getState().applyCommand({
       type: 'add_cabin_to_basket',
