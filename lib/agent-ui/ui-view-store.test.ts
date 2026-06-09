@@ -665,4 +665,61 @@ describe('ui-view-store', () => {
     expect(s.source).toBe('agent');
     expect(s.lastCorrelationId).toBe('c-cab-1');
   });
+
+  it('applyCommand(show_itinerary_summary) fills the slice and leaves view untouched', () => {
+    store.getState().applyCommand({
+      type: 'show_itinerary_summary',
+      correlationId: 'c1',
+      payload: {
+        header: { title: 'Danube', subtitle: null, image: null },
+        details: {
+          guests: '2 people',
+          month: null,
+          embarkation: null,
+          stops: null,
+          dates: null,
+          price_per_person: null,
+          cabin_name: null,
+        },
+        cabin: null,
+        package: null,
+        itinerary: null,
+        total: null,
+      },
+    });
+    const s = store.getState();
+    expect(s.itinerarySummary?.header.title).toBe('Danube');
+    expect(s.itinerarySummary?.details.guests).toBe('2 people');
+    expect(s.itinerarySummary?.cabin).toBeNull();
+    expect(s.view).toEqual({ type: 'start' });
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('c1');
+  });
+
+  it('closeItinerarySummary clears the slice with source user', () => {
+    store.getState().applyCommand({
+      type: 'show_itinerary_summary',
+      correlationId: 'c1',
+      payload: {
+        header: { title: 'Danube', subtitle: null, image: null },
+        details: {
+          guests: null,
+          month: null,
+          embarkation: null,
+          stops: null,
+          dates: null,
+          price_per_person: null,
+          cabin_name: null,
+        },
+        cabin: null,
+        package: null,
+        itinerary: null,
+        total: null,
+      },
+    });
+    store.getState().closeItinerarySummary();
+    const s = store.getState();
+    expect(s.itinerarySummary).toBeNull();
+    expect(s.source).toBe('user');
+  });
 });

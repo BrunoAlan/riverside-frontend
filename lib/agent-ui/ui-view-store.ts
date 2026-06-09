@@ -1,6 +1,8 @@
 import { useStore } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import { toItinerarySummary } from '@/lib/itinerary-summary/from-wire';
+import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 import type { UiCommand } from './commands';
 import type { BookingSummary, UiHint, UiSource, UiView } from './ui-view-types';
 
@@ -13,6 +15,7 @@ interface UiViewState {
   bookingSummary: BookingSummary | null;
   selectedCabinId: string | null;
   addedExperiences: Array<{ experienceId: string; day: string }>;
+  itinerarySummary: ItinerarySummary | null;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
@@ -20,6 +23,8 @@ interface UiViewState {
   setBookingSummaryFromDev: (summary: BookingSummary | null) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
   clearAddedExperiencesFromDev: () => void;
+  setItinerarySummaryFromDev: (summary: ItinerarySummary | null) => void;
+  closeItinerarySummary: () => void;
 }
 
 const INITIAL_VIEW: UiView = { type: 'start' };
@@ -38,6 +43,7 @@ export function createUiViewStore() {
         bookingSummary: null,
         selectedCabinId: null,
         addedExperiences: [],
+        itinerarySummary: null,
 
         applyCommand: (cmd) =>
           set(
@@ -160,6 +166,12 @@ export function createUiViewStore() {
                     lastCorrelationId: cmd.correlationId,
                   };
                 }
+                case 'show_itinerary_summary':
+                  return {
+                    itinerarySummary: toItinerarySummary(cmd.payload),
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
                 default: {
                   const _exhaustive: never = cmd;
                   void _exhaustive;
@@ -199,6 +211,20 @@ export function createUiViewStore() {
             { addedExperiences: [], source: 'dev', lastCorrelationId: null },
             false,
             'clearAddedExperiencesFromDev'
+          ),
+
+        setItinerarySummaryFromDev: (summary) =>
+          set(
+            { itinerarySummary: summary, source: 'dev', lastCorrelationId: null },
+            false,
+            'setItinerarySummaryFromDev'
+          ),
+
+        closeItinerarySummary: () =>
+          set(
+            { itinerarySummary: null, source: 'user', lastCorrelationId: null },
+            false,
+            'closeItinerarySummary'
           ),
       }),
       { name: 'ui-view-store', enabled: DEVTOOLS_ENABLED }
