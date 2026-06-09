@@ -27,9 +27,14 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
   return (
     <div className="bg-beige-200 relative flex h-full w-full flex-col overflow-hidden">
       <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
-        <div className="mx-auto max-w-[1400px] p-6 pt-16">
+        <div className="mx-auto max-w-[1400px] pt-20">
           {/* Back button — visual only, not wired */}
-          <Button type="button" variant="secondary" size="sm" className="mb-10">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="absolute top-8 left-8 mb-10"
+          >
             <CaretLeftIcon weight="bold" aria-hidden="true" /> Back
           </Button>
 
@@ -39,7 +44,7 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
             {packages.map((pkg) => (
               <p
                 key={pkg.id}
-                className="font-display pb-4 text-base leading-tight font-medium text-neutral-700"
+                className="font-display p-4 text-base leading-tight font-medium text-neutral-700"
               >
                 {pkg.name}
               </p>
@@ -63,29 +68,22 @@ export function PanelPackageSelection({ view }: PanelPackageSelectionProps) {
       </div>
 
       {/* Price + Select row — pinned to the bottom, grid mirrors the columns above */}
-      <div className="border-beige-300 shrink-0 border-t">
-        <div className="mx-auto max-w-[1400px] px-6 py-4">
-          <div className="grid items-center gap-x-6" style={{ gridTemplateColumns }}>
-            <div />
-            {packages.map((pkg) => (
-              <div key={pkg.id} className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-display text-2xl leading-none text-neutral-700">
-                    {formatPackagePrice(pkg.price, pkg.currency)}
-                  </p>
-                  <p className="pt-1 text-xs text-neutral-500">per person</p>
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  aria-label={`Select ${pkg.name}`}
-                >
-                  Select
-                </Button>
+      <div className="border-beige-300 mx-auto w-full max-w-[1400px] shrink-0 border-t">
+        <div className="grid items-center gap-x-6" style={{ gridTemplateColumns }}>
+          <div />
+          {packages.map((pkg) => (
+            <div key={pkg.id} className="flex items-center justify-between gap-3 p-4">
+              <div>
+                <p className="font-display text-xl leading-none text-neutral-700">
+                  {formatPackagePrice(pkg.price, pkg.currency)}
+                </p>
+                <p className="pt-1 text-xs text-neutral-500">per person</p>
               </div>
-            ))}
-          </div>
+              <Button type="button" variant="secondary" size="sm" aria-label={`Select ${pkg.name}`}>
+                Select
+              </Button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
