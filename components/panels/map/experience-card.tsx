@@ -36,17 +36,30 @@ export function ExperienceCard({
     }
   }, [expanded]);
 
-  const isAdded = addedDays.includes(selectedDay);
+  const isAdded = addedDays.length > 0;
+  const isSelectedDayAdded = addedDays.includes(selectedDay);
 
   return (
     <Card
       ref={cardRef}
-      className="bg-beige-50 border-beige-400/50 flex shrink-0 flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none"
+      className={cn(
+        'bg-beige-50 border-beige-400/50 flex shrink-0 flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none',
+        isAdded && 'border-primary/40 bg-primary/5'
+      )}
     >
       {expanded && images.length > 0 && <ExperienceGallery images={images} alt={experience.name} />}
       <div>
         <div className="flex grow items-center justify-between gap-2">
-          <div className="text-primary text-base leading-snug font-medium">{experience.name}</div>
+          <div className="flex min-w-0 grow flex-wrap items-center gap-2">
+            <span className="text-primary text-base leading-snug font-medium">
+              {experience.name}
+            </span>
+            {isAdded && (
+              <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+                <CheckIcon weight="bold" aria-hidden="true" /> Added · {addedDays.join(', ')}
+              </span>
+            )}
+          </div>
           <Button
             type="button"
             variant="secondary"
@@ -96,10 +109,10 @@ export function ExperienceCard({
               type="button"
               variant="secondary"
               size="sm"
-              disabled={isAdded || !selectedDay}
+              disabled={isSelectedDayAdded || !selectedDay}
               onClick={() => onConfirm(selectedDay)}
             >
-              {isAdded ? (
+              {isSelectedDayAdded ? (
                 <>
                   <CheckIcon weight="bold" /> Added
                 </>
