@@ -41,62 +41,77 @@ the existing booking summary bar slice.
 
 ## Schema (`lib/agent-ui/commands.ts`)
 
+The wire payload is **snake_case** (like every other command). The schema below
+parses snake_case; the reducer maps it to the internal camelCase
+`ItinerarySummary` type that the modal sub-components consume.
+
 Promote the `ItinerarySummary` shape (today a plain `type` in
 `lib/itinerary-summary/types.ts`) into a Zod schema, reusing the existing
 `Cabin` schema:
 
+**Everything is nullable** — the modal can open with a partial booking (no cabin
+/ package / itinerary chosen yet). Every leaf field and every section is
+`.nullable()`; the reducer maps `null` straight through and each modal
+sub-component renders a placeholder.
+
 ```ts
-export const ItinerarySummary = z.object({
-  header: z.object({ title: z.string(), subtitle: z.string(), image: z.string() }),
+const nstr = z.string().nullable();
+
+export const ItinerarySummaryWire = z.object({
+  header: z.object({ title: nstr, subtitle: nstr, image: nstr }),
   details: z.object({
-    guests: z.string(),
-    month: z.string(),
-    embarkation: z.string(),
-    stops: z.string(),
-    dates: z.string(),
-    pricePerPerson: z.string(),
-    cabinName: z.string(),
+    guests: nstr,
+    month: nstr,
+    embarkation: nstr,
+    stops: nstr,
+    dates: nstr,
+    price_per_person: nstr,
+    cabin_name: nstr,
   }),
-  cabin: Cabin,
-  package: z.object({
-    pricePerPerson: z.string(),
-    name: z.string(),
-    inclusions: z.array(z.string()),
-  }),
-  itinerary: z.object({
-    title: z.string(),
-    countries: z.array(z.string()),
-    description: z.string(),
-    cities: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        country: z.string(),
-        days: z.string(),
-        image: z.string(),
-      })
-    ),
-  }),
-  total: z.string(),
+  cabin: Cabin.nullable(),
+  package: z
+    .object({
+      price_per_person: nstr,
+      name: nstr,
+      inclusions: z.array(z.string()),
+    })
+    .nullable(),
+  itinerary: z
+    .object({
+      title: nstr,
+      countries: z.array(z.string()),
+      description: nstr,
+      cities: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          country: z.string(),
+          days: z.string(),
+          image: z.string(),
+        })
+      ),
+    })
+    .nullable(),
+  total: nstr,
 });
-export type ItinerarySummary = z.infer<typeof ItinerarySummary>;
+export type ItinerarySummaryWire = z.infer<typeof ItinerarySummaryWire>;
 
 const ShowItinerarySummary = Base.extend({
   type: z.literal('show_itinerary_summary'),
-  payload: ItinerarySummary,
+  payload: ItinerarySummaryWire,
 });
 ```
 
 Add `ShowItinerarySummary` to the `UiCommand` discriminated union.
 
-`lib/itinerary-summary/types.ts` re-exports the inferred type (or is replaced by
-the import) so existing modal components keep their `ItinerarySummary` type. The
-field names stay camelCase to match the existing internal type and the modal's
-consumers — this command's payload is internal-shaped, like `ui-view-types`.
-
-> Note: payload fields here are camelCase (not the usual snake_case) because the
-> modal sub-components already consume this exact camelCase shape. Confirm with
-> backend that they emit camelCase for this payload.
+The schema's inferred type is the **wire** type (snake_case, fully nullable). The
+reducer maps it to the internal camelCase `ItinerarySummary` in
+`lib/itinerary-summary/types.ts`. That internal type must also become nullable
+(every section/field `T | null`), and the modal sub-components
+(`SummaryCabinCard`, `SummaryPackageCard`, `SummaryItineraryColumn`,
+`SummaryDetailsRow`, `SummaryHeader`, `SummaryFooterBar`) must each render a
+**placeholder** for their `null` inputs. The snake→camel boundary lives in the
+reducer, per repo convention.
 
 ## Store (`lib/agent-ui/ui-view-store.ts`)
 
@@ -106,12 +121,15 @@ consumers — this command's payload is internal-shaped, like `ui-view-types`.
   ```ts
   case 'show_itinerary_summary':
     return {
-      itinerarySummary: cmd.payload,
+      itinerarySummary: toItinerarySummary(cmd.payload), // snake → camel mapper
       source: 'agent',
       lastCorrelationId: cmd.correlationId,
     };
   ```
-  (Does not touch `view` — the modal is an overlay.)
+  (Does not touch `view` — the modal is an overlay.) The `toItinerarySummary`
+  mapper lives next to the type in `lib/itinerary-summary/`, renames
+  `price_per_person`→`pricePerPerson` / `cabin_name`→`cabinName`, and passes
+  `null` sections/fields through unchanged; the rest of the fields are identical.
 - New local setter for close + dev:
   ```ts
   setItinerarySummaryFromDev: (s: ItinerarySummary | null) => void; // dev panel
@@ -140,18 +158,36 @@ Hooks in `lib/agent-ui/hooks.ts`:
   )}
   ```
 
-The modal mounts only when data is present; closing clears the slice locally.
+The modal mounts only when the slice is non-null; closing clears it locally.
+Note: a non-null slice with all-`null` sections is still "open" — presence of the
+slice (not its contents) drives open/closed.
+
+## Placeholders (partial bookings)
+
+Every modal sub-component must tolerate `null` and render a placeholder, since
+the booking can be half-built:
+
+- `SummaryHeader` — null title → generic/empty; null image → fallback image.
+- `SummaryDetailsRow` — each null field → muted "—".
+- `SummaryCabinCard` — null cabin → "Aún no seleccionaste tu cabina" card.
+- `SummaryPackageCard` — null package → "Aún no seleccionaste tu paquete" card.
+- `SummaryItineraryColumn` — null itinerary → "Itinerario aún sin definir".
+- `SummaryFooterBar` — null total → muted "—".
+
+Exact copy is the front's call; the wire only sends `null`.
 
 ## Dev panel + mock
 
 - Keep `ITINERARY_SUMMARY_MOCK` but reuse it as the dev payload.
-- Add an `ITINERARY_SUMMARY_MOCKS` list + a dev-panel control that calls
+- Add an `ITINERARY_SUMMARY_MOCKS` list (a "full" entry + an "empty / partial"
+  entry with all sections `null`) + a dev-panel control that calls
   `setItinerarySummaryFromDev`, mirroring the existing booking summary control in
   `lib/dev/dev-panel.tsx`.
 
 ## Tests
 
-- `lib/agent-ui/commands.test.ts`: `show_itinerary_summary` valid / invalid payload.
+- `lib/agent-ui/commands.test.ts`: `show_itinerary_summary` valid (full + all-null
+  payload) / invalid payload.
 - `lib/agent-ui/ui-view-store.test.ts`: command fills slice; `closeItinerarySummary`
   clears it with source `user`; command leaves `view` untouched.
 
