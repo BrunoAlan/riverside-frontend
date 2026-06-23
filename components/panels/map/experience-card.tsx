@@ -59,9 +59,21 @@ export function ExperienceCard({
       ref={cardRef}
       className={cn(
         'bg-beige-50 border-beige-400/50 relative flex shrink-0 flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none',
-        isAdded && 'border-l-primary border-l-4'
+        isAdded && 'border-primary/40 border-2 pt-7'
       )}
     >
+      {isAdded && (
+        <motion.span
+          initial={false}
+          animate={
+            justAdded ? { scale: [0.8, 1.12, 1], opacity: [0, 1, 1] } : { scale: 1, opacity: 1 }
+          }
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="bg-primary/40 text-primary absolute top-0 right-0 left-0 z-20 inline-flex items-center justify-center gap-1 rounded-none rounded-b-none px-2 py-0.5 text-xs font-medium"
+        >
+          <CheckIcon weight="bold" aria-hidden="true" /> Added · {addedDays.join(', ')}
+        </motion.span>
+      )}
       {justAdded && (
         <motion.div
           aria-hidden="true"
@@ -78,20 +90,6 @@ export function ExperienceCard({
             <span className="text-primary text-base leading-snug font-medium">
               {experience.name}
             </span>
-            {isAdded && (
-              <motion.span
-                initial={false}
-                animate={
-                  justAdded
-                    ? { scale: [0.8, 1.12, 1], opacity: [0, 1, 1] }
-                    : { scale: 1, opacity: 1 }
-                }
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="bg-primary/10 text-primary z-20 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
-              >
-                <CheckIcon weight="bold" aria-hidden="true" /> Added · {addedDays.join(', ')}
-              </motion.span>
-            )}
           </div>
           <Button
             type="button"

@@ -12,12 +12,7 @@ type CabinCardProps = {
 };
 
 export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProps) {
-  const info = [
-    `${cabin.guests} guests`,
-    `${cabin.area}m²`,
-    `from ${formatCabinPrice(cabin.price_from)} EUR`,
-    cabin.view,
-  ];
+  const info = [`${cabin.guests} guests`, `${cabin.area}m²`, cabin.view];
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-1.5">
@@ -29,9 +24,7 @@ export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProp
         className="h-[200px] min-h-0 w-full flex-1 rounded-2xl object-cover lg:h-auto"
       />
       <div className="flex items-start justify-between gap-2 pt-2">
-        <p className="font-display text-2xl leading-tight font-semibold text-neutral-700">
-          {cabin.name}
-        </p>
+        <p className="font-display text-2xl leading-tight">{cabin.name}</p>
         {interactive && (
           <Button
             type="button"
@@ -44,7 +37,13 @@ export function CabinCard({ cabin, interactive = true, onExpand }: CabinCardProp
           </Button>
         )}
       </div>
-      <PipeSeparatedList items={info} className="gap-x-3 gap-y-1" />
+      <div className="flex items-center justify-between">
+        <PipeSeparatedList items={info} className="gap-x-3 gap-y-1" />
+        <div className="flex items-center gap-2">
+          <div className="text-sm">From</div>
+          <div className="text-lg font-semibold">${formatCabinPrice(cabin.price_from)} EUR</div>
+        </div>
+      </div>
     </div>
   );
 }

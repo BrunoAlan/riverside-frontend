@@ -36,7 +36,7 @@ export function CabinDetailModal({ cabin, onClose, onSelect, selected }: CabinDe
           <div className="flex flex-col lg:w-[400px] lg:shrink-0 lg:overflow-y-auto">
             <div className="from-beige-200 sticky top-0 bg-gradient-to-b from-80% p-6 pt-0">
               <div className="flex items-start justify-between gap-4">
-                <DialogPrimitive.Title className="font-display text-3xl leading-tight font-semibold text-neutral-700">
+                <DialogPrimitive.Title className="font-display text-3xl leading-tight">
                   {cabin.name}
                 </DialogPrimitive.Title>
                 <DialogPrimitive.Close
@@ -64,7 +64,12 @@ export function CabinDetailModal({ cabin, onClose, onSelect, selected }: CabinDe
                 <div className="text-sm">From</div>
                 <div className="text-lg font-bold">${formatCabinPrice(cabin.price_from)} EUR</div>
               </div>
-              <Button type="button" disabled={selected} onClick={() => onSelect(cabin)}>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={selected}
+                onClick={() => onSelect(cabin)}
+              >
                 {selected ? (
                   <>
                     <CheckIcon weight="bold" /> Selected

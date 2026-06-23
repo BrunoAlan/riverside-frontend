@@ -15,7 +15,7 @@ export function PipeSeparatedList({
     <div className={cn('text-muted-foreground flex flex-wrap items-center text-sm', className)}>
       {items.map((item, i) => (
         <Fragment key={item}>
-          {i > 0 && <span className="bg-accent h-3 w-px" aria-hidden />}
+          {i > 0 && <span className="h-3 w-px bg-gray-300" aria-hidden />}
           <span>{item}</span>
         </Fragment>
       ))}
