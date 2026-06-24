@@ -4,8 +4,19 @@ import { DetailSection } from '@/components/panels/cabin/cabin-detail-section';
 import { PipeSeparatedList } from '@/components/shared/pipe-separated-list';
 import type { Cabin } from '@/lib/agent-ui/commands';
 import { formatCabinPrice } from '@/lib/cabins';
+import { SUMMARY_PLACEHOLDER } from '@/lib/itinerary-summary/copy';
 
-export function SummaryCabinCard({ cabin }: { cabin: Cabin }) {
+export function SummaryPlaceholderCard({ label }: { label: string }) {
+  return (
+    <div className="bg-beige-200 text-muted-foreground flex min-h-40 items-center justify-center rounded-2xl p-6 text-sm">
+      {label}
+    </div>
+  );
+}
+
+export function SummaryCabinCard({ cabin }: { cabin: Cabin | null }) {
+  if (!cabin) return <SummaryPlaceholderCard label={SUMMARY_PLACEHOLDER.cabin} />;
+
   const meta = [
     `${cabin.guests} guests`,
     `${cabin.area}m²`,

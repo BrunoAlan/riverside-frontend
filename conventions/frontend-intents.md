@@ -80,6 +80,19 @@ El usuario selecciona una cabina ("add to cart"). Reemplaza la selección previa
 - **entities:** `{ cabin_id: string }`
 - **vuelve:** `add_cabin_to_basket` + `show_basket_summary`
 
+### Itinerary summary
+
+Fuente: [`components/agent-ui/booking-summary.tsx`](../components/agent-ui/booking-summary.tsx).
+
+#### 8. `view_itinerary_summary`
+
+El usuario abre el modal de resumen del itinerario (botón "Itinerary Summary").
+
+- **entities:** _(ninguna)_
+- **vuelve:** `show_itinerary_summary`
+
+> El cierre del modal es puramente local (no emite intent).
+
 ## Ejemplo completo
 
 ```json
@@ -97,12 +110,13 @@ El usuario selecciona una cabina ("add to cart"). Reemplaza la selección previa
 
 ## Tabla resumen
 
-| `intent`               | entities                 | Disparo (acción del usuario)            | Comando que vuelve                                 |
-| ---------------------- | ------------------------ | --------------------------------------- | -------------------------------------------------- |
-| `explore_destination`  | `{ destination_id }`     | Abrir detalle de ciudad                 | `show_city_detail` / `show_destination_detail`     |
-| `view_itinerary`       | `{ itinerary_name? }`    | Cerrar detalle de ciudad                | —                                                  |
-| `explore_experience`   | `{ experience_id }`      | **Expandir** tarjeta de experience      | `show_experience_detail`                           |
-| `select_experience`    | `{ experience_id, day }` | **Confirm** en la tarjeta (add to cart) | `add_experience_to_basket` + `show_basket_summary` |
-| `explore_cabin`        | `{ cabin_id }`           | Abrir detalle de cabina                 | `show_cabin_detail`                                |
-| `view_cabin_selection` | _(ninguna)_              | Cerrar detalle de cabina                | —                                                  |
-| `select_cabin`         | `{ cabin_id }`           | Seleccionar cabina (add to cart)        | `add_cabin_to_basket` + `show_basket_summary`      |
+| `intent`                 | entities                 | Disparo (acción del usuario)            | Comando que vuelve                                 |
+| ------------------------ | ------------------------ | --------------------------------------- | -------------------------------------------------- |
+| `explore_destination`    | `{ destination_id }`     | Abrir detalle de ciudad                 | `show_city_detail` / `show_destination_detail`     |
+| `view_itinerary`         | `{ itinerary_name? }`    | Cerrar detalle de ciudad                | —                                                  |
+| `explore_experience`     | `{ experience_id }`      | **Expandir** tarjeta de experience      | `show_experience_detail`                           |
+| `select_experience`      | `{ experience_id, day }` | **Confirm** en la tarjeta (add to cart) | `add_experience_to_basket` + `show_basket_summary` |
+| `explore_cabin`          | `{ cabin_id }`           | Abrir detalle de cabina                 | `show_cabin_detail`                                |
+| `view_cabin_selection`   | _(ninguna)_              | Cerrar detalle de cabina                | —                                                  |
+| `select_cabin`           | `{ cabin_id }`           | Seleccionar cabina (add to cart)        | `add_cabin_to_basket` + `show_basket_summary`      |
+| `view_itinerary_summary` | _(ninguna)_              | Abrir modal Itinerary Summary           | `show_itinerary_summary`                           |

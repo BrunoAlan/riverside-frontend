@@ -152,6 +152,52 @@ const ShowExperienceDetail = Base.extend({
   payload: z.object({ experience_id: z.string().nullable() }),
 });
 
+const nstr = z.string().nullable();
+
+export const ItinerarySummaryWire = z.object({
+  header: z.object({ title: nstr, subtitle: nstr, image: nstr }),
+  details: z.object({
+    guests: nstr,
+    month: nstr,
+    embarkation: nstr,
+    stops: nstr,
+    dates: nstr,
+    price_per_person: nstr,
+    cabin_name: nstr,
+  }),
+  cabin: Cabin.nullable(),
+  package: z
+    .object({
+      price_per_person: nstr,
+      name: nstr,
+      inclusions: z.array(z.string()),
+    })
+    .nullable(),
+  itinerary: z
+    .object({
+      title: nstr,
+      countries: z.array(z.string()),
+      description: nstr,
+      cities: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          country: z.string(),
+          days: z.string(),
+          image: z.string(),
+        })
+      ),
+    })
+    .nullable(),
+  total: nstr,
+});
+export type ItinerarySummaryWire = z.infer<typeof ItinerarySummaryWire>;
+
+const ShowItinerarySummary = Base.extend({
+  type: z.literal('show_itinerary_summary'),
+  payload: ItinerarySummaryWire,
+});
+
 const AddCabinToBasket = Base.extend({
   type: z.literal('add_cabin_to_basket'),
   payload: z.object({
@@ -202,6 +248,7 @@ export const UiCommand = z.discriminatedUnion('type', [
   AddCabinToBasket,
   AddExperienceToBasket,
   SyncItineraryExperiences,
+  ShowItinerarySummary,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
 

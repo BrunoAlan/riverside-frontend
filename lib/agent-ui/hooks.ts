@@ -13,3 +13,7 @@ export const useAddedExperiences = () => useUiViewStore((s) => s.addedExperience
 export const useApplyCommand = () => useUiViewStore((s) => s.applyCommand);
 export const useClearAddedExperiencesFromDev = () =>
   useUiViewStore((s) => s.clearAddedExperiencesFromDev);
+export const useItinerarySummary = () => useUiViewStore((s) => s.itinerarySummary);
+export const useCloseItinerarySummary = () => useUiViewStore((s) => s.closeItinerarySummary);
+export const useSetItinerarySummaryFromDev = () =>
+  useUiViewStore((s) => s.setItinerarySummaryFromDev);
