@@ -14,7 +14,13 @@ export function SummaryPlaceholderCard({ label }: { label: string }) {
   );
 }
 
-export function SummaryCabinCard({ cabin }: { cabin: Cabin | null }) {
+export function SummaryCabinCard({
+  cabin,
+  compact = false,
+}: {
+  cabin: Cabin | null;
+  compact?: boolean;
+}) {
   if (!cabin) return <SummaryPlaceholderCard label={SUMMARY_PLACEHOLDER.cabin} />;
 
   const meta = [
@@ -36,13 +42,15 @@ export function SummaryCabinCard({ cabin }: { cabin: Cabin | null }) {
           </h3>
           <PipeSeparatedList items={meta} className="mt-2 gap-x-3 gap-y-1" />
         </div>
-        <div className="grid gap-x-8 sm:grid-cols-2">
-          <div className="flex flex-col gap-6">
-            <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
-            <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
+        {!compact && (
+          <div className="grid gap-x-8 sm:grid-cols-2">
+            <div className="flex flex-col gap-6">
+              <DetailSection icon={BedIcon} title="Bedroom" items={cabin.detail.bedroom} />
+              <DetailSection icon={BathtubIcon} title="Bathroom" items={cabin.detail.bathroom} />
+            </div>
+            <DetailSection icon={ArmchairIcon} title="Amenities" items={cabin.detail.amenities} />
           </div>
-          <DetailSection icon={ArmchairIcon} title="Amenities" items={cabin.detail.amenities} />
-        </div>
+        )}
       </div>
     </div>
   );
