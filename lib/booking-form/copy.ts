@@ -1,7 +1,7 @@
 // Copy for the booking form (checkout) modal, kept in one place like the
 // itinerary summary's copy.ts.
 export const BOOKING_FORM_COPY = {
-  title: 'Checkout',
+  title: 'Guest information',
   guestBlock: (n: number) => `#${n} Guest information`,
   fields: {
     firstName: 'First name',
