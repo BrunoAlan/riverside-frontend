@@ -11,14 +11,11 @@ import {
   Share,
   Users,
 } from 'lucide-react';
-import { BookingFormModal } from '@/components/panels/booking-form/booking-form-modal';
 import { ItinerarySummaryModal } from '@/components/panels/itinerary-summary/itinerary-summary-modal';
 import { Button } from '@/components/ui/button';
 import { useFrontendIntent } from '@/hooks/use-frontend-intent';
 import {
-  useBookingForm,
   useBookingSummary,
-  useCloseBookingForm,
   useCloseItinerarySummary,
   useItinerarySummary,
   useUiView,
@@ -74,8 +71,6 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
   const sendIntent = useFrontendIntent();
   const itinerarySummary = useItinerarySummary();
   const closeItinerarySummary = useCloseItinerarySummary();
-  const bookingForm = useBookingForm();
-  const closeBookingForm = useCloseBookingForm();
 
   const stopsLabel = summary.stops
     ? summary.stops.extra > 0
@@ -160,16 +155,6 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
             if (!o) closeItinerarySummary();
           }}
           data={itinerarySummary}
-        />
-      )}
-
-      {bookingForm && (
-        <BookingFormModal
-          open
-          onOpenChange={(o) => {
-            if (!o) closeBookingForm();
-          }}
-          data={bookingForm}
         />
       )}
     </div>

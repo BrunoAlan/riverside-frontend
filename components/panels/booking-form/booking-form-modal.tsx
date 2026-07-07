@@ -11,6 +11,7 @@ import { SummaryDetailsRow } from '@/components/panels/itinerary-summary/summary
 import { SummaryHeader } from '@/components/panels/itinerary-summary/summary-header';
 import { SummaryPackageCard } from '@/components/panels/itinerary-summary/summary-package-card';
 import { Button } from '@/components/ui/button';
+import { useBookingForm, useCloseBookingForm } from '@/lib/agent-ui/hooks';
 import { BOOKING_FORM_COPY } from '@/lib/booking-form/copy';
 import { type GuestInfo, makeEmptyGuests } from '@/lib/booking-form/guests';
 import type { BookingForm } from '@/lib/booking-form/types';
@@ -74,5 +75,25 @@ export function BookingFormModal({ open, onOpenChange, data }: BookingFormModalP
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
+  );
+}
+
+// Store-connected mount point. Rendered at the app layout level (not inside the
+// booking summary bar) so the modal opens whenever the bookingForm slice is set,
+// independent of the current view or whether a booking summary exists. The
+// guestCount key re-seeds the guest form when a different mock is applied.
+export function BookingFormModalContainer() {
+  const bookingForm = useBookingForm();
+  const closeBookingForm = useCloseBookingForm();
+  if (!bookingForm) return null;
+  return (
+    <BookingFormModal
+      key={bookingForm.guestCount}
+      open
+      onOpenChange={(o) => {
+        if (!o) closeBookingForm();
+      }}
+      data={bookingForm}
+    />
   );
 }
