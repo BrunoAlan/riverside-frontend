@@ -52,7 +52,7 @@ export function BookingFormModal({ open, onOpenChange, data }: BookingFormModalP
             </DialogPrimitive.Description>
 
             <div className="min-h-0 flex-1 overflow-y-auto">
-              <div className="grid gap-8 px-4 pb-8 sm:px-6 lg:grid-cols-2">
+              <div className="grid gap-8 px-4 pt-4 pb-8 sm:px-6 lg:grid-cols-2">
                 {/* Left: trip recap (reused summary components) */}
                 <div className="flex flex-col gap-6">
                   <SummaryHeader header={summary.header} />
