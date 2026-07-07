@@ -1,12 +1,20 @@
+'use client';
+
 // Radix dialog primitives directly (matching itinerary-summary-modal): the
 // shadcn Dialog wrapper hardcodes a centered max-w-lg panel with a baked-in
 // close button. This modal is a full-viewport takeover with its own chrome.
+import { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { BookingFormTopBar } from '@/components/panels/booking-form/booking-form-top-bar';
+import { CancellationPolicy } from '@/components/panels/booking-form/cancellation-policy';
+import { GuestInfoForm } from '@/components/panels/booking-form/guest-info-form';
 import { SummaryCabinCard } from '@/components/panels/itinerary-summary/summary-cabin-card';
 import { SummaryDetailsRow } from '@/components/panels/itinerary-summary/summary-details-row';
 import { SummaryHeader } from '@/components/panels/itinerary-summary/summary-header';
 import { SummaryPackageCard } from '@/components/panels/itinerary-summary/summary-package-card';
+import { Button } from '@/components/ui/button';
+import { BOOKING_FORM_COPY } from '@/lib/booking-form/copy';
+import { type GuestInfo, makeEmptyGuests } from '@/lib/booking-form/guests';
 import type { BookingForm } from '@/lib/booking-form/types';
 
 type BookingFormModalProps = {
@@ -17,6 +25,16 @@ type BookingFormModalProps = {
 
 export function BookingFormModal({ open, onOpenChange, data }: BookingFormModalProps) {
   const { summary } = data;
+  const [guests, setGuests] = useState<GuestInfo[]>(() => makeEmptyGuests(data.guestCount));
+  const [agreed, setAgreed] = useState(false);
+
+  const updateGuest = (index: number, patch: Partial<GuestInfo>) =>
+    setGuests((prev) => prev.map((g, i) => (i === index ? { ...g, ...patch } : g)));
+
+  const handleSubmit = () => {
+    // Dev-only: no backend submit yet — just surface the collected data.
+    console.log('[booking-form] submit', { guests, agreed });
+  };
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
@@ -44,8 +62,14 @@ export function BookingFormModal({ open, onOpenChange, data }: BookingFormModalP
                   <SummaryPackageCard pkg={summary.package} />
                 </div>
 
-                {/* Right: guest form — added in Task 6 */}
-                <div />
+                {/* Right: guest form */}
+                <div className="flex flex-col gap-8">
+                  <GuestInfoForm guests={guests} onChange={updateGuest} />
+                  <CancellationPolicy agreed={agreed} onAgreedChange={setAgreed} />
+                  <Button className="w-full" disabled={!agreed} onClick={handleSubmit}>
+                    {BOOKING_FORM_COPY.submit}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
