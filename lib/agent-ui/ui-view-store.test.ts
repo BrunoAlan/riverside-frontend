@@ -722,4 +722,40 @@ describe('ui-view-store', () => {
     expect(s.itinerarySummary).toBeNull();
     expect(s.source).toBe('user');
   });
+
+  const SAMPLE_BOOKING_FORM = {
+    summary: {
+      header: { title: 'Danube', subtitle: null, image: null },
+      details: {
+        guests: '2 people',
+        month: null,
+        embarkation: null,
+        stops: null,
+        dates: null,
+        pricePerPerson: null,
+        cabinName: null,
+      },
+      cabin: null,
+      package: null,
+      itinerary: null,
+      total: null,
+    },
+    guestCount: 2,
+  } as const;
+
+  it('setBookingFormFromDev fills the slice with source dev', () => {
+    store.getState().setBookingFormFromDev(SAMPLE_BOOKING_FORM);
+    const s = store.getState();
+    expect(s.bookingForm?.guestCount).toBe(2);
+    expect(s.bookingForm?.summary.header.title).toBe('Danube');
+    expect(s.source).toBe('dev');
+  });
+
+  it('closeBookingForm clears the slice with source user', () => {
+    store.getState().setBookingFormFromDev(SAMPLE_BOOKING_FORM);
+    store.getState().closeBookingForm();
+    const s = store.getState();
+    expect(s.bookingForm).toBeNull();
+    expect(s.source).toBe('user');
+  });
 });

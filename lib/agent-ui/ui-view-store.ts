@@ -1,6 +1,7 @@
 import { useStore } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import type { BookingForm } from '@/lib/booking-form/types';
 import { toItinerarySummary } from '@/lib/itinerary-summary/from-wire';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 import type { UiCommand } from './commands';
@@ -16,6 +17,7 @@ interface UiViewState {
   selectedCabinId: string | null;
   addedExperiences: Array<{ experienceId: string; day: string }>;
   itinerarySummary: ItinerarySummary | null;
+  bookingForm: BookingForm | null;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
@@ -25,6 +27,8 @@ interface UiViewState {
   clearAddedExperiencesFromDev: () => void;
   setItinerarySummaryFromDev: (summary: ItinerarySummary | null) => void;
   closeItinerarySummary: () => void;
+  setBookingFormFromDev: (form: BookingForm | null) => void;
+  closeBookingForm: () => void;
 }
 
 const INITIAL_VIEW: UiView = { type: 'start' };
@@ -44,6 +48,7 @@ export function createUiViewStore() {
         selectedCabinId: null,
         addedExperiences: [],
         itinerarySummary: null,
+        bookingForm: null,
 
         applyCommand: (cmd) =>
           set(
@@ -225,6 +230,20 @@ export function createUiViewStore() {
             { itinerarySummary: null, source: 'user', lastCorrelationId: null },
             false,
             'closeItinerarySummary'
+          ),
+
+        setBookingFormFromDev: (form) =>
+          set(
+            { bookingForm: form, source: 'dev', lastCorrelationId: null },
+            false,
+            'setBookingFormFromDev'
+          ),
+
+        closeBookingForm: () =>
+          set(
+            { bookingForm: null, source: 'user', lastCorrelationId: null },
+            false,
+            'closeBookingForm'
           ),
       }),
       { name: 'ui-view-store', enabled: DEVTOOLS_ENABLED }
