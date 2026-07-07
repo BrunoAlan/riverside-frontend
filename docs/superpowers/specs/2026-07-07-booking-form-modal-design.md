@@ -80,9 +80,14 @@ New folder `lib/booking-form/`:
 - `copy.ts` — booking-specific labels + cancellation-policy copy only.
 
 **Guest form state** lives locally in the modal: an array of
-`{ firstName, lastName, email, countryCode, phone }` sized to `guestCount`,
-plus an `agreed` boolean for the checkbox. Nothing is persisted; `onSubmit`
-only logs.
+`GuestInfo = { firstName, lastName, email, countryCode, phone }` sized to
+`guestCount`, plus an `agreed` boolean for the checkbox. Nothing is persisted;
+`onSubmit` only logs.
+
+The only non-trivial pure logic — building the initial empty guest array from
+`guestCount` — is extracted to `lib/booking-form/guests.ts`
+(`GuestInfo` type + `makeEmptyGuests(count: number): GuestInfo[]`) so it can be
+unit-tested. The component consumes it for its initial `useState`.
 
 ### Store slice
 
@@ -124,13 +129,15 @@ Reused as-is / with a prop: `SummaryHeader`, `SummaryDetailsRow`,
 
 ## Testing
 
-Follow `conventions/testing.md` — tests next to the code:
+Per `conventions/testing.md`, **only `lib/**/*.test.ts` is collected** — React
+components are verified visually via the dev panel, not unit-tested. So:
 
+- `lib/booking-form/guests.test.ts`: `makeEmptyGuests(n)` returns `n` blank
+  guests; `makeEmptyGuests(0)` returns `[]`.
 - `lib/agent-ui/ui-view-store.test.ts`: `setBookingFormFromDev` fills the slice;
   `closeBookingForm` clears it.
-- `components/panels/booking-form/guest-info-form.test.tsx` (or modal test):
-  renders `guestCount` blocks; editing an input updates local state; Submit is
-  disabled until terms checked; Submit logs the collected data.
+- **Everything visual** (N guest blocks, editable inputs, terms-gated Submit,
+  Submit logging) is verified in the dev panel — no component test.
 
 ## Out of scope
 
