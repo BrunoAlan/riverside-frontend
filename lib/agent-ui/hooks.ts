@@ -17,3 +17,6 @@ export const useItinerarySummary = () => useUiViewStore((s) => s.itinerarySummar
 export const useCloseItinerarySummary = () => useUiViewStore((s) => s.closeItinerarySummary);
 export const useSetItinerarySummaryFromDev = () =>
   useUiViewStore((s) => s.setItinerarySummaryFromDev);
+export const useBookingForm = () => useUiViewStore((s) => s.bookingForm);
+export const useSetBookingFormFromDev = () => useUiViewStore((s) => s.setBookingFormFromDev);
+export const useCloseBookingForm = () => useUiViewStore((s) => s.closeBookingForm);

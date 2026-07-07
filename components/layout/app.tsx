@@ -10,6 +10,7 @@ import { AppConfigProvider } from '@/components/layout/app-config-context';
 import { ViewController } from '@/components/layout/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
+import { BookingFormModalContainer } from '@/components/panels/booking-form/booking-form-modal';
 import { useAgentErrors } from '@/hooks/use-agent-errors';
 import { useChatTranscription } from '@/hooks/use-chat-transcription';
 import { useDebugMode } from '@/hooks/use-debug';
@@ -68,6 +69,7 @@ export function App({ appConfig }: AppProps) {
           <BookingSummaryContainer />
           <ChatDockContainer />
         </div>
+        <BookingFormModalContainer />
         <StartAudioButton label="Start Audio" />
         {IN_DEVELOPMENT && <DevPanel />}
       </AgentSessionProvider>
