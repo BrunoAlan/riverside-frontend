@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom';
 import {
   useApplyCommand,
   useClearAddedExperiencesFromDev,
+  useSetBookingFormFromDev,
   useSetBookingSummaryFromDev,
   useSetItinerarySummaryFromDev,
   useSetViewFromDev,
@@ -17,6 +18,7 @@ import { useSetDevChatMessages } from './chat-mock-store';
 import { CHAT_MOCKS } from './chat-mocks';
 import { EventLogList } from './event-log-list';
 import {
+  BOOKING_FORM_MOCKS,
   BOOKING_SUMMARY_MOCKS,
   ITINERARY_SUMMARY_MOCKS,
   SYNC_EXPERIENCES_MOCKS,
@@ -35,6 +37,7 @@ export function DevPanel() {
   const setViewFromDev = useSetViewFromDev();
   const setBookingSummaryFromDev = useSetBookingSummaryFromDev();
   const setItinerarySummaryFromDev = useSetItinerarySummaryFromDev();
+  const setBookingFormFromDev = useSetBookingFormFromDev();
   const setDevChatMessages = useSetDevChatMessages();
   const applyCommand = useApplyCommand();
   const clearAddedExperiences = useClearAddedExperiencesFromDev();
@@ -47,6 +50,7 @@ export function DevPanel() {
   const [itinerarySummaryMockId, setItinerarySummaryMockId] = useState(
     ITINERARY_SUMMARY_MOCKS[0]?.id ?? ''
   );
+  const [bookingFormMockId, setBookingFormMockId] = useState(BOOKING_FORM_MOCKS[0]?.id ?? '');
   const [chatMockId, setChatMockId] = useState(CHAT_MOCKS[0]?.id ?? '');
   const [syncMockId, setSyncMockId] = useState(SYNC_EXPERIENCES_MOCKS[0]?.id ?? '');
 
@@ -71,6 +75,12 @@ export function DevPanel() {
       ITINERARY_SUMMARY_MOCKS.find((m) => m.id === itinerarySummaryMockId) ??
       ITINERARY_SUMMARY_MOCKS[0];
     if (chosen) setItinerarySummaryFromDev(chosen.summary);
+  };
+
+  const applyBookingForm = () => {
+    const chosen =
+      BOOKING_FORM_MOCKS.find((m) => m.id === bookingFormMockId) ?? BOOKING_FORM_MOCKS[0];
+    if (chosen) setBookingFormFromDev(chosen.form);
   };
 
   const applyChat = () => {
@@ -240,6 +250,29 @@ export function DevPanel() {
                 className="w-full rounded bg-white text-black"
               >
                 Apply summary
+              </button>
+
+              <div className="mt-2 border-t border-white/20 pt-2">booking form</div>
+              <label className="block">
+                mock
+                <select
+                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                  value={bookingFormMockId}
+                  onChange={(e) => setBookingFormMockId(e.target.value)}
+                >
+                  {BOOKING_FORM_MOCKS.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                onClick={applyBookingForm}
+                className="w-full rounded bg-white text-black"
+              >
+                Apply booking form
               </button>
 
               <div className="mt-2 border-t border-white/20 pt-2">chat</div>

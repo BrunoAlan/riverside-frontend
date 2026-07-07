@@ -6,6 +6,8 @@ import type {
   PackageOption,
   UiView,
 } from '@/lib/agent-ui/ui-view-types';
+import { BOOKING_FORM_MOCK } from '@/lib/booking-form/mock';
+import type { BookingForm } from '@/lib/booking-form/types';
 import { ITINERARY_SUMMARY_MOCK } from '@/lib/itinerary-summary/mock';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 
@@ -589,5 +591,21 @@ export const SYNC_EXPERIENCES_MOCKS: readonly SyncExperiencesMock[] = [
         day: 'Day 2',
       },
     ]),
+  },
+];
+
+export interface BookingFormMock {
+  id: string;
+  label: string;
+  form: BookingForm | null;
+}
+
+export const BOOKING_FORM_MOCKS: readonly BookingFormMock[] = [
+  { id: 'clear', label: 'Closed (null)', form: null },
+  { id: 'full', label: 'Full (2 guests)', form: BOOKING_FORM_MOCK },
+  {
+    id: 'single_empty',
+    label: '1 guest, empty summary',
+    form: { summary: EMPTY_ITINERARY_SUMMARY, guestCount: 1 },
   },
 ];
