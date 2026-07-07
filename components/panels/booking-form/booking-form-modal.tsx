@@ -1,5 +1,3 @@
-'use client';
-
 // Radix dialog primitives directly (matching itinerary-summary-modal): the
 // shadcn Dialog wrapper hardcodes a centered max-w-lg panel with a baked-in
 // close button. This modal is a full-viewport takeover with its own chrome.
