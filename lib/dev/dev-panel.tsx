@@ -59,6 +59,21 @@ export function DevPanel() {
     setMockId(VIEW_MOCKS[view.type][0]?.id ?? '');
   }, [view.type]);
 
+  // Cmd/Ctrl+D toggles the panel. A window-level keydown listener still fires
+  // while a Radix modal is open — the modal's pointer-events trap only blocks
+  // clicks, not keyboard events — so this is how you collapse the panel to see
+  // a modal unobstructed.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        setOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   const applyView = () => {
     const chosen = mocks.find((m) => m.id === mockId) ?? mocks[0];
     if (chosen) setViewFromDev(chosen.view);
@@ -123,6 +138,7 @@ export function DevPanel() {
           type="button"
           onClick={() => setOpen(true)}
           className="rounded-md bg-black/80 px-2 py-1 text-white"
+          title="Toggle dev panel (⌘/Ctrl+D)"
         >
           dev
         </button>
@@ -146,7 +162,12 @@ export function DevPanel() {
                 Events
               </button>
             </div>
-            <button type="button" onClick={() => setOpen(false)} className="opacity-60">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="opacity-60"
+              title="Close dev panel (⌘/Ctrl+D)"
+            >
               ×
             </button>
           </div>
