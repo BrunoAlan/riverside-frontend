@@ -20,7 +20,7 @@ export function ExcursionsPanel({ itinerary }: ExcursionsPanelProps) {
   const dayOptions = Array.from(new Set(cities.flatMap((city) => parseCityDays(city.days))));
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center gap-4 p-6">
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-4 p-6">
       <CruiseHeroCard />
       <CityExperiencesPanel
         experiences={experiences}
@@ -37,7 +37,7 @@ export function ExcursionsPanel({ itinerary }: ExcursionsPanelProps) {
 function CruiseHeroCard() {
   return (
     <Card
-      className="bg-beige-50 border-beige-400/50 flex max-h-full flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none"
+      className="bg-beige-50 border-beige-400/50 pointer-events-auto flex max-h-full flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none"
       style={{ width: CARD_WIDTH }}
     >
       <div className="relative h-[200px] w-full shrink-0">
