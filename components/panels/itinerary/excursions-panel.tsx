@@ -1,11 +1,13 @@
 'use client';
 
+import { useCallback } from 'react';
 import Image from 'next/image';
 import { CityExperiencesPanel } from '@/components/panels/map/city-experiences-panel';
 import { Card } from '@/components/ui/card';
-import type { ItineraryFull } from '@/lib/agent-ui/commands';
+import { useFrontendIntent } from '@/hooks/use-frontend-intent';
+import type { Experience, ItineraryFull } from '@/lib/agent-ui/commands';
 import { useAddedExperiences } from '@/lib/agent-ui/hooks';
-import { parseCityDays } from '@/lib/map/parse-city-days';
+import { buildExperienceDayOptions } from '@/lib/map/build-experience-day-options';
 
 const CARD_WIDTH = 380;
 
@@ -15,9 +17,30 @@ type ExcursionsPanelProps = {
 
 export function ExcursionsPanel({ itinerary }: ExcursionsPanelProps) {
   const addedExperiences = useAddedExperiences();
+  const sendIntent = useFrontendIntent();
   const cities = itinerary?.cities ?? [];
   const experiences = cities.flatMap((city) => city.experiences ?? []);
-  const dayOptions = Array.from(new Set(cities.flatMap((city) => parseCityDays(city.days))));
+  const dayOptionsByExperience = buildExperienceDayOptions(cities);
+
+  const handleExperienceExplore = useCallback(
+    (experience: Experience) => {
+      void sendIntent('explore_experience', {
+        entities: { experience_id: experience.id },
+        userMessage: `User opened ${experience.name} detail`,
+      });
+    },
+    [sendIntent]
+  );
+
+  const handleExperienceConfirm = useCallback(
+    (experience: Experience, day: string) => {
+      void sendIntent('select_experience', {
+        entities: { experience_id: experience.id, day },
+        userMessage: `User added ${experience.name} for ${day}`,
+      });
+    },
+    [sendIntent]
+  );
 
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-4 p-6">
@@ -25,10 +48,10 @@ export function ExcursionsPanel({ itinerary }: ExcursionsPanelProps) {
       <CityExperiencesPanel
         experiences={experiences}
         detailExperienceId={null}
-        getDayOptions={() => dayOptions}
+        getDayOptions={(experience) => dayOptionsByExperience.get(experience.id) ?? []}
         addedExperiences={addedExperiences}
-        onExplore={() => {}}
-        onConfirm={() => {}}
+        onExplore={handleExperienceExplore}
+        onConfirm={handleExperienceConfirm}
       />
     </div>
   );
