@@ -43,6 +43,10 @@ type MapCanvasProps = {
   // MapCanvas is shared with compare_itinerary; the voyage route is opt-in so it
   // only renders for the single itinerary view that asks for it.
   showRoute?: boolean;
+  // False turns the map into a static, non-interactive background: no route,
+  // no city cards, no zoom/recenter controls, no pan/zoom gestures. Used when
+  // the itinerary view shows a different tab (e.g. Excursions) on top.
+  interactive?: boolean;
 };
 
 export function MapCanvas({
@@ -52,6 +56,7 @@ export function MapCanvas({
   focusCity,
   onCityExpand,
   showRoute,
+  interactive = true,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
@@ -60,6 +65,9 @@ export function MapCanvas({
   const frameItineraryRef = useRef<((animate: boolean) => void) | null>(null);
   // The recenter control element, hidden in detail mode (see effect below).
   const recenterControlRef = useRef<HTMLElement | null>(null);
+  // The corner container holding both the zoom and recenter controls, hidden
+  // entirely while non-interactive (see effect below).
+  const controlsContainerRef = useRef<HTMLElement | null>(null);
 
   // Frame the camera to all cities so cards spread out as closely as the viewport
   // allows instead of stacking. With fewer than two cities there's nothing to
@@ -128,6 +136,12 @@ export function MapCanvas({
     };
     mapInstance.addControl(recenterControl, 'bottom-right');
 
+    // Both controls above stack into one MapLibre-managed corner container;
+    // hiding this one element hides the whole zoom+recenter stack together.
+    controlsContainerRef.current = containerRef.current.querySelector<HTMLElement>(
+      '.maplibregl-ctrl-bottom-right'
+    );
+
     mapInstance.on('load', () => {
       // Inject the grain overlay into the canvas container so it textures the
       // map tiles but stays below the city-card markers, which MapLibre appends
@@ -171,6 +185,34 @@ export function MapCanvas({
     }
   }, [map, focusCity]);
 
+  // Hide the whole zoom/recenter control stack while non-interactive (e.g. a
+  // different tab is showing on top of the map).
+  useEffect(() => {
+    if (controlsContainerRef.current) {
+      controlsContainerRef.current.style.display = interactive ? '' : 'none';
+    }
+  }, [interactive]);
+
+  // Disable map gestures entirely while non-interactive, instead of tearing
+  // down and recreating the map instance.
+  useEffect(() => {
+    if (!map) return;
+    const handlers = [
+      map.dragPan,
+      map.scrollZoom,
+      map.boxZoom,
+      map.dragRotate,
+      map.keyboard,
+      map.doubleClickZoom,
+      map.touchZoomRotate,
+    ];
+    if (interactive) {
+      handlers.forEach((handler) => handler.enable());
+    } else {
+      handlers.forEach((handler) => handler.disable());
+    }
+  }, [map, interactive]);
+
   return (
     <div className="bg-beige-200 relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
@@ -182,8 +224,8 @@ export function MapCanvas({
         aria-hidden
         className="from-beige-200 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent"
       />
-      {map && showRoute && !focusCity && <RouteLayer map={map} cities={cityList} />}
-      {map && !focusCity && (
+      {map && showRoute && !focusCity && interactive && <RouteLayer map={map} cities={cityList} />}
+      {map && !focusCity && interactive && (
         <CityCardLayer map={map} cities={cityList} onCityExpand={onCityExpand} />
       )}
     </div>
