@@ -25,7 +25,7 @@ export function ExcursionsPanel({ itinerary }: ExcursionsPanelProps) {
       <CityExperiencesPanel
         experiences={experiences}
         detailExperienceId={null}
-        dayOptions={dayOptions}
+        getDayOptions={() => dayOptions}
         addedExperiences={addedExperiences}
         onExplore={() => {}}
         onConfirm={() => {}}

@@ -100,7 +100,7 @@ export function PanelMap({ view, interactive = true }: PanelMapProps) {
             <CityExperiencesPanel
               experiences={detailCity.experiences}
               detailExperienceId={detailExperienceId ?? null}
-              dayOptions={dayOptions}
+              getDayOptions={() => dayOptions}
               addedExperiences={addedExperiences}
               onExplore={handleExperienceExplore}
               onConfirm={handleExperienceConfirm}

@@ -10,7 +10,7 @@ const PANEL_WIDTH = 440;
 type CityExperiencesPanelProps = {
   experiences: Experience[];
   detailExperienceId: string | null;
-  dayOptions: string[];
+  getDayOptions: (experience: Experience) => string[];
   addedExperiences: Array<{ experienceId: string; day: string }>;
   onExplore: (experience: Experience) => void;
   onConfirm: (experience: Experience, day: string) => void;
@@ -19,7 +19,7 @@ type CityExperiencesPanelProps = {
 export function CityExperiencesPanel({
   experiences,
   detailExperienceId,
-  dayOptions,
+  getDayOptions,
   addedExperiences,
   onExplore,
   onConfirm,
@@ -61,7 +61,7 @@ export function CityExperiencesPanel({
               setOpenId(willOpen ? experience.id : null);
               if (willOpen) onExplore(experience);
             }}
-            dayOptions={dayOptions}
+            dayOptions={getDayOptions(experience)}
             addedDays={addedExperiences
               .filter((e) => e.experienceId === experience.id)
               .map((e) => e.day)}
