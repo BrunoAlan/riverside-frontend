@@ -40,6 +40,7 @@ export function ItineraryPanel({ view }: ItineraryPanelProps) {
           'absolute inset-0',
           activeTab !== 'excursions' && 'pointer-events-none opacity-0'
         )}
+        inert={activeTab !== 'excursions'}
       >
         <ExcursionsPanel itinerary={itinerary} />
       </div>
