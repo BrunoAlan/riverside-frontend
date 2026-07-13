@@ -58,18 +58,40 @@ navegación por teclado) y es el mecanismo de reuso que marcan las convenciones
 
 ### 2. `components/panels/itinerary/excursions-panel.tsx` (nuevo)
 
-`ExcursionsPanel()` (sin props). Reemplaza el `absolute inset-0` que hoy ocupa
-el mapa.
+`ExcursionsPanel({ itinerary }: { itinerary: ItineraryFull | undefined })`.
+Reemplaza el `absolute inset-0` que hoy ocupa el mapa. Layout: mismo wrapper
+centrado que ya usa `panel-map.tsx` para el overlay de detalle
+(`absolute inset-0 flex items-center justify-center gap-4 p-6`), con dos
+elementos lado a lado:
 
-- Grid de 3-4 cards mockeadas con datos hardcodeados en el archivo (constante
-  local, sin store ni fetch), reusando las ciudades reales del itinerario
-  mock (Budapest, Bratislava, Vienna) para mantener coherencia con
-  `danubeLegends` en `lib/dev/mocks.ts`.
-- Estilo de card igual a `city-detail-card.tsx`: `bg-beige-50
-  border-beige-400/50 rounded-2xl p-3`.
-- Cada card: ícono `lucide-react` (`Compass` o `MapPin`) como placeholder
-  visual (no hay imágenes reales todavía), nombre de la excursión, y una
-  descripción corta de una línea.
+**a) Card "hero" del crucero (helper privado `CruiseHeroCard`, no exportado —
+mismo patrón que `ExperienceGallery` dentro de `experience-card.tsx`):**
+
+- Todo hardcodeado como mock puro (no depende de `ItineraryFull`, que hoy no
+  tiene imagen ni descripción propias): imagen `/hero-image.jpg` (la misma que
+  ya usa `components/home/hero.tsx`, temática crucero genérica), un título y
+  descripción cortos fijos, más dos filas de datos fijos
+  ("Time spent" → "Mostly on board", "Perfect for" → "Romantic getaways").
+- Mismo estilo de card que `city-detail-card.tsx`: `bg-beige-50
+  border-beige-400/50 rounded-2xl p-3`, imagen `fill` en un contenedor
+  `relative h-[200px] w-full`.
+- Sin botón de cerrar — la única forma de salir de Excursions es tocar la pill
+  "Overview".
+
+**b) Lista de experiencias — reusa `CityExperiencesPanel` sin modificarlo:**
+
+- `experiences`: `(itinerary?.cities ?? []).flatMap((c) => c.experiences ?? [])`
+  — agrega las experiencias reales de **todas** las ciudades del itinerario
+  (no una sola ciudad), dato real del mock.
+- `dayOptions`: días únicos de todas las ciudades —
+  `Array.from(new Set((itinerary?.cities ?? []).flatMap((c) => parseCityDays(c.days))))`.
+- `addedExperiences`: `useAddedExperiences()` (mismo hook que usa `PanelMap`,
+  para reflejar experiencias ya agregadas desde el mapa).
+- `detailExperienceId`: `null` (no hay deep-link a una experiencia puntual).
+- `onExplore` / `onConfirm`: no-ops (`() => {}`). Abrir/cerrar cada
+  `ExperienceCard` sigue funcionando (es estado interno del componente), pero
+  no se dispara ningún intent real al agente — consistente con que esta
+  sección es mock por ahora.
 
 ### 3. `components/panels/itinerary/itinerary-panel.tsx` (nuevo)
 
@@ -85,7 +107,7 @@ el mapa.
     {activeTab === 'overview' ? (
       <PanelMap view={view} />
     ) : (
-      <ExcursionsPanel />
+      <ExcursionsPanel itinerary={view.itinerary} />
     )}
   </div>
   ```
@@ -108,14 +130,22 @@ Sigue siendo un wrapper delgado (mismo prop `view`, mismo patrón que hoy).
 
 ## Verificación
 
+Según `conventions/testing.md`, los componentes React no llevan test unitario
+en este repo (`vitest.config.ts` solo colecta `lib/**/*.test.ts`; la
+verificación de UI es visual vía el dev panel). Este cambio es puramente de
+componentes (`ItineraryTabs`, `ExcursionsPanel`, `ItineraryPanel`,
+`ItineraryView`), así que no se agregan archivos `.test.ts(x)` nuevos.
+
 - `pnpm lint` limpio.
-- `pnpm test` verde, incluyendo tests nuevos:
-  - `itinerary-tabs.test.tsx`: renderiza las dos pills, aplica la clase de
-    seleccionado a la que corresponde según `value`, dispara `onChange` con el
-    valor correcto al clickear la pill no activa.
-  - `itinerary-panel.test.tsx`: por defecto renderiza `PanelMap` (mock del
-    módulo, ya que depende de MapLibre) y no `ExcursionsPanel`; al clickear la
-    pill "Excursions" desmonta `PanelMap` y monta `ExcursionsPanel`; click en
-    "Overview" vuelve al mapa.
-- Manual: `pnpm dev` → vista de itinerario → tapear "Excursions" oculta el
-  mapa y muestra las cards mockeadas; tapear "Overview" lo restaura.
+- `pnpm test` verde (suite existente, sin cambios esperados).
+- Manual vía dev panel (`pnpm dev` → botón "dev" → view `itinerary`, mock
+  `danube_legends`):
+  - Se ve la barra de pills arriba a la izquierda, "Overview" seleccionada
+    (verde sage) y "Excursions" sin seleccionar (tan).
+  - Tapear "Excursions" oculta el mapa por completo y muestra la card hero +
+    la lista de experiencias de Budapest, Bratislava y Vienna juntas.
+  - Cada experiencia se puede expandir/contraer (chevron) y el selector de
+    día muestra opciones; el botón "Confirm" no dispara ningún intent (se
+    puede confirmar visualmente en devtools que no hay llamada de red nueva).
+  - Tapear "Overview" restaura el mapa exactamente como estaba (con su estado
+    de ciudad expandida si había una).
