@@ -21,9 +21,13 @@ const MapCanvas = dynamic(
 
 type PanelMapProps = {
   view: Extract<UiView, { type: 'itinerary' }>;
+  // False renders the map as a static, non-interactive background (e.g. when
+  // a different itinerary tab is showing on top). Defaults to true so every
+  // existing call site keeps behaving exactly as before.
+  interactive?: boolean;
 };
 
-export function PanelMap({ view }: PanelMapProps) {
+export function PanelMap({ view, interactive = true }: PanelMapProps) {
   const setViewFromUser = useSetViewFromUser();
   const sendIntent = useFrontendIntent();
   const addedExperiences = useAddedExperiences();
@@ -87,6 +91,7 @@ export function PanelMap({ view }: PanelMapProps) {
         focusCity={detailCity ?? undefined}
         onCityExpand={handleCityExpand}
         showRoute
+        interactive={interactive}
       />
       {detailCity && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-4 p-6">
