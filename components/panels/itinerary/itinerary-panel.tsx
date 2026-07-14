@@ -15,7 +15,7 @@ type ItineraryPanelProps = {
 export function ItineraryPanel({ view }: ItineraryPanelProps) {
   const [activeTab, setActiveTab] = useState<ItineraryTab>('overview');
   const setViewFromUser = useSetViewFromUser();
-  const { itinerary, detailCityId } = view;
+  const { itinerary, detailCityId, detailExperienceId } = view;
 
   // Switching to Excursions with a city detail open silently collapses it —
   // this is tab-switch cleanup, not a user action on the itinerary, so it
@@ -32,7 +32,10 @@ export function ItineraryPanel({ view }: ItineraryPanelProps) {
 
   return (
     <div className="absolute inset-0">
-      <div className={cn('absolute inset-0', activeTab !== 'overview' && 'pointer-events-none')}>
+      <div
+        className={cn('absolute inset-0', activeTab !== 'overview' && 'pointer-events-none')}
+        inert={activeTab !== 'overview'}
+      >
         <PanelMap view={view} interactive={activeTab === 'overview'} />
       </div>
       <div
@@ -42,7 +45,7 @@ export function ItineraryPanel({ view }: ItineraryPanelProps) {
         )}
         inert={activeTab !== 'excursions'}
       >
-        <ExcursionsPanel itinerary={itinerary} />
+        <ExcursionsPanel itinerary={itinerary} detailExperienceId={detailExperienceId} />
       </div>
       <div className="absolute top-6 left-6 z-20">
         <ItineraryTabs value={activeTab} onChange={handleTabChange} />

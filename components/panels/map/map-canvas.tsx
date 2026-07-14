@@ -205,6 +205,7 @@ export function MapCanvas({
       map.keyboard,
       map.doubleClickZoom,
       map.touchZoomRotate,
+      map.touchPitch,
     ];
     if (interactive) {
       handlers.forEach((handler) => handler.enable());

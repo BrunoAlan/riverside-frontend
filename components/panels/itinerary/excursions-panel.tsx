@@ -13,9 +13,10 @@ const CARD_WIDTH = 380;
 
 type ExcursionsPanelProps = {
   itinerary: ItineraryFull | undefined;
+  detailExperienceId: string | undefined;
 };
 
-export function ExcursionsPanel({ itinerary }: ExcursionsPanelProps) {
+export function ExcursionsPanel({ itinerary, detailExperienceId }: ExcursionsPanelProps) {
   const addedExperiences = useAddedExperiences();
   const sendIntent = useFrontendIntent();
   const cities = itinerary?.cities ?? [];
@@ -47,7 +48,7 @@ export function ExcursionsPanel({ itinerary }: ExcursionsPanelProps) {
       <CruiseHeroCard />
       <CityExperiencesPanel
         experiences={experiences}
-        detailExperienceId={null}
+        detailExperienceId={detailExperienceId ?? null}
         getDayOptions={(experience) => dayOptionsByExperience.get(experience.id) ?? []}
         addedExperiences={addedExperiences}
         onExplore={handleExperienceExplore}
