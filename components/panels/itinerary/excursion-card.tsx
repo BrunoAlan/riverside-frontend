@@ -11,7 +11,7 @@ import type { Experience } from '@/lib/agent-ui/commands';
 import { formatDayBadge } from '@/lib/map/format-day-badge';
 import { cn } from '@/lib/shadcn/utils';
 
-const CARD_WIDTH = 260;
+const CARD_WIDTH = 320;
 
 type ExcursionCardProps = {
   experience: Experience;
@@ -49,12 +49,12 @@ export function ExcursionCard({
       style={{ width: CARD_WIDTH }}
     >
       {images.length > 0 && (
-        <div className="relative h-32 w-full shrink-0 overflow-hidden rounded-xl">
+        <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-xl">
           <Image
             src={images[0]}
             alt={experience.name}
             fill
-            sizes="260px"
+            sizes="320px"
             className="object-cover"
           />
           {badgeLabel && <DaysBadge className="absolute top-1 left-1">{badgeLabel}</DaysBadge>}
