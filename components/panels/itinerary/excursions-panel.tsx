@@ -1,15 +1,12 @@
 'use client';
 
-import { useCallback } from 'react';
-import Image from 'next/image';
-import { CityExperiencesPanel } from '@/components/panels/map/city-experiences-panel';
-import { Card } from '@/components/ui/card';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ExcursionCard } from '@/components/panels/itinerary/excursion-card';
 import { useFrontendIntent } from '@/hooks/use-frontend-intent';
+import { useScrollFade } from '@/hooks/use-scroll-fade';
 import type { Experience, ItineraryFull } from '@/lib/agent-ui/commands';
 import { useAddedExperiences } from '@/lib/agent-ui/hooks';
-import { buildExperienceDayOptions } from '@/lib/map/build-experience-day-options';
-
-const CARD_WIDTH = 380;
+import { buildExcursionItems } from '@/lib/map/build-excursion-items';
 
 type ExcursionsPanelProps = {
   itinerary: ItineraryFull | undefined;
@@ -19,9 +16,20 @@ type ExcursionsPanelProps = {
 export function ExcursionsPanel({ itinerary, detailExperienceId }: ExcursionsPanelProps) {
   const addedExperiences = useAddedExperiences();
   const sendIntent = useFrontendIntent();
-  const cities = itinerary?.cities ?? [];
-  const experiences = cities.flatMap((city) => city.experiences ?? []);
-  const dayOptionsByExperience = buildExperienceDayOptions(cities);
+  const items = buildExcursionItems(itinerary?.cities ?? []);
+
+  // Only one detail dialog is open at a time, and the backend's
+  // show_experience_detail command must be able to drive it, so the open id lives
+  // here rather than inside each card.
+  const [openDetailId, setOpenDetailId] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { showTopFade, showBottomFade } = useScrollFade(scrollRef, [items.length]);
+
+  useEffect(() => {
+    if (detailExperienceId) {
+      setOpenDetailId(detailExperienceId);
+    }
+  }, [detailExperienceId]);
 
   const handleExperienceExplore = useCallback(
     (experience: Experience) => {
@@ -44,55 +52,34 @@ export function ExcursionsPanel({ itinerary, detailExperienceId }: ExcursionsPan
   );
 
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-4 p-6">
-      <CruiseHeroCard />
-      <CityExperiencesPanel
-        experiences={experiences}
-        detailExperienceId={detailExperienceId ?? null}
-        getDayOptions={(experience) => dayOptionsByExperience.get(experience.id) ?? []}
-        addedExperiences={addedExperiences}
-        onExplore={handleExperienceExplore}
-        onConfirm={handleExperienceConfirm}
+    <div className="pointer-events-none absolute inset-0 p-6">
+      <div
+        className={`pointer-events-none absolute top-0 right-0 left-0 z-1 h-[60px] bg-gradient-to-b from-[#E7DCD3] transition-opacity duration-200 ${showTopFade ? 'opacity-100' : 'opacity-0'} `}
+      />
+      <div
+        className="scrollbar-hide flex h-full flex-wrap content-start items-start gap-3 overflow-y-auto"
+        ref={scrollRef}
+      >
+        {items.map(({ experience, dayOptions }) => (
+          <ExcursionCard
+            key={experience.id}
+            experience={experience}
+            dayOptions={dayOptions}
+            addedDays={addedExperiences
+              .filter((e) => e.experienceId === experience.id)
+              .map((e) => e.day)}
+            detailOpen={openDetailId === experience.id}
+            onDetailOpenChange={(open) => {
+              setOpenDetailId(open ? experience.id : null);
+              if (open) handleExperienceExplore(experience);
+            }}
+            onConfirm={(day) => handleExperienceConfirm(experience, day)}
+          />
+        ))}
+      </div>
+      <div
+        className={`pointer-events-none absolute right-0 bottom-0 left-0 z-1 h-[60px] bg-gradient-to-t from-[#EDE6DD] transition-opacity duration-200 ${showBottomFade ? 'opacity-100' : 'opacity-0'} `}
       />
     </div>
-  );
-}
-
-function CruiseHeroCard() {
-  return (
-    <Card
-      className="bg-beige-50 border-beige-400/50 pointer-events-auto flex max-h-full flex-col gap-0 overflow-hidden rounded-2xl p-3 shadow-none"
-      style={{ width: CARD_WIDTH }}
-    >
-      <div className="relative h-[200px] w-full shrink-0">
-        <Image
-          src="/hero-image.jpg"
-          alt="Riverside cruise along the Danube"
-          fill
-          sizes="356px"
-          className="rounded-lg object-cover"
-        />
-      </div>
-      <div className="mt-4 flex flex-col gap-4 px-2 pb-2">
-        <div>
-          <p className="text-2xl leading-tight">Danube Legends</p>
-          <p className="text-primary mt-1 text-sm leading-relaxed">
-            Explore Riverside luxury along the Danube, visiting Budapest, Bratislava and Vienna.
-          </p>
-        </div>
-        <div>
-          <p className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
-            Time spent
-          </p>
-          <p className="text-primary mt-1 text-sm">Mostly on board</p>
-        </div>
-        <div>
-          <p className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
-            Perfect for
-          </p>
-          <p className="text-primary mt-1 text-sm">Romantic getaways</p>
-        </div>
-      </div>
-    </Card>
   );
 }
