@@ -3,6 +3,11 @@ import { z } from 'zod';
 const Base = z.object({
   correlationId: z.string(),
   sessionId: z.string().optional(),
+  // Who originated the command: 'frontend-intent' when the user tapped,
+  // 'classifier' when the agent decided on its own. The backend computes this
+  // (turn_handler.py:143) but does not send it yet — accepted here so it parses
+  // the day it does. Nothing renders differently on it today.
+  source: z.string().optional(),
 });
 
 const ShowDiscoveryCanvas = Base.extend({
@@ -152,6 +157,11 @@ const ShowExperienceDetail = Base.extend({
   payload: z.object({ experience_id: z.string().nullable() }),
 });
 
+const ShowItineraryTab = Base.extend({
+  type: z.literal('show_itinerary_tab'),
+  payload: z.object({ tab: z.enum(['overview', 'excursions']) }),
+});
+
 const nstr = z.string().nullable();
 
 export const ItinerarySummaryWire = z.object({
@@ -245,6 +255,7 @@ export const UiCommand = z.discriminatedUnion('type', [
   ShowCabinDetail,
   ShowCityDetail,
   ShowExperienceDetail,
+  ShowItineraryTab,
   AddCabinToBasket,
   AddExperienceToBasket,
   SyncItineraryExperiences,

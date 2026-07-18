@@ -892,3 +892,45 @@ describe('show_cabin_options', () => {
     expect(parsed.success).toBe(false);
   });
 });
+
+describe('show_itinerary_tab', () => {
+  it('parses show_itinerary_tab with a valid tab', () => {
+    const result = UiCommand.parse({
+      type: 'show_itinerary_tab',
+      correlationId: 'c1',
+      payload: { tab: 'excursions' },
+    });
+    if (result.type !== 'show_itinerary_tab') throw new Error('discriminator failed');
+    expect(result.payload.tab).toBe('excursions');
+  });
+
+  it('rejects an unknown tab', () => {
+    const result = UiCommand.safeParse({
+      type: 'show_itinerary_tab',
+      correlationId: 'c1',
+      payload: { tab: 'cabins' },
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('command envelope source', () => {
+  it('accepts a command carrying a source', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c1',
+      source: 'classifier',
+      payload: { experience_id: 'exp-1' },
+    });
+    expect(result.source).toBe('classifier');
+  });
+
+  it('still accepts a command without a source', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c1',
+      payload: { experience_id: 'exp-1' },
+    });
+    expect(result.source).toBeUndefined();
+  });
+});

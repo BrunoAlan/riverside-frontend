@@ -63,7 +63,10 @@ export function EventLogList() {
           Clear
         </button>
       </div>
-      <div className="max-h-80 overflow-auto">
+      {/* No scroll of its own: DevPanel's body already scrolls, and nesting a
+          second container here would cap the list at 320px and show two
+          scrollbars. */}
+      <div>
         {newestFirst.length === 0 && <div className="opacity-50">no events yet</div>}
         {newestFirst.map((e) => (
           <EventRow key={e.id} event={e} />
