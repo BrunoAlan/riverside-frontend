@@ -826,7 +826,81 @@ describe('ui-view-store', () => {
 
       expect(store.getState().view).toEqual({ type: 'start' });
     });
+
+    it('collapses an open city detail when moving to excursions', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        itinerary: undefined,
+        detailCityId: 'vienna',
+      });
+
+      store.getState().applyCommand({
+        type: 'show_itinerary_tab',
+        correlationId: 'c2',
+        payload: { tab: 'excursions' },
+      });
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.detailCityId).toBeUndefined();
+    });
+
+    it('keeps an open city detail when moving back to overview', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        itinerary: undefined,
+        activeTab: 'excursions',
+        detailCityId: 'vienna',
+      });
+
+      store.getState().applyCommand({
+        type: 'show_itinerary_tab',
+        correlationId: 'c3',
+        payload: { tab: 'overview' },
+      });
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.detailCityId).toBe('vienna');
+    });
   });
+
+  // Mirrors `itineraryPayload` above, plus the experiences the tab-forcing logic
+  // needs: it decides by asking whether the open city already renders the
+  // experience the agent is pointing at.
+  function itineraryWithVienna() {
+    return {
+      id: 'danube_legends',
+      name: 'Danube Legends',
+      duration: { days: 12, nights: 11 },
+      match_score: 0.6667,
+      departure_dates: ['2026-04-22'],
+      center: [16.57, 48.15] as [number, number],
+      zoom: 6,
+      cities: [
+        {
+          id: 'vienna',
+          name: 'Vienna',
+          country: 'Austria',
+          image: 'https://example.com/vienna.jpg',
+          days: 'Days 5, 10 & 11',
+          lon: 16.3738,
+          lat: 48.2082,
+          experiences: [
+            {
+              id: 'exp-vienna',
+              name: 'Belvedere Palace',
+              type: 'private_concert',
+              venue: 'Belvedere Palace',
+              description: 'Private concert.',
+            },
+          ],
+        },
+      ],
+    };
+  }
 
   describe('applyCommand(show_experience_detail) tab behaviour', () => {
     it('switches to the excursions tab so the detail is visible', () => {
@@ -862,25 +936,66 @@ describe('ui-view-store', () => {
       expect(view.detailExperienceId).toBeUndefined();
     });
 
-    it('does not change the tab when a city detail is open on the map', () => {
+    it('does not change the tab when the open city already shows that experience', () => {
       const store = createUiViewStore();
       store.getState().setViewFromUser({
         type: 'itinerary',
-        itinerary: undefined,
+        itinerary: itineraryWithVienna(),
+        activeTab: 'overview',
         detailCityId: 'vienna',
       });
 
       store.getState().applyCommand({
         type: 'show_experience_detail',
         correlationId: 'c3',
+        payload: { experience_id: 'exp-vienna' },
+      });
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.activeTab).toBe('overview');
+      expect(view.detailCityId).toBe('vienna');
+      expect(view.detailExperienceId).toBe('exp-vienna');
+    });
+
+    it('switches the tab for an experience the open city does not show', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        itinerary: itineraryWithVienna(),
+        activeTab: 'overview',
+        detailCityId: 'vienna',
+      });
+
+      store.getState().applyCommand({
+        type: 'show_experience_detail',
+        correlationId: 'c4',
+        payload: { experience_id: 'exp-from-another-city' },
+      });
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.activeTab).toBe('excursions');
+    });
+
+    it('switches the tab when a city is open but its data is unavailable', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        itinerary: undefined,
+        activeTab: 'overview',
+        detailCityId: 'vienna',
+      });
+
+      store.getState().applyCommand({
+        type: 'show_experience_detail',
+        correlationId: 'c5',
         payload: { experience_id: 'exp-1' },
       });
 
       const { view } = store.getState();
       if (view.type !== 'itinerary') throw new Error('expected itinerary view');
-      expect(view.activeTab).toBeUndefined();
-      expect(view.detailCityId).toBe('vienna');
-      expect(view.detailExperienceId).toBe('exp-1');
+      expect(view.activeTab).toBe('excursions');
     });
   });
 });

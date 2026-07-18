@@ -34,6 +34,18 @@ interface UiViewState {
 
 const INITIAL_VIEW: UiView = { type: 'start' };
 
+// True when the open city detail on the map is already rendering this experience,
+// i.e. CityExperiencesPanel has it in its list. Used to decide whether an
+// agent-sent experience detail needs to pull the user to the Excursions tab.
+function isExperienceOnMap(
+  view: Extract<UiView, { type: 'itinerary' }>,
+  experienceId: string
+): boolean {
+  if (!view.detailCityId) return false;
+  const openCity = view.itinerary?.cities.find((city) => city.id === view.detailCityId);
+  return openCity?.experiences?.some((experience) => experience.id === experienceId) ?? false;
+}
+
 const DEVTOOLS_ENABLED = process.env.NODE_ENV !== 'production';
 
 export function createUiViewStore() {
@@ -138,13 +150,19 @@ export function createUiViewStore() {
                       ...state.view,
                       detailExperienceId: experienceId,
                       // Opening a detail forces the tab that can show it, so the
-                      // agent needs one command instead of an ordered pair — but
-                      // only when no city detail is open on the map: that surface
-                      // already renders the experience via CityExperiencesPanel,
-                      // so forcing the tab there would yank the user off the map.
-                      // Closing leaves the tab where the user left it.
+                      // agent needs one command instead of an ordered pair.
+                      //
+                      // The exception is when the map is ALREADY showing this
+                      // experience: an open city detail renders its own
+                      // experiences via CityExperiencesPanel, and expanding one
+                      // there round-trips through the agent as
+                      // explore_experience → show_experience_detail. Switching
+                      // tabs then would yank the user off the map by their own
+                      // click. Note this is scoped to the specific experience —
+                      // an experience from a different city is not on screen, so
+                      // it still needs the tab. Closing leaves the tab alone.
                       activeTab:
-                        experienceId && !state.view.detailCityId
+                        experienceId && !isExperienceOnMap(state.view, experienceId)
                           ? 'excursions'
                           : state.view.activeTab,
                     },
@@ -158,7 +176,17 @@ export function createUiViewStore() {
                     return { source: 'agent', lastCorrelationId: cmd.correlationId };
                   }
                   return {
-                    view: { ...state.view, activeTab: cmd.payload.tab },
+                    view: {
+                      ...state.view,
+                      activeTab: cmd.payload.tab,
+                      // Leaving Overview collapses any open city detail, matching
+                      // what a user tap on the tab does (itinerary-panel.tsx).
+                      // Without this the same transition would leave different
+                      // state depending on who triggered it, and the card would
+                      // still be open when the user came back.
+                      detailCityId:
+                        cmd.payload.tab === 'excursions' ? undefined : state.view.detailCityId,
+                    },
                     hint: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,

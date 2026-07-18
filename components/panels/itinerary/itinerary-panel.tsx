@@ -32,18 +32,38 @@ export function ItineraryPanel({ view }: ItineraryPanelProps) {
     (tab: ItineraryTab) => {
       if (tab === activeTab) return;
       if (tab === 'excursions' && detailCityId) {
-        setViewFromUser({ type: 'itinerary', itinerary, activeTab: 'excursions' });
+        // Full-view replace, so every field we mean to keep is named. The open
+        // experience detail carries over deliberately — the user was reading it
+        // on the map and the grid can show the same one.
+        setViewFromUser({
+          type: 'itinerary',
+          itinerary,
+          activeTab: 'excursions',
+          detailExperienceId,
+        });
       } else {
         setItineraryTab(tab);
       }
+      // `view_itinerary` is also what PanelMap sends when the user closes a city
+      // card, so the payload matches that one — both mean "the user is looking at
+      // the itinerary again", and the backend should treat them the same.
       void sendIntent(tab === 'excursions' ? 'view_excursions' : 'view_itinerary', {
+        entities: { itinerary_name: itinerary?.name },
         userMessage:
           tab === 'excursions'
             ? 'User switched to the excursions tab'
             : 'User returned to the itinerary tab',
       });
     },
-    [activeTab, detailCityId, itinerary, setItineraryTab, setViewFromUser, sendIntent]
+    [
+      activeTab,
+      detailCityId,
+      detailExperienceId,
+      itinerary,
+      setItineraryTab,
+      setViewFromUser,
+      sendIntent,
+    ]
   );
 
   return (

@@ -214,6 +214,14 @@ que emita ningún command — con que actualice el estado alcanza.
 handler debería además marcar que el usuario **salió** de la tab de excursiones. Los
 dos intents son las dos caras de la misma transición.
 
+**Ojo con esto:** el frontend emite `view_itinerary` en **dos situaciones distintas** —
+cuando el usuario cierra la tarjeta de detalle de una ciudad (`panel-map.tsx:58`) y
+cuando vuelve a la tab de Overview (`itinerary-panel.tsx`). Ambas mandan el mismo
+payload (`entities: { itinerary_name }`), porque las dos significan lo mismo: el usuario
+está mirando el itinerario otra vez. Si para ustedes necesitan comportamientos distintos,
+avísennos y agregamos un entity que las diferencie — hoy no lo hacemos porque nadie lo
+pidió.
+
 ---
 
 ## Resumen del trabajo
