@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ItineraryCity } from '@/lib/agent-ui/commands';
-import { buildExperienceDayOptions } from './build-experience-day-options';
+import { buildExcursionItems } from './build-excursion-items';
 
 function city(overrides: Partial<ItineraryCity>): ItineraryCity {
   return {
@@ -15,11 +15,12 @@ function city(overrides: Partial<ItineraryCity>): ItineraryCity {
   };
 }
 
-describe('buildExperienceDayOptions', () => {
-  it("maps each experience to its own city's parsed days", () => {
+describe('buildExcursionItems', () => {
+  it("pairs each experience with its own city's parsed days", () => {
     const cities: ItineraryCity[] = [
       city({
         id: 'budapest',
+        name: 'Budapest',
         days: 'Days 1 & 2',
         experiences: [
           {
@@ -33,6 +34,7 @@ describe('buildExperienceDayOptions', () => {
       }),
       city({
         id: 'vienna',
+        name: 'Vienna',
         days: 'Days 4, 5 & 6',
         experiences: [
           {
@@ -46,21 +48,20 @@ describe('buildExperienceDayOptions', () => {
       }),
     ];
 
-    const result = buildExperienceDayOptions(cities);
+    const items = buildExcursionItems(cities);
 
-    expect(result.get('exp-1')).toEqual(['Day 1', 'Day 2']);
-    expect(result.get('exp-2')).toEqual(['Day 4', 'Day 5', 'Day 6']);
+    expect(items).toHaveLength(2);
+    expect(items[0].experience.id).toBe('exp-1');
+    expect(items[0].dayOptions).toEqual(['Day 1', 'Day 2']);
+    expect(items[1].experience.id).toBe('exp-2');
+    expect(items[1].dayOptions).toEqual(['Day 4', 'Day 5', 'Day 6']);
   });
 
   it('skips a city with no experiences', () => {
-    const cities: ItineraryCity[] = [city({ id: 'budapest', days: 'Day 1' })];
-
-    const result = buildExperienceDayOptions(cities);
-
-    expect(result.size).toBe(0);
+    expect(buildExcursionItems([city({ id: 'bratislava' })])).toEqual([]);
   });
 
-  it('returns an empty map for no cities', () => {
-    expect(buildExperienceDayOptions([]).size).toBe(0);
+  it('returns an empty list for no cities', () => {
+    expect(buildExcursionItems([])).toEqual([]);
   });
 });

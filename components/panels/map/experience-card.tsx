@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { motion } from 'motion/react';
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
+import { ExperienceGallery } from '@/components/shared/experience-gallery';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { Experience } from '@/lib/agent-ui/commands';
@@ -83,7 +83,16 @@ export function ExperienceCard({
           transition={{ duration: 0.6, ease: 'easeOut' }}
         />
       )}
-      {expanded && images.length > 0 && <ExperienceGallery images={images} alt={experience.name} />}
+      {expanded && images.length > 0 && (
+        <div className="mb-2">
+          <ExperienceGallery
+            images={images}
+            alt={experience.name}
+            heroClassName="h-36"
+            heroSizes="440px"
+          />
+        </div>
+      )}
       <div>
         <div className="flex grow items-center justify-between gap-2">
           <div className="flex min-w-0 grow flex-wrap items-center gap-2">
@@ -155,37 +164,5 @@ export function ExperienceCard({
         </div>
       )}
     </Card>
-  );
-}
-
-function ExperienceGallery({ images, alt }: { images: string[]; alt: string }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeSrc = images[activeIndex] ?? images[0];
-
-  return (
-    <div className="mb-2 flex flex-col gap-2">
-      <div className="relative h-36 w-full overflow-hidden rounded-lg">
-        <Image src={activeSrc} alt={alt} fill sizes="440px" className="object-cover" />
-      </div>
-      {images.length > 1 && (
-        <div className="flex gap-2">
-          {images.map((src, index) => (
-            <button
-              key={src}
-              type="button"
-              aria-label={`Show image ${index + 1}`}
-              aria-pressed={index === activeIndex}
-              onClick={() => setActiveIndex(index)}
-              className={cn(
-                'relative h-14 w-20 shrink-0 overflow-hidden rounded-md transition',
-                index === activeIndex ? 'ring-primary ring-2' : 'opacity-70 hover:opacity-100'
-              )}
-            >
-              <Image src={src} alt="" fill sizes="80px" className="object-cover" />
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }
