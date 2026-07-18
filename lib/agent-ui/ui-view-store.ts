@@ -64,6 +64,9 @@ export function createUiViewStore() {
                   };
                 case 'show_itinerary_options':
                   return {
+                    // Replaces the whole view, so activeTab resets to undefined
+                    // (Overview). Deliberate: a newly delivered itinerary should
+                    // always start on Overview.
                     view: { type: 'itinerary', itinerary: cmd.payload.itinerary },
                     hint: null,
                     source: 'agent',
@@ -135,9 +138,15 @@ export function createUiViewStore() {
                       ...state.view,
                       detailExperienceId: experienceId,
                       // Opening a detail forces the tab that can show it, so the
-                      // agent needs one command instead of an ordered pair.
+                      // agent needs one command instead of an ordered pair — but
+                      // only when no city detail is open on the map: that surface
+                      // already renders the experience via CityExperiencesPanel,
+                      // so forcing the tab there would yank the user off the map.
                       // Closing leaves the tab where the user left it.
-                      activeTab: experienceId ? 'excursions' : state.view.activeTab,
+                      activeTab:
+                        experienceId && !state.view.detailCityId
+                          ? 'excursions'
+                          : state.view.activeTab,
                     },
                     hint: null,
                     source: 'agent',

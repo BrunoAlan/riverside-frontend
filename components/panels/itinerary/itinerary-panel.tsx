@@ -31,9 +31,10 @@ export function ItineraryPanel({ view }: ItineraryPanelProps) {
   const handleTabChange = useCallback(
     (tab: ItineraryTab) => {
       if (tab === activeTab) return;
-      setItineraryTab(tab);
       if (tab === 'excursions' && detailCityId) {
         setViewFromUser({ type: 'itinerary', itinerary, activeTab: 'excursions' });
+      } else {
+        setItineraryTab(tab);
       }
       void sendIntent(tab === 'excursions' ? 'view_excursions' : 'view_itinerary', {
         userMessage:

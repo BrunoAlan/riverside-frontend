@@ -861,5 +861,26 @@ describe('ui-view-store', () => {
       expect(view.activeTab).toBe('overview');
       expect(view.detailExperienceId).toBeUndefined();
     });
+
+    it('does not change the tab when a city detail is open on the map', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        itinerary: undefined,
+        detailCityId: 'vienna',
+      });
+
+      store.getState().applyCommand({
+        type: 'show_experience_detail',
+        correlationId: 'c3',
+        payload: { experience_id: 'exp-1' },
+      });
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.activeTab).toBeUndefined();
+      expect(view.detailCityId).toBe('vienna');
+      expect(view.detailExperienceId).toBe('exp-1');
+    });
   });
 });

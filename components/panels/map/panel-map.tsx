@@ -45,22 +45,27 @@ export function PanelMap({ view, interactive = true }: PanelMapProps) {
 
   const handleCityExpand = useCallback(
     (city: City) => {
-      setViewFromUser({ type: 'itinerary', itinerary, detailCityId: city.id });
+      setViewFromUser({
+        type: 'itinerary',
+        itinerary,
+        detailCityId: city.id,
+        activeTab: view.activeTab,
+      });
       void sendIntent('explore_destination', {
         entities: { destination_id: city.id },
         userMessage: `User opened ${city.name} detail`,
       });
     },
-    [setViewFromUser, sendIntent, itinerary]
+    [setViewFromUser, sendIntent, itinerary, view.activeTab]
   );
 
   const handleClose = useCallback(() => {
-    setViewFromUser({ type: 'itinerary', itinerary });
+    setViewFromUser({ type: 'itinerary', itinerary, activeTab: view.activeTab });
     void sendIntent('view_itinerary', {
       entities: { itinerary_name: itinerary?.name },
       userMessage: 'User returned to the itinerary',
     });
-  }, [setViewFromUser, sendIntent, itinerary]);
+  }, [setViewFromUser, sendIntent, itinerary, view.activeTab]);
 
   const handleExperienceExplore = useCallback(
     (experience: Experience) => {
