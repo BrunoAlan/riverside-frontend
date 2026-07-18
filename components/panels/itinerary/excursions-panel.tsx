@@ -25,10 +25,13 @@ export function ExcursionsPanel({ itinerary, detailExperienceId }: ExcursionsPan
   const scrollRef = useRef<HTMLDivElement>(null);
   const { showTopFade, showBottomFade } = useScrollFade(scrollRef, [items.length]);
 
+  // Authoritative over local state so the backend can also close the dialog
+  // (detailExperienceId becomes undefined). Note: if the backend re-sends the
+  // same id after the user closed it locally, the prop doesn't change and this
+  // effect won't re-run, so the dialog stays shut — fixing that needs a nonce
+  // alongside detailExperienceId in the store, which is out of scope here.
   useEffect(() => {
-    if (detailExperienceId) {
-      setOpenDetailId(detailExperienceId);
-    }
+    setOpenDetailId(detailExperienceId ?? null);
   }, [detailExperienceId]);
 
   const handleExperienceExplore = useCallback(

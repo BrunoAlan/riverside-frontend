@@ -32,6 +32,10 @@ export function ExcursionCard({
 }: ExcursionCardProps) {
   const images = experience.images ?? (experience.image ? [experience.image] : []);
   const [selectedDay, setSelectedDay] = useState(dayOptions[0] ?? '');
+  // dayOptions can change (revised itinerary) while selectedDay still holds a
+  // day from the previous options, so derive the effective day during render
+  // instead of trusting state blindly.
+  const day = dayOptions.includes(selectedDay) ? selectedDay : (dayOptions[0] ?? '');
 
   const isAdded = addedDays.length > 0;
   const badgeLabel = formatDayBadge(dayOptions);
@@ -71,7 +75,7 @@ export function ExcursionCard({
               </label>
               <select
                 id={`card-day-${experience.id}`}
-                value={selectedDay}
+                value={day}
                 onChange={(event) => setSelectedDay(event.target.value)}
                 className="bg-beige-50 border-beige-400/50 text-primary rounded-md border px-1 py-1 text-xs"
               >
@@ -92,8 +96,8 @@ export function ExcursionCard({
               type="button"
               variant="secondary"
               size="sm"
-              disabled={!selectedDay}
-              onClick={() => onConfirm(selectedDay)}
+              disabled={!day}
+              onClick={() => onConfirm(day)}
             >
               Add
             </Button>
@@ -106,7 +110,7 @@ export function ExcursionCard({
         open={detailOpen}
         onOpenChange={onDetailOpenChange}
         dayOptions={dayOptions}
-        selectedDay={selectedDay}
+        selectedDay={day}
         onSelectDay={setSelectedDay}
         addedDays={addedDays}
         onConfirm={onConfirm}
