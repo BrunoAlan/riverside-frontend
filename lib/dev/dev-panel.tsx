@@ -144,8 +144,11 @@ export function DevPanel() {
         </button>
       )}
       {open && (
-        <div className="w-80 space-y-2 rounded-md bg-black/80 p-3 text-white">
-          <div className="flex items-center justify-between">
+        // The mocks tab is long enough to run off-screen, so cap the panel at the
+        // viewport and scroll the body. The tab bar stays put so you can still
+        // switch tabs and close from anywhere in the scroll.
+        <div className="flex max-h-[85vh] w-80 flex-col gap-2 rounded-md bg-black/80 p-3 text-white">
+          <div className="flex shrink-0 items-center justify-between">
             <div className="flex gap-2">
               <button
                 type="button"
@@ -171,198 +174,200 @@ export function DevPanel() {
               ×
             </button>
           </div>
-          {tab === 'events' ? (
-            <EventLogList />
-          ) : (
-            <>
-              <div>
-                current: <b>{view.type}</b> (source: {source})
-              </div>
-              <label className="block">
-                view
-                <select
-                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
-                  value={type}
-                  onChange={(e) => {
-                    const nextType = e.target.value as UiView['type'];
-                    setType(nextType);
-                    setMockId(VIEW_MOCKS[nextType][0]?.id ?? '');
-                  }}
-                >
-                  {VIEW_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block">
-                mock
-                <select
-                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
-                  value={mockId}
-                  onChange={(e) => setMockId(e.target.value)}
-                >
-                  {mocks.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="flex gap-2">
+          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+            {tab === 'events' ? (
+              <EventLogList />
+            ) : (
+              <>
+                <div>
+                  current: <b>{view.type}</b> (source: {source})
+                </div>
+                <label className="block">
+                  view
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={type}
+                    onChange={(e) => {
+                      const nextType = e.target.value as UiView['type'];
+                      setType(nextType);
+                      setMockId(VIEW_MOCKS[nextType][0]?.id ?? '');
+                    }}
+                  >
+                    {VIEW_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  mock
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={mockId}
+                    onChange={(e) => setMockId(e.target.value)}
+                  >
+                    {mocks.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={applyView}
+                    className="flex-1 rounded bg-white text-black"
+                  >
+                    Apply view
+                  </button>
+                  <button
+                    type="button"
+                    onClick={reset}
+                    className="rounded bg-white/20 px-2 text-white"
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                <div className="mt-2 border-t border-white/20 pt-2">booking summary</div>
+                <label className="block">
+                  mock
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={summaryMockId}
+                    onChange={(e) => setSummaryMockId(e.target.value)}
+                  >
+                    {BOOKING_SUMMARY_MOCKS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button
                   type="button"
-                  onClick={applyView}
-                  className="flex-1 rounded bg-white text-black"
+                  onClick={applySummary}
+                  className="w-full rounded bg-white text-black"
                 >
-                  Apply view
+                  Apply summary
                 </button>
+
+                <div className="mt-2 border-t border-white/20 pt-2">itinerary summary</div>
+                <label className="block">
+                  mock
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={itinerarySummaryMockId}
+                    onChange={(e) => setItinerarySummaryMockId(e.target.value)}
+                  >
+                    {ITINERARY_SUMMARY_MOCKS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button
                   type="button"
-                  onClick={reset}
-                  className="rounded bg-white/20 px-2 text-white"
+                  onClick={applyItinerarySummary}
+                  className="w-full rounded bg-white text-black"
                 >
-                  Reset
+                  Apply summary
                 </button>
-              </div>
 
-              <div className="mt-2 border-t border-white/20 pt-2">booking summary</div>
-              <label className="block">
-                mock
-                <select
-                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
-                  value={summaryMockId}
-                  onChange={(e) => setSummaryMockId(e.target.value)}
-                >
-                  {BOOKING_SUMMARY_MOCKS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                onClick={applySummary}
-                className="w-full rounded bg-white text-black"
-              >
-                Apply summary
-              </button>
-
-              <div className="mt-2 border-t border-white/20 pt-2">itinerary summary</div>
-              <label className="block">
-                mock
-                <select
-                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
-                  value={itinerarySummaryMockId}
-                  onChange={(e) => setItinerarySummaryMockId(e.target.value)}
-                >
-                  {ITINERARY_SUMMARY_MOCKS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                onClick={applyItinerarySummary}
-                className="w-full rounded bg-white text-black"
-              >
-                Apply summary
-              </button>
-
-              <div className="mt-2 border-t border-white/20 pt-2">booking form</div>
-              <label className="block">
-                mock
-                <select
-                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
-                  value={bookingFormMockId}
-                  onChange={(e) => setBookingFormMockId(e.target.value)}
-                >
-                  {BOOKING_FORM_MOCKS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                onClick={applyBookingForm}
-                className="w-full rounded bg-white text-black"
-              >
-                Apply booking form
-              </button>
-
-              <div className="mt-2 border-t border-white/20 pt-2">chat</div>
-              <label className="block">
-                mock
-                <select
-                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
-                  value={chatMockId}
-                  onChange={(e) => setChatMockId(e.target.value)}
-                >
-                  {CHAT_MOCKS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                onClick={applyChat}
-                className="w-full rounded bg-white text-black"
-              >
-                Apply chat
-              </button>
-
-              <div className="mt-2 border-t border-white/20 pt-2">itinerary experiences</div>
-              <label className="block">
-                mock
-                <select
-                  className="mt-1 w-full bg-white/10 px-1 py-0.5"
-                  value={syncMockId}
-                  onChange={(e) => setSyncMockId(e.target.value)}
-                >
-                  {SYNC_EXPERIENCES_MOCKS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="flex gap-2">
+                <div className="mt-2 border-t border-white/20 pt-2">booking form</div>
+                <label className="block">
+                  mock
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={bookingFormMockId}
+                    onChange={(e) => setBookingFormMockId(e.target.value)}
+                  >
+                    {BOOKING_FORM_MOCKS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button
                   type="button"
-                  onClick={applyExperiences}
-                  className="flex-1 rounded bg-white text-black"
+                  onClick={applyBookingForm}
+                  className="w-full rounded bg-white text-black"
                 >
-                  Apply experiences
+                  Apply booking form
                 </button>
-                <button
-                  type="button"
-                  onClick={replayExperiences}
-                  className="rounded bg-white/20 px-2 text-white"
-                >
-                  Replay
-                </button>
-                <button
-                  type="button"
-                  onClick={clearAddedExperiences}
-                  className="rounded bg-white/20 px-2 text-white"
-                >
-                  Clear
-                </button>
-              </div>
 
-              {lastError && (
-                <div className="rounded bg-red-900/60 p-1">last error: {lastError.message}</div>
-              )}
-            </>
-          )}
+                <div className="mt-2 border-t border-white/20 pt-2">chat</div>
+                <label className="block">
+                  mock
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={chatMockId}
+                    onChange={(e) => setChatMockId(e.target.value)}
+                  >
+                    {CHAT_MOCKS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={applyChat}
+                  className="w-full rounded bg-white text-black"
+                >
+                  Apply chat
+                </button>
+
+                <div className="mt-2 border-t border-white/20 pt-2">itinerary experiences</div>
+                <label className="block">
+                  mock
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={syncMockId}
+                    onChange={(e) => setSyncMockId(e.target.value)}
+                  >
+                    {SYNC_EXPERIENCES_MOCKS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={applyExperiences}
+                    className="flex-1 rounded bg-white text-black"
+                  >
+                    Apply experiences
+                  </button>
+                  <button
+                    type="button"
+                    onClick={replayExperiences}
+                    className="rounded bg-white/20 px-2 text-white"
+                  >
+                    Replay
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearAddedExperiences}
+                    className="rounded bg-white/20 px-2 text-white"
+                  >
+                    Clear
+                  </button>
+                </div>
+
+                {lastError && (
+                  <div className="rounded bg-red-900/60 p-1">last error: {lastError.message}</div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>
