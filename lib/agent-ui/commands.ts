@@ -152,6 +152,11 @@ const ShowExperienceDetail = Base.extend({
   payload: z.object({ experience_id: z.string().nullable() }),
 });
 
+const ShowItineraryTab = Base.extend({
+  type: z.literal('show_itinerary_tab'),
+  payload: z.object({ tab: z.enum(['overview', 'excursions']) }),
+});
+
 const nstr = z.string().nullable();
 
 export const ItinerarySummaryWire = z.object({
@@ -245,6 +250,7 @@ export const UiCommand = z.discriminatedUnion('type', [
   ShowCabinDetail,
   ShowCityDetail,
   ShowExperienceDetail,
+  ShowItineraryTab,
   AddCabinToBasket,
   AddExperienceToBasket,
   SyncItineraryExperiences,

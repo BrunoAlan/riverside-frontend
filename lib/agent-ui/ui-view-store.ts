@@ -139,6 +139,17 @@ export function createUiViewStore() {
                     lastCorrelationId: cmd.correlationId,
                   };
                 }
+                case 'show_itinerary_tab': {
+                  if (state.view.type !== 'itinerary') {
+                    return { source: 'agent', lastCorrelationId: cmd.correlationId };
+                  }
+                  return {
+                    view: { ...state.view, activeTab: cmd.payload.tab },
+                    hint: null,
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                }
                 case 'add_cabin_to_basket':
                   return {
                     selectedCabinId: cmd.payload.cabin_id,

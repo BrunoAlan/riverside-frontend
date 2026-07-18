@@ -796,4 +796,35 @@ describe('ui-view-store', () => {
       expect(store.getState().view).toEqual({ type: 'start' });
     });
   });
+
+  describe('applyCommand(show_itinerary_tab)', () => {
+    it('switches the tab and marks the source as agent', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({ type: 'itinerary', itinerary: undefined });
+
+      store.getState().applyCommand({
+        type: 'show_itinerary_tab',
+        correlationId: 'c1',
+        payload: { tab: 'excursions' },
+      });
+
+      const { view, source } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.activeTab).toBe('excursions');
+      expect(source).toBe('agent');
+    });
+
+    it('leaves a non-itinerary view untouched', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({ type: 'start' });
+
+      store.getState().applyCommand({
+        type: 'show_itinerary_tab',
+        correlationId: 'c1',
+        payload: { tab: 'excursions' },
+      });
+
+      expect(store.getState().view).toEqual({ type: 'start' });
+    });
+  });
 });
