@@ -5,7 +5,7 @@ import type { BookingForm } from '@/lib/booking-form/types';
 import { toItinerarySummary } from '@/lib/itinerary-summary/from-wire';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 import type { UiCommand } from './commands';
-import type { BookingSummary, UiHint, UiSource, UiView } from './ui-view-types';
+import type { BookingSummary, ItineraryTab, UiHint, UiSource, UiView } from './ui-view-types';
 
 interface UiViewState {
   view: UiView;
@@ -22,6 +22,7 @@ interface UiViewState {
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
   setViewFromUser: (view: UiView) => void;
+  setItineraryTabFromUser: (tab: ItineraryTab) => void;
   setBookingSummaryFromDev: (summary: BookingSummary | null) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
   clearAddedExperiencesFromDev: () => void;
@@ -200,6 +201,21 @@ export function createUiViewStore() {
             { view, hint: null, source: 'user', lastCorrelationId: null },
             false,
             'setViewFromUser'
+          ),
+
+        setItineraryTabFromUser: (tab) =>
+          set(
+            (state) =>
+              state.view.type === 'itinerary'
+                ? {
+                    view: { ...state.view, activeTab: tab },
+                    hint: null,
+                    source: 'user',
+                    lastCorrelationId: null,
+                  }
+                : {},
+            false,
+            'setItineraryTabFromUser'
           ),
 
         setBookingSummaryFromDev: (summary) =>

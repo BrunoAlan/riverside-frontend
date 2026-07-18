@@ -21,6 +21,8 @@ export type PackageOption = {
   cells: Record<string, PackageCell>; // keyed by feature.id
 };
 
+export type ItineraryTab = 'overview' | 'excursions';
+
 export type UiView =
   | { type: 'start' }
   | { type: 'presentation' }
@@ -28,6 +30,9 @@ export type UiView =
   | {
       type: 'itinerary';
       itinerary?: ItineraryFull;
+      // Which tab the itinerary view is showing. Undefined means 'overview'.
+      // Lives here rather than in component state so ui-commands can drive it.
+      activeTab?: ItineraryTab;
       detailCityId?: string;
       detailExperienceId?: string;
     }

@@ -758,4 +758,42 @@ describe('ui-view-store', () => {
     expect(s.bookingForm).toBeNull();
     expect(s.source).toBe('user');
   });
+
+  describe('itinerary active tab', () => {
+    it('setItineraryTabFromUser switches the tab and marks the source as user', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({ type: 'itinerary', itinerary: undefined });
+
+      store.getState().setItineraryTabFromUser('excursions');
+
+      const { view, source } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.activeTab).toBe('excursions');
+      expect(source).toBe('user');
+    });
+
+    it('setItineraryTabFromUser preserves the rest of the itinerary view', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({
+        type: 'itinerary',
+        itinerary: undefined,
+        detailCityId: 'budapest',
+      });
+
+      store.getState().setItineraryTabFromUser('excursions');
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.detailCityId).toBe('budapest');
+    });
+
+    it('setItineraryTabFromUser is a no-op when the view is not an itinerary', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({ type: 'start' });
+
+      store.getState().setItineraryTabFromUser('excursions');
+
+      expect(store.getState().view).toEqual({ type: 'start' });
+    });
+  });
 });

@@ -6,6 +6,7 @@ export const useUiSource = () => useUiViewStore((s) => s.source);
 export const useUiLastError = () => useUiViewStore((s) => s.lastError);
 export const useSetViewFromDev = () => useUiViewStore((s) => s.setViewFromDev);
 export const useSetViewFromUser = () => useUiViewStore((s) => s.setViewFromUser);
+export const useSetItineraryTabFromUser = () => useUiViewStore((s) => s.setItineraryTabFromUser);
 export const useBookingSummary = () => useUiViewStore((s) => s.bookingSummary);
 export const useSetBookingSummaryFromDev = () => useUiViewStore((s) => s.setBookingSummaryFromDev);
 export const useSelectedCabinId = () => useUiViewStore((s) => s.selectedCabinId);
