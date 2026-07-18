@@ -44,6 +44,18 @@ export function ExcursionsPanel({ itinerary, detailExperienceId }: ExcursionsPan
     [sendIntent]
   );
 
+  // Closing the detail has to be reported too, or the agent keeps believing the
+  // modal is still open. The backend's view_experience_selection handler is the
+  // counterpart to explore_experience and answers with show_experience_detail:null.
+  const handleExperienceCloseDetail = useCallback(
+    (experience: Experience) => {
+      void sendIntent('view_experience_selection', {
+        userMessage: `User closed ${experience.name} detail`,
+      });
+    },
+    [sendIntent]
+  );
+
   const handleExperienceConfirm = useCallback(
     (experience: Experience, day: string) => {
       void sendIntent('select_experience', {
@@ -77,6 +89,7 @@ export function ExcursionsPanel({ itinerary, detailExperienceId }: ExcursionsPan
             onDetailOpenChange={(open) => {
               setOpenDetailId(open ? experience.id : null);
               if (open) handleExperienceExplore(experience);
+              else handleExperienceCloseDetail(experience);
             }}
             onConfirm={(day) => handleExperienceConfirm(experience, day)}
           />
