@@ -57,7 +57,6 @@ needs the city days to render its badge, so a new pure helper
 ```ts
 export type ExcursionItem = {
   experience: Experience;
-  cityName: string;
   dayOptions: string[];
 };
 
@@ -170,9 +169,8 @@ components are not unit-tested — they are verified visually in the dev panel. 
 only automated tests are for the two new pure helpers:
 
 - `lib/map/format-day-badge.test.ts` — covers the four label cases in the table above.
-- `lib/map/build-excursion-items.test.ts` — asserts each item carries its city name
-  and the parsed day options of its owning city, and that cities without
-  experiences contribute nothing.
+- `lib/map/build-excursion-items.test.ts` — asserts each item carries the parsed day
+  options of its owning city, and that cities without experiences contribute nothing.
 
 Both follow the style of `build-experience-day-options.test.ts`.
 
