@@ -43,23 +43,31 @@ excursions-panel.tsx          (rewritten: grid container, no hero, no 440px pane
 
 Both new files live in `components/panels/itinerary/`.
 
-`components/ui/dialog.tsx` does not exist yet and must be added via the shadcn CLI
-(`pnpm dlx shadcn@latest add dialog`). Per the repo's hard rules it is not
-hand-written and not edited afterwards.
+`components/ui/dialog.tsx` already exists and exports `Dialog`, `DialogContent`,
+`DialogHeader`, `DialogTitle`, `DialogDescription` among others. No shadcn CLI step
+is needed and the primitive is not edited.
 
 ### Data flow
 
 `excursions-panel.tsx:23` currently flattens experiences with
 `itinerary.cities.flatMap(c => c.experiences)`, discarding the owning city. The card
-needs the city to render its day badge, so the flatten changes to preserve it:
+needs the city days to render its badge, so a new pure helper
+`lib/map/build-excursion-items.ts` does the flatten while preserving them:
 
 ```ts
-type ExcursionItem = { experience: Experience; city: ItineraryCity }
+export type ExcursionItem = {
+  experience: Experience;
+  cityName: string;
+  dayOptions: string[];
+};
+
+export function buildExcursionItems(cities: ItineraryCity[]): ExcursionItem[];
 ```
 
-Day options continue to come from `buildExperienceDayOptions(cities)`, which is
-unchanged along with its existing tests. The panel passes each card its
-`dayOptions: string[]` plus the item.
+The helper lives in `lib/` rather than inside the component because vitest only
+collects `lib/**/*.test.ts` — logic placed in a component cannot be tested here.
+It composes `parseCityDays` per city, which keeps it consistent with
+`buildExperienceDayOptions` (left unchanged, still used by the map overlay).
 
 Added state continues to come from `useAddedExperiences`
 (`lib/agent-ui/hooks.ts:12`, shape `Array<{ experienceId; day }>`). No hook changes.
@@ -143,14 +151,30 @@ the container scrolls, with the same top and bottom gradient fades used by
 The existing tab-visibility mechanism in `itinerary-panel.tsx:41-49`
 (`pointer-events-none opacity-0` + `inert` when inactive) is unchanged.
 
+## Agent-driven detail
+
+`ExcursionsPanel` already receives `detailExperienceId`, set by the backend's
+`show_experience_detail` command. Today `CityExperiencesPanel` uses it to expand a
+row. That behaviour is preserved against the new UI: when `detailExperienceId`
+matches a card, that card's dialog opens.
+
+Dialog open state therefore lives in `ExcursionsPanel` as a single
+`openExperienceId` value, not per-card — only one dialog can be open, and the
+backend must be able to drive it. Opening a dialog fires the existing
+`explore_experience` intent, as expanding a row does today.
+
 ## Testing
 
-- `lib/map/format-day-badge.test.ts` — covers the four label cases in the table
-  above, following the style of `build-experience-day-options.test.ts`.
-- A test for the experience→city pairing produced by the rewritten flatten in
-  `excursions-panel.tsx`, asserting each item carries its owning city.
+Per `conventions/testing.md:11,21`, vitest only collects `lib/**/*.test.ts` and React
+components are not unit-tested — they are verified visually in the dev panel. So the
+only automated tests are for the two new pure helpers:
 
-Tests sit next to the code they cover, per the repo convention.
+- `lib/map/format-day-badge.test.ts` — covers the four label cases in the table above.
+- `lib/map/build-excursion-items.test.ts` — asserts each item carries its city name
+  and the parsed day options of its owning city, and that cities without
+  experiences contribute nothing.
+
+Both follow the style of `build-experience-day-options.test.ts`.
 
 ## Verification
 
