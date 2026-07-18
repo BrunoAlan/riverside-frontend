@@ -913,3 +913,24 @@ describe('show_itinerary_tab', () => {
     expect(result.success).toBe(false);
   });
 });
+
+describe('command envelope source', () => {
+  it('accepts a command carrying a source', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c1',
+      source: 'classifier',
+      payload: { experience_id: 'exp-1' },
+    });
+    expect(result.source).toBe('classifier');
+  });
+
+  it('still accepts a command without a source', () => {
+    const result = UiCommand.parse({
+      type: 'show_experience_detail',
+      correlationId: 'c1',
+      payload: { experience_id: 'exp-1' },
+    });
+    expect(result.source).toBeUndefined();
+  });
+});

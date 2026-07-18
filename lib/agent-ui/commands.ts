@@ -3,6 +3,11 @@ import { z } from 'zod';
 const Base = z.object({
   correlationId: z.string(),
   sessionId: z.string().optional(),
+  // Who originated the command: 'frontend-intent' when the user tapped,
+  // 'classifier' when the agent decided on its own. The backend computes this
+  // (turn_handler.py:143) but does not send it yet — accepted here so it parses
+  // the day it does. Nothing renders differently on it today.
+  source: z.string().optional(),
 });
 
 const ShowDiscoveryCanvas = Base.extend({
