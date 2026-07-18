@@ -129,10 +129,15 @@ export function createUiViewStore() {
                   if (state.view.type !== 'itinerary') {
                     return { source: 'agent', lastCorrelationId: cmd.correlationId };
                   }
+                  const experienceId = cmd.payload.experience_id ?? undefined;
                   return {
                     view: {
                       ...state.view,
-                      detailExperienceId: cmd.payload.experience_id ?? undefined,
+                      detailExperienceId: experienceId,
+                      // Opening a detail forces the tab that can show it, so the
+                      // agent needs one command instead of an ordered pair.
+                      // Closing leaves the tab where the user left it.
+                      activeTab: experienceId ? 'excursions' : state.view.activeTab,
                     },
                     hint: null,
                     source: 'agent',

@@ -827,4 +827,39 @@ describe('ui-view-store', () => {
       expect(store.getState().view).toEqual({ type: 'start' });
     });
   });
+
+  describe('applyCommand(show_experience_detail) tab behaviour', () => {
+    it('switches to the excursions tab so the detail is visible', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({ type: 'itinerary', itinerary: undefined });
+
+      store.getState().applyCommand({
+        type: 'show_experience_detail',
+        correlationId: 'c1',
+        payload: { experience_id: 'exp-1' },
+      });
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.activeTab).toBe('excursions');
+      expect(view.detailExperienceId).toBe('exp-1');
+    });
+
+    it('does not change the tab when closing the detail', () => {
+      const store = createUiViewStore();
+      store.getState().setViewFromUser({ type: 'itinerary', itinerary: undefined });
+      store.getState().setItineraryTabFromUser('overview');
+
+      store.getState().applyCommand({
+        type: 'show_experience_detail',
+        correlationId: 'c2',
+        payload: { experience_id: null },
+      });
+
+      const { view } = store.getState();
+      if (view.type !== 'itinerary') throw new Error('expected itinerary view');
+      expect(view.activeTab).toBe('overview');
+      expect(view.detailExperienceId).toBeUndefined();
+    });
+  });
 });
