@@ -18,7 +18,7 @@
 - Card chrome uses the house recipe: `bg-beige-50 border-beige-400/50 gap-0 overflow-hidden rounded-2xl shadow-none`.
 - Icons use `@phosphor-icons/react` with `weight="bold"`.
 - No changes to `lib/agent-ui/commands.ts`. No `price` field is added.
-- Do not modify `components/panels/map/experience-card.tsx`, `components/panels/map/city-experiences-panel.tsx`, or `lib/map/build-experience-day-options.ts` — they remain the map overlay's path.
+- Do not modify `components/panels/map/city-experiences-panel.tsx` or `lib/map/build-experience-day-options.ts` — they remain the map overlay's path. `components/panels/map/experience-card.tsx` is modified in Task 3 only, to consume the extracted shared gallery; its behaviour must not change.
 - Work happens on branch `feat/excursion-cards-grid`.
 
 ---
@@ -220,29 +220,125 @@ git commit -m "feat(map): add buildExcursionItems to pair experiences with city 
 
 ---
 
-### Task 3: `ExcursionDetailDialog`
+### Task 3: Shared gallery + `ExcursionDetailDialog`
 
 **Files:**
+- Create: `components/shared/experience-gallery.tsx`
+- Modify: `components/panels/map/experience-card.tsx` (delete the local `ExperienceGallery` at :161-191, import the shared one)
 - Create: `components/panels/itinerary/excursion-detail-dialog.tsx`
+
+The gallery is extracted first because the dialog needs the same hero-plus-thumbnails
+widget that `experience-card.tsx:161-191` already implements. Copying it would
+duplicate ~30 lines verbatim. The only differences between the two call sites are the
+hero height and the `sizes` hint, so both become props.
+
+`ExperienceCard`'s rendered output must not change: it passes `heroClassName="h-36"`
+and `heroSizes="440px"`, which are its current values.
 
 **Interfaces:**
 - Consumes: `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription` from `@/components/ui/dialog`; `Button` from `@/components/ui/button`; `Experience` from `@/lib/agent-ui/commands`; `cn` from `@/lib/shadcn/utils`.
+- Produces (gallery): `ExperienceGallery({ images, alt, heroClassName, heroSizes }: { images: string[]; alt: string; heroClassName: string; heroSizes: string })` from `@/components/shared/experience-gallery`.
 - Produces: `ExcursionDetailDialog` with props
   `{ experience: Experience; images: string[]; open: boolean; onOpenChange: (open: boolean) => void; dayOptions: string[]; selectedDay: string; onSelectDay: (day: string) => void; addedDays: string[]; onConfirm: (day: string) => void }`.
   The selected day is lifted to the parent card so the card footer and the dialog stay in sync.
 
-This task has no automated test — it is a React component, which this repo does not unit-test (`conventions/testing.md:21`). It is verified in Task 5.
+This task has no automated test — these are React components, which this repo does not unit-test (`conventions/testing.md:21`). Verified in Task 5.
 
-- [ ] **Step 1: Write the component**
+- [ ] **Step 1: Extract the shared gallery**
 
-Create `components/panels/itinerary/excursion-detail-dialog.tsx`:
+Create `components/shared/experience-gallery.tsx` by moving the function from
+`experience-card.tsx:161-191` and parameterising the two hard-coded values:
 
 ```tsx
 'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { cn } from '@/lib/shadcn/utils';
+
+// Hero image plus a thumbnail strip. Used by the map overlay's experience card and
+// by the Excursions detail dialog, which differ only in hero size.
+export function ExperienceGallery({
+  images,
+  alt,
+  heroClassName,
+  heroSizes,
+}: {
+  images: string[];
+  alt: string;
+  heroClassName: string;
+  heroSizes: string;
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeSrc = images[activeIndex] ?? images[0];
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className={cn('relative w-full overflow-hidden rounded-lg', heroClassName)}>
+        <Image src={activeSrc} alt={alt} fill sizes={heroSizes} className="object-cover" />
+      </div>
+      {images.length > 1 && (
+        <div className="flex gap-2">
+          {images.map((src, index) => (
+            <button
+              key={src}
+              type="button"
+              aria-label={`Show image ${index + 1}`}
+              aria-pressed={index === activeIndex}
+              onClick={() => setActiveIndex(index)}
+              className={cn(
+                'relative h-14 w-20 shrink-0 overflow-hidden rounded-md transition',
+                index === activeIndex ? 'ring-primary ring-2' : 'opacity-70 hover:opacity-100'
+              )}
+            >
+              <Image src={src} alt="" fill sizes="80px" className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+- [ ] **Step 2: Point `ExperienceCard` at the shared gallery**
+
+In `components/panels/map/experience-card.tsx`:
+
+1. Delete the local `ExperienceGallery` function (lines 161-191).
+2. Add the import `import { ExperienceGallery } from '@/components/shared/experience-gallery';`
+3. Replace the call site at line 86 with:
+
+```tsx
+{expanded && images.length > 0 && (
+  <div className="mb-2">
+    <ExperienceGallery
+      images={images}
+      alt={experience.name}
+      heroClassName="h-36"
+      heroSizes="440px"
+    />
+  </div>
+)}
+```
+
+The wrapper `div` carries the `mb-2` that the old local gallery had on its own root,
+so spacing is unchanged.
+
+- [ ] **Step 3: Verify the extraction is behaviour-neutral**
+
+Run: `pnpm lint && pnpm test`
+Expected: both PASS. Confirm `git diff components/panels/map/experience-card.tsx` shows only the import, the call site, and the deleted function — no other behavioural change.
+
+- [ ] **Step 4: Write the dialog**
+
+Create `components/panels/itinerary/excursion-detail-dialog.tsx`:
+
+```tsx
+'use client';
+
 import { CheckIcon } from '@phosphor-icons/react';
+import { ExperienceGallery } from '@/components/shared/experience-gallery';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -252,7 +348,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import type { Experience } from '@/lib/agent-ui/commands';
-import { cn } from '@/lib/shadcn/utils';
 
 type ExcursionDetailDialogProps = {
   experience: Experience;
@@ -290,7 +385,14 @@ export function ExcursionDetailDialog({
             </DialogDescription>
           )}
         </DialogHeader>
-        {images.length > 0 && <DetailGallery images={images} alt={experience.name} />}
+        {images.length > 0 && (
+          <ExperienceGallery
+            images={images}
+            alt={experience.name}
+            heroClassName="h-56"
+            heroSizes="512px"
+          />
+        )}
         <p className="text-primary/80 text-sm leading-relaxed">{experience.description}</p>
         <div className="flex items-center justify-between gap-2">
           <label htmlFor={`dialog-day-${experience.id}`} className="sr-only">
@@ -330,49 +432,18 @@ export function ExcursionDetailDialog({
   );
 }
 
-function DetailGallery({ images, alt }: { images: string[]; alt: string }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeSrc = images[activeIndex] ?? images[0];
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="relative h-56 w-full overflow-hidden rounded-lg">
-        <Image src={activeSrc} alt={alt} fill sizes="512px" className="object-cover" />
-      </div>
-      {images.length > 1 && (
-        <div className="flex gap-2">
-          {images.map((src, index) => (
-            <button
-              key={src}
-              type="button"
-              aria-label={`Show image ${index + 1}`}
-              aria-pressed={index === activeIndex}
-              onClick={() => setActiveIndex(index)}
-              className={cn(
-                'relative h-14 w-20 shrink-0 overflow-hidden rounded-md transition',
-                index === activeIndex ? 'ring-primary ring-2' : 'opacity-70 hover:opacity-100'
-              )}
-            >
-              <Image src={src} alt="" fill sizes="80px" className="object-cover" />
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 ```
 
-- [ ] **Step 2: Verify it compiles and lints**
+- [ ] **Step 5: Verify it compiles and lints**
 
-Run: `pnpm lint`
-Expected: PASS with no errors for `excursion-detail-dialog.tsx`. The component is not yet imported anywhere, which is fine — it is wired up in Task 4.
+Run: `pnpm lint && pnpm test`
+Expected: both PASS. The dialog is not yet imported anywhere, which is fine — it is wired up in Task 4.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add components/panels/itinerary/excursion-detail-dialog.tsx
-git commit -m "feat(itinerary): add excursion detail dialog with gallery and day picker"
+git add components/shared/experience-gallery.tsx components/panels/map/experience-card.tsx components/panels/itinerary/excursion-detail-dialog.tsx
+git commit -m "feat(itinerary): extract shared experience gallery and add excursion detail dialog"
 ```
 
 ---
