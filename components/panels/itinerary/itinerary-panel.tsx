@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { ExcursionsPanel } from '@/components/panels/itinerary/excursions-panel';
 import { type ItineraryTab, ItineraryTabs } from '@/components/panels/itinerary/itinerary-tabs';
 import { PanelMap } from '@/components/panels/map/panel-map';
-import { useSetViewFromUser } from '@/lib/agent-ui/hooks';
+import { useFrontendIntent } from '@/hooks/use-frontend-intent';
+import { useSetItineraryTabFromUser, useSetViewFromUser } from '@/lib/agent-ui/hooks';
 import type { UiView } from '@/lib/agent-ui/ui-view-types';
 import { cn } from '@/lib/shadcn/utils';
 
@@ -13,21 +14,35 @@ type ItineraryPanelProps = {
 };
 
 export function ItineraryPanel({ view }: ItineraryPanelProps) {
-  const [activeTab, setActiveTab] = useState<ItineraryTab>('overview');
+  const setItineraryTab = useSetItineraryTabFromUser();
   const setViewFromUser = useSetViewFromUser();
+  const sendIntent = useFrontendIntent();
   const { itinerary, detailCityId, detailExperienceId } = view;
+  const activeTab = view.activeTab ?? 'overview';
 
   // Switching to Excursions with a city detail open silently collapses it —
   // this is tab-switch cleanup, not a user action on the itinerary, so it
-  // sends no agent intent (unlike CityDetailCard's own close button).
+  // sends no explore/close intent of its own.
+  //
+  // The intent below is edge-triggered here, on a real user tab change. It must
+  // never move to an effect on `activeTab`: an agent-driven switch would echo
+  // back, and every intent occupies one of the backend's three
+  // conversation-history slots.
   const handleTabChange = useCallback(
     (tab: ItineraryTab) => {
-      setActiveTab(tab);
+      if (tab === activeTab) return;
+      setItineraryTab(tab);
       if (tab === 'excursions' && detailCityId) {
-        setViewFromUser({ type: 'itinerary', itinerary });
+        setViewFromUser({ type: 'itinerary', itinerary, activeTab: 'excursions' });
       }
+      void sendIntent(tab === 'excursions' ? 'view_excursions' : 'view_itinerary', {
+        userMessage:
+          tab === 'excursions'
+            ? 'User switched to the excursions tab'
+            : 'User returned to the itinerary tab',
+      });
     },
-    [detailCityId, itinerary, setViewFromUser]
+    [activeTab, detailCityId, itinerary, setItineraryTab, setViewFromUser, sendIntent]
   );
 
   return (

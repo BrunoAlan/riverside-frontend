@@ -1,9 +1,10 @@
 'use client';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { ItineraryTab } from '@/lib/agent-ui/ui-view-types';
 import { cn } from '@/lib/shadcn/utils';
 
-export type ItineraryTab = 'overview' | 'excursions';
+export type { ItineraryTab };
 
 type ItineraryTabsProps = {
   value: ItineraryTab;
