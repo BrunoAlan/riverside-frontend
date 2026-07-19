@@ -8,12 +8,15 @@ import { BookingSummaryContainer } from '@/components/agent-ui/booking-summary';
 import { SuggestionPillsContainer } from '@/components/agent-ui/suggestion-pills';
 import { ChatDock } from '@/components/chat/chat-dock';
 import { AppConfigProvider } from '@/components/layout/app-config-context';
+import {
+  ChatTranscriptionProvider,
+  useChatTranscriptionContext,
+} from '@/components/layout/chat-transcription-context';
 import { ViewController } from '@/components/layout/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
 import { BookingFormModalContainer } from '@/components/panels/booking-form/booking-form-modal';
 import { useAgentErrors } from '@/hooks/use-agent-errors';
-import { useChatTranscription } from '@/hooks/use-chat-transcription';
 import { useDebugMode } from '@/hooks/use-debug';
 import { useSessionAnalytics } from '@/hooks/use-session-analytics';
 import { useViewAnalytics } from '@/hooks/use-view-analytics';
@@ -36,7 +39,7 @@ function AppSetup() {
 
 function ChatDockContainer() {
   const view = useUiView();
-  const { messages: liveMessages, sendMessage } = useChatTranscription();
+  const { messages: liveMessages, sendMessage } = useChatTranscriptionContext();
   const mockMessages = useDevChatMessages();
   if (view.type === 'start') return null;
   const messages = mockMessages ?? liveMessages;
@@ -63,14 +66,16 @@ export function App({ appConfig }: AppProps) {
     <AppConfigProvider config={appConfig}>
       <AgentSessionProvider session={session}>
         <AppSetup />
-        <div className="relative flex h-full flex-col">
-          <div className="relative min-h-0 flex-1">
-            <ViewController />
+        <ChatTranscriptionProvider>
+          <div className="relative flex h-full flex-col">
+            <div className="relative min-h-0 flex-1">
+              <ViewController />
+            </div>
+            <SuggestionPillsContainer />
+            <BookingSummaryContainer />
+            <ChatDockContainer />
           </div>
-          <SuggestionPillsContainer />
-          <BookingSummaryContainer />
-          <ChatDockContainer />
-        </div>
+        </ChatTranscriptionProvider>
         <BookingFormModalContainer />
         <StartAudioButton label="Start Audio" />
         {IN_DEVELOPMENT && <DevPanel />}

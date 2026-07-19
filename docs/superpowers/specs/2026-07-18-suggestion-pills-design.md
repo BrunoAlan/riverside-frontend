@@ -85,7 +85,8 @@ dismissal state, and sends the message.
 
 - `stacked` is `useBookingSummary() === null`.
 - `pills` is `pillsForView(view.type)`.
-- On select: `sendMessage(pill.message ?? pill.label)` from `useChatTranscription()`.
+- On select: `sendMessage(pill.message ?? pill.label)` from `useChatTranscriptionContext()` (see
+  [Send path](#send-path) — the transcription hook is a single shared instance behind a provider).
 
 ### Dismissal
 
@@ -141,6 +142,20 @@ sits over the overlay. The padding is symmetric, so the row stays centered in th
 Identical to the chat dock's submit path: `localParticipant.sendText(text, { topic: 'lk.chat' })`
 via `useChatTranscription`. The pill's text is appended to the transcript as a user message and the
 agent replies as it would to typed input.
+
+`useChatTranscription` must be a **single shared instance**, not called once per consumer. The hook
+registers LiveKit text stream handlers for the `lk.chat` and `lk.transcription` topics, and
+`Room.registerTextStreamHandler` throws (`A text stream handler for topic "lk.chat" has already been
+set.`) when a topic already has a handler — so a second call in the same tree crashes at runtime.
+Two instances would also split the transcript state, since each hook keeps its own `messages` and
+LiveKit does not echo a participant's own text stream back to itself (which is why `sendMessage`
+appends the sent message locally).
+
+`components/layout/chat-transcription-context.tsx` therefore calls the hook once and exposes
+`{ messages, sendMessage }` via context. `ChatTranscriptionProvider` is mounted in
+`components/layout/app.tsx` inside `AgentSessionProvider` (the hook needs the LiveKit room context)
+and wraps both `SuggestionPillsContainer` and `ChatDockContainer`; both read
+`useChatTranscriptionContext()` instead of calling the hook.
 
 ## Testing
 

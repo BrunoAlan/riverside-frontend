@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { ConnectionState } from 'livekit-client';
 import { useConnectionState } from '@livekit/components-react';
+import { useChatTranscriptionContext } from '@/components/layout/chat-transcription-context';
 import { Button } from '@/components/ui/button';
-import { useChatTranscription } from '@/hooks/use-chat-transcription';
 import { useBookingSummary, useUiView } from '@/lib/agent-ui/hooks';
 import { cn } from '@/lib/shadcn/utils';
 import { type SuggestionPill, pillsForView } from '@/lib/suggestions/pills';
@@ -43,7 +43,7 @@ export function SuggestionPillsContainer() {
   const view = useUiView();
   const summary = useBookingSummary();
   const connectionState = useConnectionState();
-  const { sendMessage } = useChatTranscription();
+  const { sendMessage } = useChatTranscriptionContext();
   const [dismissedAt, setDismissedAt] = useState<string | null>(null);
 
   const pills = pillsForView(view.type);
