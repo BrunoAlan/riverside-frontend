@@ -6,7 +6,7 @@ import { useConnectionState } from '@livekit/components-react';
 import { CHAT_DOCK_OPEN_LANE_PX, CHAT_DOCK_OPEN_STORAGE_KEY } from '@/components/chat/chat-dock';
 import { useChatTranscriptionContext } from '@/components/layout/chat-transcription-context';
 import { Button } from '@/components/ui/button';
-import { useUiView, useVisibleBookingSummary } from '@/lib/agent-ui/hooks';
+import { useUiSource, useUiView, useVisibleBookingSummary } from '@/lib/agent-ui/hooks';
 import { viewKey } from '@/lib/agent-ui/view-key';
 import { useSessionStorageState } from '@/lib/chat/use-session-storage-state';
 import { cn } from '@/lib/shadcn/utils';
@@ -14,6 +14,8 @@ import { type SuggestionPill, pillsForView } from '@/lib/suggestions/pills';
 
 /** Gutter between the pills and the open chat overlay. */
 const LANE_GUTTER_PX = 16;
+
+const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
 interface SuggestionPillsProps {
   pills: SuggestionPill[];
@@ -49,6 +51,7 @@ export function SuggestionPillsContainer() {
   const view = useUiView();
   const summary = useVisibleBookingSummary();
   const connectionState = useConnectionState();
+  const source = useUiSource();
   const { sendMessage } = useChatTranscriptionContext();
   const [isChatOpen] = useSessionStorageState<boolean>(CHAT_DOCK_OPEN_STORAGE_KEY, false);
   const [dismissedAt, setDismissedAt] = useState<string | null>(null);
@@ -57,8 +60,12 @@ export function SuggestionPillsContainer() {
   const currentKey = viewKey(view);
 
   // Sending text needs a connected room, so a pill tapped before the session is
-  // connected would fail to send. Hide the row until the room is connected.
-  if (connectionState !== ConnectionState.Connected) return null;
+  // connected would fail to send. Hide the row until the room is connected —
+  // except for views the dev panel pushed, which exist precisely to be designed
+  // against with no backend. Tapping a pill there fails to send and the row
+  // comes back via the rollback below. Never softened in production.
+  const isDevPreview = IN_DEVELOPMENT && source === 'dev';
+  if (!isDevPreview && connectionState !== ConnectionState.Connected) return null;
   if (pills.length === 0) return null;
   if (dismissedAt === currentKey) return null;
 
