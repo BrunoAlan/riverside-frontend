@@ -15,10 +15,9 @@ import { ItinerarySummaryModal } from '@/components/panels/itinerary-summary/iti
 import { Button } from '@/components/ui/button';
 import { useFrontendIntent } from '@/hooks/use-frontend-intent';
 import {
-  useBookingSummary,
   useCloseItinerarySummary,
   useItinerarySummary,
-  useUiView,
+  useVisibleBookingSummary,
 } from '@/lib/agent-ui/hooks';
 import type { BookingSummary as BookingSummaryType } from '@/lib/agent-ui/ui-view-types';
 import { cn } from '@/lib/shadcn/utils';
@@ -162,10 +161,8 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
 }
 
 export function BookingSummaryContainer() {
-  const view = useUiView();
-  const summary = useBookingSummary();
+  const summary = useVisibleBookingSummary();
 
-  if (view.type === 'start') return null;
   if (summary === null) return null;
 
   return (

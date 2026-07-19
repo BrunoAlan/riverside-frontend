@@ -3,11 +3,17 @@
 import { useState } from 'react';
 import { ConnectionState } from 'livekit-client';
 import { useConnectionState } from '@livekit/components-react';
+import { CHAT_DOCK_OPEN_LANE_PX, CHAT_DOCK_OPEN_STORAGE_KEY } from '@/components/chat/chat-dock';
 import { useChatTranscriptionContext } from '@/components/layout/chat-transcription-context';
 import { Button } from '@/components/ui/button';
-import { useBookingSummary, useUiView } from '@/lib/agent-ui/hooks';
+import { useUiView, useVisibleBookingSummary } from '@/lib/agent-ui/hooks';
+import { viewKey } from '@/lib/agent-ui/view-key';
+import { useSessionStorageState } from '@/lib/chat/use-session-storage-state';
 import { cn } from '@/lib/shadcn/utils';
 import { type SuggestionPill, pillsForView } from '@/lib/suggestions/pills';
+
+/** Gutter between the pills and the open chat overlay. */
+const LANE_GUTTER_PX = 16;
 
 interface SuggestionPillsProps {
   pills: SuggestionPill[];
@@ -41,33 +47,38 @@ export function SuggestionPills({ pills, stacked, onSelect }: SuggestionPillsPro
 
 export function SuggestionPillsContainer() {
   const view = useUiView();
-  const summary = useBookingSummary();
+  const summary = useVisibleBookingSummary();
   const connectionState = useConnectionState();
   const { sendMessage } = useChatTranscriptionContext();
+  const [isChatOpen] = useSessionStorageState<boolean>(CHAT_DOCK_OPEN_STORAGE_KEY, false);
   const [dismissedAt, setDismissedAt] = useState<string | null>(null);
 
   const pills = pillsForView(view.type);
+  const currentKey = viewKey(view);
 
   // Sending text needs a connected room, so a pill tapped before the session is
   // connected would fail to send. Hide the row until the room is connected.
   if (connectionState !== ConnectionState.Connected) return null;
   if (pills.length === 0) return null;
-  if (dismissedAt === view.type) return null;
+  if (dismissedAt === currentKey) return null;
 
   return (
-    // `z-30` keeps the row above the chat dock (`z-20`); the wide-viewport
-    // padding keeps it clear of the dock's 360px chat overlay lane on the left.
-    <div className="pointer-events-none relative z-30 flex justify-center px-18 pb-4 xl:px-[26.5rem]">
+    // `z-30` keeps the row above the chat dock (`z-20`), so the row must clear
+    // the overlay's lane itself — but only while the overlay exists, and only on
+    // the left, so narrow viewports keep the full remaining width.
+    <div
+      className="pointer-events-none relative z-30 flex justify-center px-18 pb-4"
+      style={isChatOpen ? { paddingLeft: CHAT_DOCK_OPEN_LANE_PX + LANE_GUTTER_PX } : undefined}
+    >
       <SuggestionPills
         pills={pills}
         stacked={summary === null}
         onSelect={(pill) => {
-          const dismissedView = view.type;
-          setDismissedAt(dismissedView);
+          setDismissedAt(currentKey);
           // Restore the row if the send fails so a dropped message does not
           // strand the user with no suggestions.
-          sendMessage(pill.message ?? pill.label).catch(() => {
-            setDismissedAt((current) => (current === dismissedView ? null : current));
+          void sendMessage(pill.message ?? pill.label).catch(() => {
+            setDismissedAt((current) => (current === currentKey ? null : current));
           });
         }}
       />
