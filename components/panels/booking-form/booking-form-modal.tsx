@@ -18,6 +18,7 @@ import {
   useSubmitBookingFormFromUser,
   useUpdateGuestFromUser,
 } from '@/lib/agent-ui/hooks';
+import { uiViewStore } from '@/lib/agent-ui/ui-view-store';
 import { BOOKING_FORM_COPY } from '@/lib/booking-form/copy';
 import type { GuestInfo } from '@/lib/booking-form/guests';
 import type { BookingForm } from '@/lib/booking-form/types';
@@ -71,12 +72,14 @@ export function BookingFormModal({
 
                 {/* Right: guest form */}
                 <div className="flex flex-col gap-8">
-                  <GuestInfoForm
-                    guests={data.guests}
-                    onChange={onGuestChange}
-                    onCommit={onGuestCommit}
-                  />
-                  <CancellationPolicy agreed={data.agreed} onAgreedChange={onAgreedChange} />
+                  <fieldset disabled={data.status === 'submitting'} className="contents">
+                    <GuestInfoForm
+                      guests={data.guests}
+                      onChange={onGuestChange}
+                      onCommit={onGuestCommit}
+                    />
+                    <CancellationPolicy agreed={data.agreed} onAgreedChange={onAgreedChange} />
+                  </fieldset>
                   <Button
                     className="w-full"
                     disabled={!data.agreed || data.status === 'submitting'}
@@ -112,7 +115,12 @@ export function BookingFormModalContainer() {
     <BookingFormModal
       open
       onOpenChange={(o) => {
-        if (!o) closeBookingForm();
+        if (o) return;
+        void sendIntent('abandon_booking_form', {
+          entities: { status: bookingForm.status },
+          userMessage: 'User closed the booking form',
+        });
+        closeBookingForm();
       }}
       data={bookingForm}
       onGuestChange={updateGuestFromUser}
@@ -125,9 +133,11 @@ export function BookingFormModalContainer() {
       onAgreedChange={setAgreedFromUser}
       onSubmit={() => {
         submitBookingFormFromUser();
+        const current = uiViewStore.getState().bookingForm;
+        if (!current) return;
         void sendIntent('submit_booking_form', {
           entities: {
-            guests: bookingForm.guests.map((g) => ({
+            guests: current.guests.map((g) => ({
               first_name: g.firstName,
               last_name: g.lastName,
               email: g.email,

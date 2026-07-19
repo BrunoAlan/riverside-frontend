@@ -48,4 +48,9 @@ describe('makeBookingForm', () => {
     expect(makeBookingForm(summary, 0).guests).toHaveLength(1);
     expect(makeBookingForm(summary, -3).guestCount).toBe(1);
   });
+
+  it('clamps guest_count to at most 8', () => {
+    const summary = {} as import('@/lib/itinerary-summary/types').ItinerarySummary;
+    expect(makeBookingForm(summary, 100).guests).toHaveLength(8);
+  });
 });

@@ -270,8 +270,8 @@ const ShowSuggestions = Base.extend({
 const ShowBookingForm = Base.extend({
   type: z.literal('show_booking_form'),
   // Same wire as show_itinerary_summary plus how many guest blocks to render.
-  // guest_count is not floored here — the reducer clamps to >= 1; the parser
-  // never drops a command over odd content.
+  // guest_count is not floored or capped here — the reducer clamps it to the
+  // [1, 8] range.
   payload: z.object({
     summary: ItinerarySummaryWire,
     guest_count: z.number().int(),

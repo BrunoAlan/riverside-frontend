@@ -1248,5 +1248,38 @@ describe('ui-view-store', () => {
       store.getState().applyCommand({ type: 'close_booking_form', correlationId: 'bf6' });
       expect(store.getState().bookingForm).toBeNull();
     });
+
+    it('update_booking_form during submitting preserves status: submitting', () => {
+      openForm(1);
+      store.getState().submitBookingFormFromUser();
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf7',
+        payload: { guests: [{ index: 0, first_name: 'Juan' }] },
+      });
+      const form = store.getState().bookingForm;
+      expect(form?.status).toBe('submitting');
+      expect(form?.guests[0].firstName).toBe('Juan');
+    });
+
+    it('show_booking_form while a form is open resets to a fresh empty editing form', () => {
+      openForm(2);
+      store.getState().updateGuestFromUser(0, { firstName: 'Ana' });
+      store.getState().setAgreedFromUser(true);
+      openForm(1);
+      const form = store.getState().bookingForm;
+      expect(form?.status).toBe('editing');
+      expect(form?.agreed).toBe(false);
+      expect(form?.guests).toHaveLength(1);
+      expect(form?.guests[0].firstName).toBe('');
+    });
+
+    it('close_booking_form with no open form leaves bookingForm null and only tags source/correlation', () => {
+      store.getState().applyCommand({ type: 'close_booking_form', correlationId: 'bf8' });
+      const s = store.getState();
+      expect(s.bookingForm).toBeNull();
+      expect(s.source).toBe('agent');
+      expect(s.lastCorrelationId).toBe('bf8');
+    });
   });
 });

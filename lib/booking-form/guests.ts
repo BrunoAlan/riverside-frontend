@@ -23,7 +23,8 @@ export function makeEmptyGuests(count: number): GuestInfo[] {
 export const COUNTRY_CODES = ['US', 'GB', 'DE', 'FR', 'ES'] as const;
 
 export function makeBookingForm(summary: ItinerarySummary, guestCount: number): BookingForm {
-  const count = Math.max(1, guestCount);
+  // Defensive cap — a malformed guest_count must not render thousands of blocks.
+  const count = Math.min(Math.max(1, guestCount), 8);
   return {
     summary,
     guestCount: count,
