@@ -30,6 +30,9 @@ Cada command trae `{ type, payload, correlationId }`. Payloads exactos:
 | `sync_itinerary_experiences` | `{ experiences: [{ experience_id, name, day, destination, passenger_count }] }` |
 | `show_itinerary_summary` | ver `ItinerarySummaryWire` en `lib/agent-ui/commands.ts` |
 | `show_suggestions` | `{ suggestions: [{ id, text, label? }] }` — ver pedido 2.5 |
+| `show_booking_form` | `{ summary: <mismo wire que show_itinerary_summary>, guest_count }` — ver pedido 2.11 |
+| `update_booking_form` | `{ guests: [{ index, first_name?, last_name?, email?, country_code?, phone? }] }` — ver pedido 2.11 |
+| `close_booking_form` | `{}` — ver pedido 2.11 |
 
 Notas de comportamiento:
 
@@ -61,6 +64,15 @@ Cabinas, ya emitidos hoy:
 - `explore_cabin` — el usuario expandió una carta. `entities: { cabin_id }`.
 - `view_cabin_selection` — el usuario cerró el detalle de una cabina.
 - `select_cabin` — el usuario eligió una cabina. `entities: { cabin_id }`.
+
+Booking form, ya emitidos hoy:
+
+- `continue_booking` — el usuario tocó "Continue to booking" en la booking summary.
+- `provide_guest_info` — el usuario completó un campo por teclado.
+  `entities: { guest_index, field, value }`, con `field` ∈ `first_name | last_name |
+  email | country_code | phone`.
+- `submit_booking_form` — el usuario envió el form.
+  `entities: { guests: [{ first_name, last_name, email, country_code, phone }], agreed: true }`.
 
 ---
 
@@ -192,3 +204,33 @@ intent de cierre.
 Pedimos: un intent de cierre para el summary (el nombre que prefieran — p. ej.
 `view_itinerary_summary_closed` o reutilizar un `view_*` existente, avísennos
 cuál). Apenas lo definan, lo emitimos desde el frontend al cerrar el modal.
+
+### 2.11 Booking form: abrirlo, llenarlo por voz y cerrarlo
+
+El form de checkout (datos de huéspedes) ya es operable por command del lado del
+front. La cadena completa que pedimos:
+
+1. **Habilitar el CTA.** `cta.enabled` de `set_booking_summary` depende de
+   `canBook`/`bookingContextComplete`, flags que hoy nada escribe — el botón está
+   permanentemente deshabilitado. Lo mismo con el guard de `continue_booking`
+   (`availabilityConfirmed`). Definan quién escribe esos flags.
+2. **`continue_booking` emite `show_booking_form`.** El handler hoy es un stub.
+   El frontend ya manda el intent al tocar el CTA; respondan con el command
+   (payload arriba: el mismo builder del summary + `guest_count` de
+   `traveler_profile.traveler_count`).
+3. **Dictado por voz → `update_booking_form`.** Cuando el usuario dicta datos
+   ("mi nombre es Juan Pérez"), extraigan los campos y emitan el command con
+   patches parciales por huésped (`index` basado en 0). El frontend los pinta en
+   el form a la vista. Índices fuera de rango y `country_code` no soportados se
+   ignoran. **`agreed` no existe en el payload a propósito**: el consentimiento
+   de la política de cancelación solo lo marca el usuario con un tap — no lo
+   intenten setear.
+4. **Teclado → `provide_guest_info`.** Cada campo que el usuario completa
+   tipeando les llega como intent (payload arriba). Con eso el agente sabe qué
+   falta y puede guiar ("te falta el mail del huésped 2").
+5. **Submit → `submit_booking_form` → `close_booking_form`.** Al enviar, el
+   frontend manda el snapshot completo y deja el modal en estado "Sending…"
+   hasta que ustedes respondan `close_booking_form` (la X sigue activa como
+   escape). Validen y confirmen por voz; si más adelante quieren una vista de
+   confirmación (`show_confirmation_summary` ya existe en su código), definimos
+   el payload juntos y la sumamos.
