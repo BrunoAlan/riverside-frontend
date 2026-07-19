@@ -326,14 +326,14 @@ línea en el contenedor. El componente no se toca: ya recibe las pills por prop.
 
 | # | Acción | Backend | Frontend |
 | --- | --- | --- | --- |
-| 0 | Subir `activeTab` a `UiView` | — | **Nuestro** |
-| 1 | Intent `view_excursions` | Handler nuevo | Emitirlo al cambiar de tab |
-| 2 | Command `show_itinerary_tab` | Command nuevo | Aplicarlo al store |
-| 3 | Detalle por voz | `experience_id` en el esquema del LLM + resolver | Ya está |
-| 4 | Agregar por voz + marcador de origen | Lo del punto 3 + propagar `source` | Mostrar el origen |
-| 5 | Volver a Overview | Cubierto por el punto 2 | Cubierto por el punto 2 |
+| 0 | Subir `activeTab` a `UiView` | — | ✅ Hecho |
+| 1 | Intent `view_excursions` | Handler nuevo | ✅ Hecho — se emite al cambiar de tab |
+| 2 | Command `show_itinerary_tab` | Command nuevo | ✅ Hecho — aplicado al store |
+| 3 | Detalle por voz | `experience_id` en el esquema del LLM + resolver | ✅ Hecho (incluye auto-cambio de tab) |
+| 4 | Agregar por voz + marcador de origen | Lo del punto 3 + propagar `source` | ✅ El schema acepta `source`; decisión de producto: sin distinción visual, el card marcado como agregado alcanza |
+| 5 | Volver a Overview | Cubierto por el punto 2 | ✅ Cubierto por el punto 2 |
 | 6 | `view_itinerary` deja de ser no-op | Escribir estado | **Ya lo mandamos** |
-| 7 | Command `show_suggestions` (pills) | Command nuevo + generación | Schema, store y mock |
+| 7 | Command `show_suggestions` (pills) | Command nuevo + generación | ✅ Hecho — schema, store, contenedor y mock. `suggestions: []` limpia y vuelve el fallback estático; el front limpia además al cambiar de vista; se renderizan máx. 6 |
 
 ---
 
@@ -363,20 +363,18 @@ vacía nunca se transmite — lo que refuerza el mismo agujero.
 
 ### B. Dos commands se descartan en silencio
 
-`transport.ts:33-58` tira cualquier command que falle el `safeParse`. Estos dos fallan
-siempre:
+**Resuelto del lado del frontend (2026-07-19):** el schema del front ahora acepta
+lo que el backend manda hoy.
 
-| Command | Backend manda | Frontend espera |
-| --- | --- | --- |
-| `add_experience_to_basket` | `{experience_id}` (`select_experience.py:193`) | `{experience_id, day, passenger_count}` (`commands.ts:215-221`) |
-| `soft_redirect` | `{reasonCode, suggestedIntent}` | `{reason_code, missing}` (`commands.ts:13-19`) |
+| Command | Qué se alineó |
+| --- | --- |
+| `add_experience_to_basket` | `day` y `passenger_count` pasaron a opcionales; sin `day` el front no marca nada y `sync_itinerary_experiences` sigue siendo la fuente de verdad |
+| `soft_redirect` | La forma del backend (`{reasonCode, suggestedIntent}`) es la canónica; `suggestedIntent` se ignora y el overlay de debug es solo-dev |
 
-Ninguno tiene impacto visible hoy — `sync_itinerary_experiences` ya trae la info del
-basket, y `soft_redirect` solo pinta el enum crudo en un overlay de debug. Pero es
-deuda: el día que quieran usarlos, no van a llegar.
-
-**Decidan ustedes de qué lado se arregla** y nos avisan. Si van a converger a
-snake_case, lo alineamos del lado del front.
+**Drift nuevo encontrado y también resuelto:** `set_booking_summary` — el backend
+emite un slot por experience del basket **sin tope** (`_booking_summary_ui.py:136-150`)
+y el front validaba `slots` con máximo 6, descartando el command entero a partir del
+séptimo slot. El cap se eliminó del schema.
 
 ### C. La documentación del backend no sirve como contrato
 
