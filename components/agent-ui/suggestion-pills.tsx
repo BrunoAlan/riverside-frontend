@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useMaybeRoomContext } from '@livekit/components-react';
+import { ConnectionState } from 'livekit-client';
+import { useConnectionState } from '@livekit/components-react';
 import { Button } from '@/components/ui/button';
 import { useChatTranscription } from '@/hooks/use-chat-transcription';
 import { useBookingSummary, useUiView } from '@/lib/agent-ui/hooks';
@@ -41,26 +42,33 @@ export function SuggestionPills({ pills, stacked, onSelect }: SuggestionPillsPro
 export function SuggestionPillsContainer() {
   const view = useUiView();
   const summary = useBookingSummary();
-  const room = useMaybeRoomContext();
+  const connectionState = useConnectionState();
   const { sendMessage } = useChatTranscription();
   const [dismissedAt, setDismissedAt] = useState<string | null>(null);
 
   const pills = pillsForView(view.type);
 
-  // `sendMessage` silently no-ops without a connected local participant, so a
-  // pill tapped before the room connects would do nothing. Hide until it does.
-  if (!room?.localParticipant) return null;
+  // Sending text needs a connected room, so a pill tapped before the session is
+  // connected would fail to send. Hide the row until the room is connected.
+  if (connectionState !== ConnectionState.Connected) return null;
   if (pills.length === 0) return null;
   if (dismissedAt === view.type) return null;
 
   return (
-    <div className="pointer-events-none flex justify-center px-18 pb-4">
+    // `z-30` keeps the row above the chat dock (`z-20`); the wide-viewport
+    // padding keeps it clear of the dock's 360px chat overlay lane on the left.
+    <div className="pointer-events-none relative z-30 flex justify-center px-18 pb-4 xl:px-[26.5rem]">
       <SuggestionPills
         pills={pills}
         stacked={summary === null}
         onSelect={(pill) => {
-          setDismissedAt(view.type);
-          void sendMessage(pill.message ?? pill.label);
+          const dismissedView = view.type;
+          setDismissedAt(dismissedView);
+          // Restore the row if the send fails so a dropped message does not
+          // strand the user with no suggestions.
+          sendMessage(pill.message ?? pill.label).catch(() => {
+            setDismissedAt((current) => (current === dismissedView ? null : current));
+          });
         }}
       />
     </div>

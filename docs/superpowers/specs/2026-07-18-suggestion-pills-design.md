@@ -91,8 +91,9 @@ dismissal state, and sends the message.
 
 A `useState<string | null>` holds the `view.type` at which the row was dismissed. Tapping any pill
 sets it to the current `view.type`, hiding the whole row. When `view.type` changes the stored value
-no longer matches and the row reappears with that view's pills. Nothing is persisted and nothing
-is added to `uiViewStore`.
+no longer matches and the row reappears with that view's pills. If the send rejects, the dismissal
+is rolled back (unless the view already changed) so a failed message does not strand the user with
+no suggestions. Nothing is persisted and nothing is added to `uiViewStore`.
 
 ### Render gating
 
@@ -100,14 +101,16 @@ The container renders `null` when any of these hold:
 
 1. `pillsForView(view.type)` is empty.
 2. The row was dismissed at the current `view.type`.
-3. There is no connected local participant.
+3. The room is not connected.
 
-Condition 3 matters because `useChatTranscription().sendMessage` silently returns when
-`room.localParticipant` is absent (`hooks/use-chat-transcription.ts:54`). Before the user starts
-the session — which is the whole of the `start` view until the room connects — a pill tap would do
-nothing. Gating on the participant means a pill configured with `views: ['start']` stays hidden
-until the room is connected, then appears while still on `start`. The container reads the room via
-`useMaybeRoomContext()`, the same hook `useChatTranscription` uses.
+Condition 3 matters because sending text requires a connected room: `sendMessage` calls
+`localParticipant.sendText()`, which fails when the room has not connected yet. (Its own guard in
+`hooks/use-chat-transcription.ts` checks only that a local participant object is *present* — that is
+always true, since `Room.localParticipant` is non-optional and assigned in the `Room` constructor —
+so it does not cover this case.) Before the user starts the session a pill tap would fail. The
+container reads the live state with `useConnectionState()` from `@livekit/components-react` and
+renders only when it equals `ConnectionState.Connected`, so a pill configured with `views: ['start']`
+stays hidden until the room connects, then appears while still on `start`.
 
 ## Placement
 
@@ -126,6 +129,12 @@ Normal flow layout, no absolute positioning. When the booking summary is absent 
 the empty space above the chat dock; when it is present the row sits directly above the summary
 card. The wrapper uses the same horizontal padding as `BookingSummaryContainer` (`px-18 pb-4`) so
 the two align.
+
+`ChatDock` is `absolute inset-0 z-20` inside the same flex column, and its `ChatOverlay` is an
+opaque 360px panel anchored bottom-left. The wrapper is therefore `relative z-30` so pills always
+paint above the dock and stay clickable, and from `xl` up it pads symmetrically by the full width of
+that left lane (`xl:px-[26.5rem]` = `left-4` + controls + gap + 360px) so the centered row never
+sits over the overlay. The padding is symmetric, so the row stays centered in the viewport.
 
 ## Send path
 

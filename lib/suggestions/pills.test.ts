@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SUGGESTION_PILLS, type SuggestionPill, pillsForView } from './pills';
+import { type SuggestionPill, pillsForView } from './pills';
 
 const FIXTURE: SuggestionPill[] = [
   { id: 'scoped', label: 'Scoped', views: ['dream_stage'] },
@@ -29,8 +29,10 @@ describe('pillsForView', () => {
   });
 
   it('defaults to the shipped catalog', () => {
-    expect(pillsForView('presentation')).toEqual(
-      SUGGESTION_PILLS.filter((p) => !p.views || p.views.includes('presentation'))
-    );
+    expect(pillsForView('presentation').map((p) => p.id)).toEqual([
+      'vienna-christmas',
+      'budapest',
+      'river-vs-ocean',
+    ]);
   });
 });
