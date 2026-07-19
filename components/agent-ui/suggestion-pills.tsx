@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ConnectionState } from 'livekit-client';
 import { useConnectionState } from '@livekit/components-react';
 import { CHAT_DOCK_OPEN_LANE_PX, CHAT_DOCK_OPEN_STORAGE_KEY } from '@/components/chat/chat-dock';
+import { useAppConfig } from '@/components/layout/app-config-context';
 import { useChatTranscriptionContext } from '@/components/layout/chat-transcription-context';
 import { Button } from '@/components/ui/button';
 import { useUiSource, useUiView, useVisibleBookingSummary } from '@/lib/agent-ui/hooks';
@@ -56,7 +57,9 @@ export function SuggestionPillsContainer() {
   const [isChatOpen] = useSessionStorageState<boolean>(CHAT_DOCK_OPEN_STORAGE_KEY, false);
   const [dismissedAt, setDismissedAt] = useState<string | null>(null);
 
-  const pills = pillsForView(view.type);
+  const { suggestionPills } = useAppConfig();
+
+  const pills = pillsForView(view.type, suggestionPills);
   const currentKey = viewKey(view);
 
   // Sending text needs a connected room, so a pill tapped before the session is

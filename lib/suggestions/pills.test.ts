@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import { type SuggestionPill, pillsForView } from './pills';
 
 const FIXTURE: SuggestionPill[] = [
@@ -29,10 +30,20 @@ describe('pillsForView', () => {
   });
 
   it('defaults to the shipped catalog', () => {
-    expect(pillsForView('presentation').map((p) => p.id)).toEqual([
-      'vienna-christmas',
-      'budapest',
-      'river-vs-ocean',
-    ]);
+    const shipped = APP_CONFIG_DEFAULTS.suggestionPills;
+    const result = pillsForView('presentation');
+
+    // Asserted structurally rather than by id: the copy is product-owned and
+    // changes often, but the wiring to the shipped catalog must not.
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((pill) => shipped.includes(pill))).toBe(true);
+    expect(result.every((pill) => !pill.views || pill.views.includes('presentation'))).toBe(true);
+  });
+});
+
+describe('the shipped catalog', () => {
+  it('has unique ids', () => {
+    const ids = APP_CONFIG_DEFAULTS.suggestionPills.map((pill) => pill.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
