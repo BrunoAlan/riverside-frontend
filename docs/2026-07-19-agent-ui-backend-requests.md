@@ -36,6 +36,10 @@ Notas de comportamiento:
 - `show_experience_detail` funciona desde cualquier tab: si la excursión no está a la
   vista, el frontend cambia solo a la tab de Excursions. No hace falta mandar
   `show_itinerary_tab` antes.
+- `show_cabin_detail` solo tiene efecto si el usuario ya está en la vista de cabinas.
+  Para abrir un detalle desde otra vista, manden `show_cabin_options` +
+  `show_cabin_detail` **en ese orden en el mismo batch** — el frontend los aplica en
+  orden y funciona hoy.
 - `sync_itinerary_experiences` es la fuente de verdad de qué excursiones están
   agregadas; es lo que marca las cartas en la UI.
 - Un command que no parsea contra estos payloads se descarta en silencio. Ante
@@ -43,12 +47,18 @@ Notas de comportamiento:
 
 ### Intents (frontend → agente, `frontend-intent`)
 
-Los dos relevantes para navegación del itinerario, ya emitidos hoy:
+Navegación del itinerario, ya emitidos hoy:
 
 - `view_excursions` — el usuario cambió a la tab de Excursions. `entities: { itinerary_name }`.
 - `view_itinerary` — el usuario volvió a mirar el itinerario. Se emite en dos
   situaciones con el mismo payload (`entities: { itinerary_name }`): cerró la tarjeta
   de detalle de una ciudad, o volvió a la tab de Overview. Significan lo mismo.
+
+Cabinas, ya emitidos hoy:
+
+- `explore_cabin` — el usuario expandió una carta. `entities: { cabin_id }`.
+- `view_cabin_selection` — el usuario cerró el detalle de una cabina.
+- `select_cabin` — el usuario eligió una cabina. `entities: { cabin_id }`.
 
 ---
 
@@ -134,3 +144,36 @@ Pedimos:
 
 Cuando esté, del lado del front alineamos `sync_itinerary_experiences` a semántica
 de reemplazo total (hoy solo agrega; nunca quita).
+
+### 2.7 Cabinas por voz
+
+Mismo agujero que 2.4, versión cabinas. `open_cabin_detail` está anunciado al LLM
+como intent de voz ("show me the Owner's Suite"), pero es inalcanzable: `cabin_id`
+no está en el esquema de entidades y no hay resolver de nombre → ID, así que por voz
+siempre termina en `soft_redirect MISSING_OPTION`.
+
+Pedimos:
+
+- `cabin_id` en el esquema de entidades del LLM.
+- Un resolver de nombre → ID sobre el dataset de suites.
+
+Acá es más fácil que en excursiones: el intent, la validación contra el dataset y
+los soft-redirects ya existen — solo falta la extracción de la entity.
+
+### 2.8 Quitar la cabina elegida
+
+Cambiar de cabina ya funciona (`select_cabin` reemplaza: el basket es mono-item
+para cabina). Lo que no existe es sacarla del basket sin elegir otra: no hay
+intent, handler ni command de deselect. Pedido menor, pero es el mismo tipo de
+callejón sin salida que 2.6.
+
+### 2.9 Dos commands de cabina que emiten y el front descarta
+
+- `show_cabin_selector` (legacy): lo emite `request_accommodations`, duplicado con
+  `show_cabin_options`.
+- `show_basket_summary { items }`: lo emite `select_cabin`, junto a
+  `add_cabin_to_basket` y `set_booking_summary`, que ya traen la misma información.
+
+Ninguno está en el schema del front, así que se descartan en silencio y hoy no
+tienen impacto. Pedimos que dejen de emitirlos — o avísennos si quieren que los
+soportemos, y definimos payload juntos.
