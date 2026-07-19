@@ -665,14 +665,18 @@ describe('set_booking_summary', () => {
     expect(out.success).toBe(true);
   });
 
-  it('rejects more than 6 slots', () => {
-    const tooMany = Array.from({ length: 7 }, () => ({ label: 'x', state: 'empty' as const }));
-    const out = UiCommand.safeParse({
+  it('accepts more than 6 slots (backend emits one per basket experience, uncapped)', () => {
+    const many = Array.from({ length: 8 }, (_, i) => ({
+      label: `Experience ${i + 1}`,
+      state: 'filled' as const,
+    }));
+    const result = UiCommand.parse({
       type: 'set_booking_summary',
-      correlationId: 'b1',
-      payload: { ...validPayload, slots: tooMany },
+      correlationId: 'b7',
+      payload: { ...validPayload, slots: many },
     });
-    expect(out.success).toBe(false);
+    if (result.type !== 'set_booking_summary') throw new Error('discriminator failed');
+    expect(result.payload.slots).toHaveLength(8);
   });
 
   it('rejects unknown slot state', () => {

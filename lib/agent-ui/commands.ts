@@ -102,14 +102,15 @@ export const BookingSummarySnapshot = z.object({
   stops: z.object({ primary: z.string(), extra: z.number().int().min(0) }).nullable(),
   duration: LabelField,
   price: LabelField,
-  slots: z
-    .array(
-      z.object({
-        label: z.string(),
-        state: z.enum(['active', 'filled', 'empty']),
-      })
-    )
-    .max(6),
+  // Uncapped: the backend emits one slot per basket experience with no limit
+  // (_booking_summary_ui.py:136-150). A length cap here would drop the whole
+  // command and silently freeze the summary.
+  slots: z.array(
+    z.object({
+      label: z.string(),
+      state: z.enum(['active', 'filled', 'empty']),
+    })
+  ),
   cta: z.object({ label: z.string(), enabled: z.boolean() }),
 });
 export type BookingSummarySnapshot = z.infer<typeof BookingSummarySnapshot>;
