@@ -11,14 +11,9 @@ import {
   Share,
   Users,
 } from 'lucide-react';
-import { ItinerarySummaryModal } from '@/components/panels/itinerary-summary/itinerary-summary-modal';
 import { Button } from '@/components/ui/button';
 import { useFrontendIntent } from '@/hooks/use-frontend-intent';
-import {
-  useCloseItinerarySummary,
-  useItinerarySummary,
-  useVisibleBookingSummary,
-} from '@/lib/agent-ui/hooks';
+import { useVisibleBookingSummary } from '@/lib/agent-ui/hooks';
 import type { BookingSummary as BookingSummaryType } from '@/lib/agent-ui/ui-view-types';
 import { cn } from '@/lib/shadcn/utils';
 
@@ -68,8 +63,6 @@ function Slot({ label, state }: SlotProps) {
 
 export function BookingSummary({ summary }: BookingSummaryProps) {
   const sendIntent = useFrontendIntent();
-  const itinerarySummary = useItinerarySummary();
-  const closeItinerarySummary = useCloseItinerarySummary();
 
   const stopsLabel = summary.stops
     ? summary.stops.extra > 0
@@ -146,16 +139,6 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
           <Button disabled={!summary.cta.enabled}>{summary.cta.label}</Button>
         </div>
       </div>
-
-      {itinerarySummary && (
-        <ItinerarySummaryModal
-          open
-          onOpenChange={(o) => {
-            if (!o) closeItinerarySummary();
-          }}
-          data={itinerarySummary}
-        />
-      )}
     </div>
   );
 }
