@@ -995,3 +995,67 @@ describe('show_suggestions', () => {
     expect(result.success).toBe(false);
   });
 });
+
+describe('booking form commands', () => {
+  it('parses show_booking_form with a summary wire and guest_count', () => {
+    const result = UiCommand.parse({
+      type: 'show_booking_form',
+      correlationId: 'bf1',
+      payload: {
+        summary: {
+          header: { title: null, subtitle: null, image: null },
+          details: {
+            guests: null,
+            month: null,
+            embarkation: null,
+            stops: null,
+            dates: null,
+            price_per_person: '$5,000',
+            cabin_name: null,
+          },
+          cabin: null,
+          package: { price_per_person: '$5,000', name: null, inclusions: [] },
+          itinerary: null,
+          total: '$10,000',
+        },
+        guest_count: 2,
+      },
+    });
+    if (result.type !== 'show_booking_form') throw new Error('discriminator failed');
+    expect(result.payload.guest_count).toBe(2);
+  });
+
+  it('parses update_booking_form with partial guest patches', () => {
+    const result = UiCommand.parse({
+      type: 'update_booking_form',
+      correlationId: 'bf2',
+      payload: {
+        guests: [
+          { index: 0, first_name: 'Juan', last_name: 'Pérez' },
+          { index: 1, email: 'ana@example.com' },
+        ],
+      },
+    });
+    if (result.type !== 'update_booking_form') throw new Error('discriminator failed');
+    expect(result.payload.guests).toHaveLength(2);
+    expect(result.payload.guests[0].first_name).toBe('Juan');
+    expect(result.payload.guests[1].phone).toBeUndefined();
+  });
+
+  it('rejects an update_booking_form guest patch without index', () => {
+    const result = UiCommand.safeParse({
+      type: 'update_booking_form',
+      correlationId: 'bf3',
+      payload: { guests: [{ first_name: 'Juan' }] },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('parses close_booking_form without payload', () => {
+    const result = UiCommand.parse({
+      type: 'close_booking_form',
+      correlationId: 'bf4',
+    });
+    expect(result.type).toBe('close_booking_form');
+  });
+});

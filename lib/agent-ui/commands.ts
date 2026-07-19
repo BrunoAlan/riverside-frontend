@@ -267,6 +267,40 @@ const ShowSuggestions = Base.extend({
   }),
 });
 
+const ShowBookingForm = Base.extend({
+  type: z.literal('show_booking_form'),
+  // Same wire as show_itinerary_summary plus how many guest blocks to render.
+  // guest_count is not floored here — the reducer clamps to >= 1; the parser
+  // never drops a command over odd content.
+  payload: z.object({
+    summary: ItinerarySummaryWire,
+    guest_count: z.number().int(),
+  }),
+});
+
+const UpdateBookingForm = Base.extend({
+  type: z.literal('update_booking_form'),
+  // Voice-dictated data filling the form visibly. Deliberately NO `agreed`
+  // field: the cancellation-policy consent is only ever a user tap.
+  payload: z.object({
+    guests: z.array(
+      z.object({
+        index: z.number().int(),
+        first_name: z.string().optional(),
+        last_name: z.string().optional(),
+        email: z.string().optional(),
+        country_code: z.string().optional(),
+        phone: z.string().optional(),
+      })
+    ),
+  }),
+});
+
+const CloseBookingForm = Base.extend({
+  type: z.literal('close_booking_form'),
+  payload: z.object({}).optional(),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
@@ -283,6 +317,9 @@ export const UiCommand = z.discriminatedUnion('type', [
   SyncItineraryExperiences,
   ShowItinerarySummary,
   ShowSuggestions,
+  ShowBookingForm,
+  UpdateBookingForm,
+  CloseBookingForm,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
 
