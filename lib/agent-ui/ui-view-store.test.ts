@@ -118,14 +118,13 @@ describe('ui-view-store', () => {
     store.getState().applyCommand({
       type: 'soft_redirect',
       correlationId: 'c2',
-      payload: { reason_code: 'MISSING_DATE', missing: ['dates'] },
+      payload: { reasonCode: 'MISSING_DATE' },
     });
     const s = store.getState();
     expect(s.view).toEqual({ type: 'presentation' });
     expect(s.hint).toEqual({
       type: 'soft_redirect',
       reasonCode: 'MISSING_DATE',
-      missing: ['dates'],
     });
     expect(s.lastCorrelationId).toBe('c2');
   });
@@ -134,7 +133,7 @@ describe('ui-view-store', () => {
     store.getState().applyCommand({
       type: 'soft_redirect',
       correlationId: 'c1',
-      payload: { reason_code: 'MISSING_DATE' },
+      payload: { reasonCode: 'MISSING_DATE' },
     });
     store.getState().applyCommand({
       type: 'show_discovery_canvas',

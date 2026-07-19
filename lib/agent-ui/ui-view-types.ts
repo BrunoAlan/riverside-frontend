@@ -44,7 +44,7 @@ export type UiView =
       packages: PackageOption[];
     };
 
-export type UiHint = { type: 'soft_redirect'; reasonCode: string; missing?: string[] };
+export type UiHint = { type: 'soft_redirect'; reasonCode: string };
 
 export type UiSource = 'initial' | 'agent' | 'dev' | 'user';
 

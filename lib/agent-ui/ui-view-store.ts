@@ -99,8 +99,7 @@ export function createUiViewStore() {
                   return {
                     hint: {
                       type: 'soft_redirect',
-                      reasonCode: cmd.payload.reason_code,
-                      missing: cmd.payload.missing,
+                      reasonCode: cmd.payload.reasonCode,
                     },
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,

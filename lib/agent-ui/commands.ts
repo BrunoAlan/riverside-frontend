@@ -17,9 +17,10 @@ const ShowDiscoveryCanvas = Base.extend({
 
 const SoftRedirect = Base.extend({
   type: z.literal('soft_redirect'),
+  // Matches what the backend actually emits: {reasonCode, suggestedIntent}.
+  // `suggestedIntent` is renderer steering, deliberately not modeled here.
   payload: z.object({
-    reason_code: z.string(),
-    missing: z.array(z.string()).optional(),
+    reasonCode: z.string(),
   }),
 });
 

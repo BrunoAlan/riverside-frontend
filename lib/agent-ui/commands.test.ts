@@ -11,15 +11,23 @@ describe('UiCommand schema', () => {
     expect(result.correlationId).toBe('abc-123');
   });
 
-  it('parses soft_redirect with reason_code and missing', () => {
+  it('parses soft_redirect with the backend payload shape', () => {
     const result = UiCommand.parse({
       type: 'soft_redirect',
       correlationId: 'abc-123',
-      payload: { reason_code: 'MISSING_DATE_PREFERENCE', missing: ['dates'] },
+      payload: { reasonCode: 'MISSING_DATE_PREFERENCE', suggestedIntent: 'provide_preferences' },
     });
     if (result.type !== 'soft_redirect') throw new Error('discriminator failed');
-    expect(result.payload.reason_code).toBe('MISSING_DATE_PREFERENCE');
-    expect(result.payload.missing).toEqual(['dates']);
+    expect(result.payload.reasonCode).toBe('MISSING_DATE_PREFERENCE');
+  });
+
+  it('rejects soft_redirect without reasonCode', () => {
+    const result = UiCommand.safeParse({
+      type: 'soft_redirect',
+      correlationId: 'abc-123',
+      payload: { reason_code: 'MISSING_DATE_PREFERENCE' },
+    });
+    expect(result.success).toBe(false);
   });
 
   it('parses show_itinerary_options with a single rich itinerary', () => {
