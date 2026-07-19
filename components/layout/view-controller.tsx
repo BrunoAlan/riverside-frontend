@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ContentView } from '@/components/agent-ui/content-view';
 import { WindowBackground } from '@/components/layout/window-background';
 import { useUiView } from '@/lib/agent-ui/hooks';
+import { viewKey } from '@/lib/agent-ui/view-key';
 
 const MotionContentView = motion.create(ContentView);
 
@@ -17,13 +18,6 @@ const VIEW_MOTION_PROPS = {
   exit: 'hidden',
   transition: { duration: 0.5, ease: 'linear' as const },
 };
-
-function viewKey(view: ReturnType<typeof useUiView>): string {
-  if (view.type === 'compare_itinerary') {
-    return `compare_itinerary:${view.options.map((o) => o.id).join(',')}`;
-  }
-  return view.type;
-}
 
 export function ViewController() {
   const view = useUiView();

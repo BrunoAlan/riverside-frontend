@@ -10,6 +10,9 @@ import { useScrollFade } from '@/hooks/use-scroll-fade';
 import type { ChatMessage } from '@/lib/chat/messages';
 import { cn } from '@/lib/shadcn/utils';
 
+/** Rendered width of the overlay. Anything laying out around it imports this. */
+export const CHAT_OVERLAY_WIDTH_PX = 360;
+
 export type ChatOverlayProps = {
   messages: ChatMessage[];
   onSubmit: (text: string) => void;
@@ -38,8 +41,9 @@ function ChatOverlay({
   return (
     <div
       data-slot="chat-overlay"
+      style={{ width: CHAT_OVERLAY_WIDTH_PX }}
       className={cn(
-        'bg-beige-50 pointer-events-auto relative flex w-[360px] flex-col overflow-hidden rounded-2xl p-2 shadow-xl backdrop-blur-md',
+        'bg-beige-50 pointer-events-auto relative flex flex-col overflow-hidden rounded-2xl p-2 shadow-xl backdrop-blur-md',
         className
       )}
     >

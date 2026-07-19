@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
+import { CHAT_DOCK_OPEN_STORAGE_KEY } from '@/components/chat/chat-dock';
 import {
   useApplyCommand,
   useClearAddedExperiencesFromDev,
@@ -26,7 +27,6 @@ import {
 } from './mocks';
 
 const VIEW_TYPES = Object.keys(VIEW_MOCKS) as UiView['type'][];
-const CHAT_DOCK_OPEN_KEY = 'chat:dock:open';
 
 export function DevPanel() {
   const [open, setOpen] = useState(false);
@@ -104,7 +104,7 @@ export function DevPanel() {
     setDevChatMessages(chosen.messages);
     if (view.type === 'start') applyView();
     try {
-      window.sessionStorage.setItem(CHAT_DOCK_OPEN_KEY, JSON.stringify(true));
+      window.sessionStorage.setItem(CHAT_DOCK_OPEN_STORAGE_KEY, JSON.stringify(true));
     } catch {}
   };
 
