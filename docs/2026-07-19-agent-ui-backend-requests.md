@@ -40,6 +40,8 @@ Notas de comportamiento:
   Para abrir un detalle desde otra vista, manden `show_cabin_options` +
   `show_cabin_detail` **en ese orden en el mismo batch** — el frontend los aplica en
   orden y funciona hoy.
+- `show_itinerary_summary` abre el modal de summary desde cualquier vista — no
+  depende de que la booking summary esté en pantalla.
 - `sync_itinerary_experiences` es la fuente de verdad de qué excursiones están
   agregadas; es lo que marca las cartas en la UI.
 - Un command que no parsea contra estos payloads se descarta en silencio. Ante
@@ -177,3 +179,16 @@ callejón sin salida que 2.6.
 Ninguno está en el schema del front, así que se descartan en silencio y hoy no
 tienen impacto. Pedimos que dejen de emitirlos — o avísennos si quieren que los
 soportemos, y definimos payload juntos.
+
+### 2.10 Aviso de cierre del summary modal
+
+Abrir el summary ya funciona por las dos vías: tap (intent
+`view_itinerary_summary`) y voz (`review_selection`), ambas emiten
+`show_itinerary_summary`. Lo que falta es la contracara: cuando el usuario
+cierra el modal, el backend no se entera — a diferencia del detalle de cabina
+(`view_cabin_selection`) y de excursión (`view_itinerary`), que sí tienen su
+intent de cierre.
+
+Pedimos: un intent de cierre para el summary (el nombre que prefieran — p. ej.
+`view_itinerary_summary_closed` o reutilizar un `view_*` existente, avísennos
+cuál). Apenas lo definan, lo emitimos desde el frontend al cerrar el modal.
