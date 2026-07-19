@@ -19,4 +19,5 @@ export const BOOKING_FORM_COPY = {
     terms: 'I agree to the Terms of Services, booking and cancellation policy',
   },
   submit: 'Submit',
+  submitting: 'Sending…',
 } as const;

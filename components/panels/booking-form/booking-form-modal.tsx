@@ -1,39 +1,47 @@
 // Radix dialog primitives directly (matching itinerary-summary-modal): the
 // shadcn Dialog wrapper hardcodes a centered max-w-lg panel with a baked-in
 // close button. This modal is a full-viewport takeover with its own chrome.
-import { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { BookingFormTopBar } from '@/components/panels/booking-form/booking-form-top-bar';
 import { CancellationPolicy } from '@/components/panels/booking-form/cancellation-policy';
-import { GuestInfoForm } from '@/components/panels/booking-form/guest-info-form';
+import { type GuestField, GuestInfoForm } from '@/components/panels/booking-form/guest-info-form';
 import { SummaryCabinCard } from '@/components/panels/itinerary-summary/summary-cabin-card';
 import { SummaryDetailsRow } from '@/components/panels/itinerary-summary/summary-details-row';
 import { SummaryHeader } from '@/components/panels/itinerary-summary/summary-header';
 import { SummaryPackageCard } from '@/components/panels/itinerary-summary/summary-package-card';
 import { Button } from '@/components/ui/button';
-import { useBookingForm, useCloseBookingForm } from '@/lib/agent-ui/hooks';
+import { useFrontendIntent } from '@/hooks/use-frontend-intent';
+import {
+  useBookingForm,
+  useCloseBookingForm,
+  useSetAgreedFromUser,
+  useSubmitBookingFormFromUser,
+  useUpdateGuestFromUser,
+} from '@/lib/agent-ui/hooks';
 import { BOOKING_FORM_COPY } from '@/lib/booking-form/copy';
-import { type GuestInfo, makeEmptyGuests } from '@/lib/booking-form/guests';
+import type { GuestInfo } from '@/lib/booking-form/guests';
 import type { BookingForm } from '@/lib/booking-form/types';
 
 type BookingFormModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: BookingForm;
+  onGuestChange: (index: number, patch: Partial<GuestInfo>) => void;
+  onGuestCommit: (index: number, field: GuestField, value: string) => void;
+  onAgreedChange: (agreed: boolean) => void;
+  onSubmit: () => void;
 };
 
-export function BookingFormModal({ open, onOpenChange, data }: BookingFormModalProps) {
+export function BookingFormModal({
+  open,
+  onOpenChange,
+  data,
+  onGuestChange,
+  onGuestCommit,
+  onAgreedChange,
+  onSubmit,
+}: BookingFormModalProps) {
   const { summary } = data;
-  const [guests, setGuests] = useState<GuestInfo[]>(() => makeEmptyGuests(data.guestCount));
-  const [agreed, setAgreed] = useState(false);
-
-  const updateGuest = (index: number, patch: Partial<GuestInfo>) =>
-    setGuests((prev) => prev.map((g, i) => (i === index ? { ...g, ...patch } : g)));
-
-  const handleSubmit = () => {
-    // Dev-only: no backend submit yet — just surface the collected data.
-    console.log('[booking-form] submit', { guests, agreed });
-  };
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
@@ -63,10 +71,20 @@ export function BookingFormModal({ open, onOpenChange, data }: BookingFormModalP
 
                 {/* Right: guest form */}
                 <div className="flex flex-col gap-8">
-                  <GuestInfoForm guests={guests} onChange={updateGuest} />
-                  <CancellationPolicy agreed={agreed} onAgreedChange={setAgreed} />
-                  <Button className="w-full" disabled={!agreed} onClick={handleSubmit}>
-                    {BOOKING_FORM_COPY.submit}
+                  <GuestInfoForm
+                    guests={data.guests}
+                    onChange={onGuestChange}
+                    onCommit={onGuestCommit}
+                  />
+                  <CancellationPolicy agreed={data.agreed} onAgreedChange={onAgreedChange} />
+                  <Button
+                    className="w-full"
+                    disabled={!data.agreed || data.status === 'submitting'}
+                    onClick={onSubmit}
+                  >
+                    {data.status === 'submitting'
+                      ? BOOKING_FORM_COPY.submitting
+                      : BOOKING_FORM_COPY.submit}
                   </Button>
                 </div>
               </div>
@@ -80,20 +98,47 @@ export function BookingFormModal({ open, onOpenChange, data }: BookingFormModalP
 
 // Store-connected mount point. Rendered at the app layout level (not inside the
 // booking summary bar) so the modal opens whenever the bookingForm slice is set,
-// independent of the current view or whether a booking summary exists. The
-// guestCount key re-seeds the guest form when a different mock is applied.
+// independent of the current view or whether a booking summary exists.
 export function BookingFormModalContainer() {
   const bookingForm = useBookingForm();
   const closeBookingForm = useCloseBookingForm();
+  const updateGuestFromUser = useUpdateGuestFromUser();
+  const setAgreedFromUser = useSetAgreedFromUser();
+  const submitBookingFormFromUser = useSubmitBookingFormFromUser();
+  const sendIntent = useFrontendIntent();
+
   if (!bookingForm) return null;
   return (
     <BookingFormModal
-      key={bookingForm.guestCount}
       open
       onOpenChange={(o) => {
         if (!o) closeBookingForm();
       }}
       data={bookingForm}
+      onGuestChange={updateGuestFromUser}
+      onGuestCommit={(index, field, value) => {
+        void sendIntent('provide_guest_info', {
+          entities: { guest_index: index, field, value },
+          userMessage: `User filled ${field.replace('_', ' ')} for guest ${index + 1}`,
+        });
+      }}
+      onAgreedChange={setAgreedFromUser}
+      onSubmit={() => {
+        submitBookingFormFromUser();
+        void sendIntent('submit_booking_form', {
+          entities: {
+            guests: bookingForm.guests.map((g) => ({
+              first_name: g.firstName,
+              last_name: g.lastName,
+              email: g.email,
+              country_code: g.countryCode,
+              phone: g.phone,
+            })),
+            agreed: true,
+          },
+          userMessage: 'User submitted the booking form',
+        });
+      }}
     />
   );
 }

@@ -136,7 +136,16 @@ export function BookingSummary({ summary }: BookingSummaryProps) {
           <Button variant="ghost" size="icon" aria-label="Save">
             <Save className="size-4" />
           </Button>
-          <Button disabled={!summary.cta.enabled}>{summary.cta.label}</Button>
+          <Button
+            disabled={!summary.cta.enabled}
+            onClick={() =>
+              void sendIntent('continue_booking', {
+                userMessage: 'User tapped Continue to booking',
+              })
+            }
+          >
+            {summary.cta.label}
+          </Button>
         </div>
       </div>
     </div>
