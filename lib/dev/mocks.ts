@@ -10,6 +10,7 @@ import { BOOKING_FORM_MOCK } from '@/lib/booking-form/mock';
 import type { BookingForm } from '@/lib/booking-form/types';
 import { ITINERARY_SUMMARY_MOCK } from '@/lib/itinerary-summary/mock';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
+import type { SuggestionPill } from '@/lib/suggestions/pills';
 
 export interface ViewMock {
   id: string;
@@ -592,6 +593,47 @@ export const SYNC_EXPERIENCES_MOCKS: readonly SyncExperiencesMock[] = [
       },
     ]),
   },
+];
+
+export interface AgentSuggestionsMock {
+  id: string;
+  label: string;
+  /** `null` clears the override so the static catalog returns. */
+  pills: SuggestionPill[] | null;
+}
+
+export const AGENT_SUGGESTIONS_MOCKS: readonly AgentSuggestionsMock[] = [
+  {
+    id: 'itinerary_specific',
+    label: 'Itinerary-specific (Danube Legends)',
+    pills: [
+      {
+        id: 'sug-budapest',
+        label: 'What can I do in Budapest?',
+        message: 'What can I do in Budapest?',
+      },
+      {
+        id: 'sug-belvedere',
+        label: 'The Belvedere evening?',
+        message: 'Tell me more about the VIP evening at Belvedere Palace',
+      },
+      {
+        id: 'sug-day5',
+        label: "What's on day 5?",
+        message: 'What is planned for day 5 of my itinerary?',
+      },
+    ],
+  },
+  {
+    id: 'overflow',
+    label: 'Seven pills (render caps at 6)',
+    pills: Array.from({ length: 7 }, (_, i) => ({
+      id: `sug-${i + 1}`,
+      label: `Suggestion ${i + 1}`,
+      message: `Suggestion ${i + 1}`,
+    })),
+  },
+  { id: 'clear', label: 'Clear (static fallback)', pills: null },
 ];
 
 export interface BookingFormMock {
