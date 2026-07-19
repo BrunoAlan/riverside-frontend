@@ -7,7 +7,12 @@ import { CHAT_DOCK_OPEN_LANE_PX } from '@/components/chat/chat-dock';
 import { useAppConfig } from '@/components/layout/app-config-context';
 import { useChatTranscriptionContext } from '@/components/layout/chat-transcription-context';
 import { Button } from '@/components/ui/button';
-import { useUiSource, useUiView, useVisibleBookingSummary } from '@/lib/agent-ui/hooks';
+import {
+  useAgentSuggestions,
+  useUiSource,
+  useUiView,
+  useVisibleBookingSummary,
+} from '@/lib/agent-ui/hooks';
 import { viewKey } from '@/lib/agent-ui/view-key';
 import { cn } from '@/lib/shadcn/utils';
 import { type SuggestionPill, pillsForView } from '@/lib/suggestions/pills';
@@ -32,6 +37,9 @@ const MIN_ROW_WIDTH_PX = 640;
 const RESERVED_LANE = `min(${CHAT_DOCK_OPEN_LANE_PX + LANE_GUTTER_PX}px, max(4.5rem, (100% - ${MIN_ROW_WIDTH_PX}px) / 2))`;
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
+
+/** Contract doc §7: more than ~6 pills is visual noise, so cap the render. */
+const MAX_PILLS = 6;
 
 interface SuggestionPillsProps {
   pills: SuggestionPill[];
@@ -73,8 +81,16 @@ export function SuggestionPillsContainer() {
 
   const { suggestionPills } = useAppConfig();
 
-  const pills = pillsForView(view.type, suggestionPills);
-  const currentKey = viewKey(view);
+  const agentSuggestions = useAgentSuggestions();
+
+  // Backend pills override the static catalog when present (hybrid model).
+  // The dismissal key tracks the delivery, so a fresh show_suggestions
+  // un-dismisses the row even on the same view.
+  const pills = (agentSuggestions?.pills ?? pillsForView(view.type, suggestionPills)).slice(
+    0,
+    MAX_PILLS
+  );
+  const currentKey = agentSuggestions ? `agent:${agentSuggestions.key}` : viewKey(view);
 
   // Sending text needs a connected room, so a pill tapped before the session is
   // connected would fail to send. Hide the row until the room is connected —
