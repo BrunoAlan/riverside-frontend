@@ -111,10 +111,17 @@ that marks the cards.
 ### `soft_redirect`
 
 Backend sends `{reasonCode, suggestedIntent}`; frontend expects
-`{reason_code, missing}`. Fix: the payload schema accepts both spellings and
-normalizes to `reason_code` (preprocess). `missing` stays optional;
-`suggestedIntent` is ignored (unknown keys already are). Store and `HintOverlay`
-unchanged.
+`{reason_code, missing}`. Decision: **the backend's shape is the valid one.**
+The payload schema becomes `{ reasonCode: z.string() }` — `suggestedIntent` is
+ignored (unknown keys already are), and the documented-but-never-sent
+`reason_code`/`missing` spellings are dropped. `UiHint` loses its unused
+`missing` field accordingly.
+
+`HintOverlay` becomes **dev-only**: it renders nothing in production
+(`process.env.NODE_ENV !== 'production'` gate, same pattern as the dev-preview
+check in `suggestion-pills.tsx`). It remains a raw debug banner — no user-facing
+UX is built on `soft_redirect`; the conversational recovery is the agent's
+spoken reply.
 
 ### `set_booking_summary` slots cap
 
@@ -142,8 +149,8 @@ other command, and the static fallback guarantees the pills row never goes blank
 
 - `commands.test.ts`: `show_suggestions` parses (with and without `label`);
   `add_experience_to_basket` parses with only `experience_id`; `soft_redirect`
-  parses in both spellings and normalizes; `set_booking_summary` parses with >6
-  slots.
+  parses the backend shape (`{reasonCode, suggestedIntent}`);
+  `set_booking_summary` parses with >6 slots.
 - `ui-view-store.test.ts`: `show_suggestions` sets mapped pills; empty array
   clears to `null`; view-replacing commands clear; `show_itinerary_tab` and
   user tab switch keep; `add_experience_to_basket` without `day` records nothing.
