@@ -11,15 +11,23 @@ describe('UiCommand schema', () => {
     expect(result.correlationId).toBe('abc-123');
   });
 
-  it('parses soft_redirect with reason_code and missing', () => {
+  it('parses soft_redirect with the backend payload shape', () => {
     const result = UiCommand.parse({
       type: 'soft_redirect',
       correlationId: 'abc-123',
-      payload: { reason_code: 'MISSING_DATE_PREFERENCE', missing: ['dates'] },
+      payload: { reasonCode: 'MISSING_DATE_PREFERENCE', suggestedIntent: 'provide_preferences' },
     });
     if (result.type !== 'soft_redirect') throw new Error('discriminator failed');
-    expect(result.payload.reason_code).toBe('MISSING_DATE_PREFERENCE');
-    expect(result.payload.missing).toEqual(['dates']);
+    expect(result.payload.reasonCode).toBe('MISSING_DATE_PREFERENCE');
+  });
+
+  it('rejects soft_redirect without reasonCode', () => {
+    const result = UiCommand.safeParse({
+      type: 'soft_redirect',
+      correlationId: 'abc-123',
+      payload: { reason_code: 'MISSING_DATE_PREFERENCE' },
+    });
+    expect(result.success).toBe(false);
   });
 
   it('parses show_itinerary_options with a single rich itinerary', () => {
@@ -657,14 +665,18 @@ describe('set_booking_summary', () => {
     expect(out.success).toBe(true);
   });
 
-  it('rejects more than 6 slots', () => {
-    const tooMany = Array.from({ length: 7 }, () => ({ label: 'x', state: 'empty' as const }));
-    const out = UiCommand.safeParse({
+  it('accepts more than 6 slots (backend emits one per basket experience, uncapped)', () => {
+    const many = Array.from({ length: 8 }, (_, i) => ({
+      label: `Experience ${i + 1}`,
+      state: 'filled' as const,
+    }));
+    const result = UiCommand.parse({
       type: 'set_booking_summary',
-      correlationId: 'b1',
-      payload: { ...validPayload, slots: tooMany },
+      correlationId: 'b7',
+      payload: { ...validPayload, slots: many },
     });
-    expect(out.success).toBe(false);
+    if (result.type !== 'set_booking_summary') throw new Error('discriminator failed');
+    expect(result.payload.slots).toHaveLength(8);
   });
 
   it('rejects unknown slot state', () => {
@@ -780,6 +792,17 @@ describe('add_experience_to_basket', () => {
     if (result.type !== 'add_experience_to_basket') throw new Error('discriminator failed');
     expect(result.payload.day).toBe('Day 3');
     expect(result.payload.passenger_count).toBe(2);
+  });
+
+  it('parses the minimal backend payload (experience_id only)', () => {
+    const result = UiCommand.parse({
+      type: 'add_experience_to_basket',
+      correlationId: 'e2',
+      payload: { experience_id: 'signature_vienna_belvedere_palace' },
+    });
+    if (result.type !== 'add_experience_to_basket') throw new Error('discriminator failed');
+    expect(result.payload.experience_id).toBe('signature_vienna_belvedere_palace');
+    expect(result.payload.day).toBeUndefined();
   });
 });
 
@@ -932,5 +955,107 @@ describe('command envelope source', () => {
       payload: { experience_id: 'exp-1' },
     });
     expect(result.source).toBeUndefined();
+  });
+});
+
+describe('show_suggestions', () => {
+  it('parses suggestions with and without a label', () => {
+    const result = UiCommand.parse({
+      type: 'show_suggestions',
+      correlationId: 's1',
+      payload: {
+        suggestions: [
+          { id: 'a', text: 'What can I do in Budapest?' },
+          { id: 'b', text: 'Tell me more about the Belvedere evening', label: 'Belvedere?' },
+        ],
+      },
+    });
+    if (result.type !== 'show_suggestions') throw new Error('discriminator failed');
+    expect(result.payload.suggestions).toHaveLength(2);
+    expect(result.payload.suggestions[0].label).toBeUndefined();
+    expect(result.payload.suggestions[1].label).toBe('Belvedere?');
+  });
+
+  it('parses an empty suggestions array', () => {
+    const result = UiCommand.parse({
+      type: 'show_suggestions',
+      correlationId: 's2',
+      payload: { suggestions: [] },
+    });
+    if (result.type !== 'show_suggestions') throw new Error('discriminator failed');
+    expect(result.payload.suggestions).toEqual([]);
+  });
+
+  it('rejects a suggestion without text', () => {
+    const result = UiCommand.safeParse({
+      type: 'show_suggestions',
+      correlationId: 's3',
+      payload: { suggestions: [{ id: 'a', label: 'No text' }] },
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('booking form commands', () => {
+  it('parses show_booking_form with a summary wire and guest_count', () => {
+    const result = UiCommand.parse({
+      type: 'show_booking_form',
+      correlationId: 'bf1',
+      payload: {
+        summary: {
+          header: { title: null, subtitle: null, image: null },
+          details: {
+            guests: null,
+            month: null,
+            embarkation: null,
+            stops: null,
+            dates: null,
+            price_per_person: '$5,000',
+            cabin_name: null,
+          },
+          cabin: null,
+          package: { price_per_person: '$5,000', name: null, inclusions: [] },
+          itinerary: null,
+          total: '$10,000',
+        },
+        guest_count: 2,
+      },
+    });
+    if (result.type !== 'show_booking_form') throw new Error('discriminator failed');
+    expect(result.payload.guest_count).toBe(2);
+  });
+
+  it('parses update_booking_form with partial guest patches', () => {
+    const result = UiCommand.parse({
+      type: 'update_booking_form',
+      correlationId: 'bf2',
+      payload: {
+        guests: [
+          { index: 0, first_name: 'Juan', last_name: 'Pérez' },
+          { index: 1, email: 'ana@example.com' },
+        ],
+      },
+    });
+    if (result.type !== 'update_booking_form') throw new Error('discriminator failed');
+    expect(result.payload.guests).toHaveLength(2);
+    expect(result.payload.guests[0].first_name).toBe('Juan');
+    expect(result.payload.guests[1].phone).toBeUndefined();
+  });
+
+  it('rejects an update_booking_form guest patch without index', () => {
+    const result = UiCommand.safeParse({
+      type: 'update_booking_form',
+      correlationId: 'bf3',
+      payload: { guests: [{ first_name: 'Juan' }] },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('parses close_booking_form without payload', () => {
+    const result = UiCommand.parse({
+      type: 'close_booking_form',
+      correlationId: 'bf4',
+    });
+    expect(result.type).toBe('close_booking_form');
   });
 });

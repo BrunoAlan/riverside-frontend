@@ -28,3 +28,10 @@ export const useSetItinerarySummaryFromDev = () =>
 export const useBookingForm = () => useUiViewStore((s) => s.bookingForm);
 export const useSetBookingFormFromDev = () => useUiViewStore((s) => s.setBookingFormFromDev);
 export const useCloseBookingForm = () => useUiViewStore((s) => s.closeBookingForm);
+export const useAgentSuggestions = () => useUiViewStore((s) => s.agentSuggestions);
+export const useSetAgentSuggestionsFromDev = () =>
+  useUiViewStore((s) => s.setAgentSuggestionsFromDev);
+export const useUpdateGuestFromUser = () => useUiViewStore((s) => s.updateGuestFromUser);
+export const useSetAgreedFromUser = () => useUiViewStore((s) => s.setAgreedFromUser);
+export const useSubmitBookingFormFromUser = () =>
+  useUiViewStore((s) => s.submitBookingFormFromUser);

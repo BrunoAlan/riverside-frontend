@@ -16,6 +16,7 @@ import { ViewController } from '@/components/layout/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
 import { BookingFormModalContainer } from '@/components/panels/booking-form/booking-form-modal';
+import { ItinerarySummaryModalContainer } from '@/components/panels/itinerary-summary/itinerary-summary-modal';
 import { useAgentErrors } from '@/hooks/use-agent-errors';
 import { useDebugMode } from '@/hooks/use-debug';
 import { useSessionAnalytics } from '@/hooks/use-session-analytics';
@@ -76,6 +77,7 @@ export function App({ appConfig }: AppProps) {
             <ChatDockContainer />
           </div>
         </ChatTranscriptionProvider>
+        <ItinerarySummaryModalContainer />
         <BookingFormModalContainer />
         <StartAudioButton label="Start Audio" />
         {IN_DEVELOPMENT && <DevPanel />}

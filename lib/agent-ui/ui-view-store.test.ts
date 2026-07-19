@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { UiCommand } from './commands';
 import { createUiViewStore } from './ui-view-store';
 
 describe('ui-view-store', () => {
@@ -118,14 +119,13 @@ describe('ui-view-store', () => {
     store.getState().applyCommand({
       type: 'soft_redirect',
       correlationId: 'c2',
-      payload: { reason_code: 'MISSING_DATE', missing: ['dates'] },
+      payload: { reasonCode: 'MISSING_DATE' },
     });
     const s = store.getState();
     expect(s.view).toEqual({ type: 'presentation' });
     expect(s.hint).toEqual({
       type: 'soft_redirect',
       reasonCode: 'MISSING_DATE',
-      missing: ['dates'],
     });
     expect(s.lastCorrelationId).toBe('c2');
   });
@@ -134,7 +134,7 @@ describe('ui-view-store', () => {
     store.getState().applyCommand({
       type: 'soft_redirect',
       correlationId: 'c1',
-      payload: { reason_code: 'MISSING_DATE' },
+      payload: { reasonCode: 'MISSING_DATE' },
     });
     store.getState().applyCommand({
       type: 'show_discovery_canvas',
@@ -530,6 +530,18 @@ describe('ui-view-store', () => {
     ]);
   });
 
+  it('applyCommand(add_experience_to_basket) without a day records nothing', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'e9',
+      payload: { experience_id: 'belvedere' },
+    });
+    const s = store.getState();
+    expect(s.addedExperiences).toEqual([]);
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('e9');
+  });
+
   it('applyCommand(sync_itinerary_experiences) merges new entries', () => {
     store.getState().applyCommand({
       type: 'sync_itinerary_experiences',
@@ -741,7 +753,10 @@ describe('ui-view-store', () => {
       total: null,
     },
     guestCount: 2,
-  } as const;
+    guests: [],
+    agreed: false,
+    status: 'editing' as const,
+  };
 
   it('setBookingFormFromDev fills the slice with source dev', () => {
     store.getState().setBookingFormFromDev(SAMPLE_BOOKING_FORM);
@@ -996,6 +1011,275 @@ describe('ui-view-store', () => {
       const { view } = store.getState();
       if (view.type !== 'itinerary') throw new Error('expected itinerary view');
       expect(view.activeTab).toBe('excursions');
+    });
+  });
+
+  describe('agent suggestions', () => {
+    const suggestionsCommand = (
+      correlationId: string
+    ): Extract<UiCommand, { type: 'show_suggestions' }> => ({
+      type: 'show_suggestions',
+      correlationId,
+      payload: {
+        suggestions: [
+          { id: 'a', text: 'What can I do in Budapest?' },
+          { id: 'b', text: 'Tell me more about Belvedere', label: 'Belvedere?' },
+        ],
+      },
+    });
+
+    const itinerary = {
+      id: 'danube_legends',
+      name: 'Danube Legends',
+      duration: { days: 12, nights: 11 },
+      match_score: 0.6667,
+      departure_dates: ['2026-04-22'],
+      center: [16.57, 48.15] as [number, number],
+      zoom: 6,
+      cities: [
+        {
+          id: 'budapest',
+          name: 'Budapest',
+          country: 'Hungary',
+          image: 'https://res.cloudinary.com/demo/image/upload/budapest.jpg',
+          days: 'Days 1, 2, 6 & 7',
+          lon: 19.0402,
+          lat: 47.4979,
+        },
+      ],
+    };
+
+    it('initializes with agentSuggestions null', () => {
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('show_suggestions maps wire pills, keyed by correlationId', () => {
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      expect(store.getState().agentSuggestions).toEqual({
+        key: 's1',
+        pills: [
+          { id: 'a', label: 'What can I do in Budapest?', message: 'What can I do in Budapest?' },
+          { id: 'b', label: 'Belvedere?', message: 'Tell me more about Belvedere' },
+        ],
+      });
+      expect(store.getState().source).toBe('agent');
+    });
+
+    it('show_suggestions with an empty list clears the override', () => {
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().applyCommand({
+        type: 'show_suggestions',
+        correlationId: 's2',
+        payload: { suggestions: [] },
+      });
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('a view-replacing command clears the override', () => {
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c2',
+        payload: { itinerary },
+      });
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('field-level commands keep the override', () => {
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c1',
+        payload: { itinerary },
+      });
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().applyCommand({
+        type: 'show_itinerary_tab',
+        correlationId: 'c2',
+        payload: { tab: 'excursions' },
+      });
+      expect(store.getState().agentSuggestions?.key).toBe('s1');
+    });
+
+    it('setViewFromUser keeps the override for the same view type', () => {
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c1',
+        payload: { itinerary },
+      });
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().setViewFromUser({ type: 'itinerary', itinerary, activeTab: 'excursions' });
+      expect(store.getState().agentSuggestions?.key).toBe('s1');
+    });
+
+    it('setViewFromUser clears the override when the view type changes', () => {
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c1',
+        payload: { itinerary },
+      });
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().setViewFromUser({ type: 'start' });
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('setAgentSuggestionsFromDev sets and clears the override with source dev', () => {
+      store
+        .getState()
+        .setAgentSuggestionsFromDev([{ id: 'd1', label: 'Dev pill', message: 'Dev pill' }]);
+      expect(store.getState().agentSuggestions).toEqual({
+        key: 'dev',
+        pills: [{ id: 'd1', label: 'Dev pill', message: 'Dev pill' }],
+      });
+      expect(store.getState().source).toBe('dev');
+      store.getState().setAgentSuggestionsFromDev(null);
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+  });
+
+  describe('booking form', () => {
+    const summaryWire = {
+      header: { title: 'Danube', subtitle: null, image: null },
+      details: {
+        guests: '2 People',
+        month: null,
+        embarkation: null,
+        stops: null,
+        dates: null,
+        price_per_person: '$5,000',
+        cabin_name: null,
+      },
+      cabin: null,
+      package: { price_per_person: '$5,000', name: null, inclusions: [] },
+      itinerary: null,
+      total: '$10,000',
+    };
+
+    const openForm = (guestCount = 2) =>
+      store.getState().applyCommand({
+        type: 'show_booking_form',
+        correlationId: 'bf1',
+        payload: { summary: summaryWire, guest_count: guestCount },
+      });
+
+    it('show_booking_form opens an editing form with empty guests', () => {
+      openForm(2);
+      const form = store.getState().bookingForm;
+      expect(form?.guests).toHaveLength(2);
+      expect(form?.agreed).toBe(false);
+      expect(form?.status).toBe('editing');
+      expect(store.getState().source).toBe('agent');
+    });
+
+    it('show_booking_form clamps guest_count to at least 1', () => {
+      openForm(0);
+      expect(store.getState().bookingForm?.guests).toHaveLength(1);
+    });
+
+    it('update_booking_form patches only the named fields', () => {
+      openForm(2);
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf2',
+        payload: { guests: [{ index: 0, first_name: 'Juan', email: 'juan@example.com' }] },
+      });
+      const guests = store.getState().bookingForm?.guests;
+      expect(guests?.[0]).toMatchObject({
+        firstName: 'Juan',
+        email: 'juan@example.com',
+        lastName: '',
+      });
+      expect(guests?.[1].firstName).toBe('');
+    });
+
+    it('update_booking_form ignores out-of-range indices and unknown country codes', () => {
+      openForm(1);
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf3',
+        payload: {
+          guests: [
+            { index: 5, first_name: 'Nadie' },
+            { index: 0, country_code: 'XX', phone: '123' },
+          ],
+        },
+      });
+      const guests = store.getState().bookingForm?.guests;
+      expect(guests).toHaveLength(1);
+      expect(guests?.[0].countryCode).toBe('US');
+      expect(guests?.[0].phone).toBe('123');
+    });
+
+    it('update_booking_form without an open form only tags the correlation', () => {
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf4',
+        payload: { guests: [{ index: 0, first_name: 'Juan' }] },
+      });
+      expect(store.getState().bookingForm).toBeNull();
+      expect(store.getState().lastCorrelationId).toBe('bf4');
+    });
+
+    it('no command can set agreed', () => {
+      openForm(1);
+      store.getState().setAgreedFromUser(true);
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf5',
+        payload: { guests: [{ index: 0, first_name: 'Juan' }] },
+      });
+      expect(store.getState().bookingForm?.agreed).toBe(true);
+    });
+
+    it('user actions edit guests, consent, and submit status', () => {
+      openForm(1);
+      store.getState().updateGuestFromUser(0, { firstName: 'Ana' });
+      store.getState().setAgreedFromUser(true);
+      store.getState().submitBookingFormFromUser();
+      const form = store.getState().bookingForm;
+      expect(form?.guests[0].firstName).toBe('Ana');
+      expect(form?.agreed).toBe(true);
+      expect(form?.status).toBe('submitting');
+      expect(store.getState().source).toBe('user');
+    });
+
+    it('close_booking_form clears the slice', () => {
+      openForm(1);
+      store.getState().submitBookingFormFromUser();
+      store.getState().applyCommand({ type: 'close_booking_form', correlationId: 'bf6' });
+      expect(store.getState().bookingForm).toBeNull();
+    });
+
+    it('update_booking_form during submitting preserves status: submitting', () => {
+      openForm(1);
+      store.getState().submitBookingFormFromUser();
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf7',
+        payload: { guests: [{ index: 0, first_name: 'Juan' }] },
+      });
+      const form = store.getState().bookingForm;
+      expect(form?.status).toBe('submitting');
+      expect(form?.guests[0].firstName).toBe('Juan');
+    });
+
+    it('show_booking_form while a form is open resets to a fresh empty editing form', () => {
+      openForm(2);
+      store.getState().updateGuestFromUser(0, { firstName: 'Ana' });
+      store.getState().setAgreedFromUser(true);
+      openForm(1);
+      const form = store.getState().bookingForm;
+      expect(form?.status).toBe('editing');
+      expect(form?.agreed).toBe(false);
+      expect(form?.guests).toHaveLength(1);
+      expect(form?.guests[0].firstName).toBe('');
+    });
+
+    it('close_booking_form with no open form leaves bookingForm null and only tags source/correlation', () => {
+      store.getState().applyCommand({ type: 'close_booking_form', correlationId: 'bf8' });
+      const s = store.getState();
+      expect(s.bookingForm).toBeNull();
+      expect(s.source).toBe('agent');
+      expect(s.lastCorrelationId).toBe('bf8');
     });
   });
 });

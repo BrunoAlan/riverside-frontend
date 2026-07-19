@@ -6,6 +6,7 @@ import { CHAT_DOCK_OPEN_STORAGE_KEY } from '@/components/chat/chat-dock';
 import {
   useApplyCommand,
   useClearAddedExperiencesFromDev,
+  useSetAgentSuggestionsFromDev,
   useSetBookingFormFromDev,
   useSetBookingSummaryFromDev,
   useSetItinerarySummaryFromDev,
@@ -19,6 +20,7 @@ import { useSetDevChatMessages } from './chat-mock-store';
 import { CHAT_MOCKS } from './chat-mocks';
 import { EventLogList } from './event-log-list';
 import {
+  AGENT_SUGGESTIONS_MOCKS,
   BOOKING_FORM_MOCKS,
   BOOKING_SUMMARY_MOCKS,
   ITINERARY_SUMMARY_MOCKS,
@@ -41,6 +43,7 @@ export function DevPanel() {
   const setDevChatMessages = useSetDevChatMessages();
   const applyCommand = useApplyCommand();
   const clearAddedExperiences = useClearAddedExperiencesFromDev();
+  const setAgentSuggestionsFromDev = useSetAgentSuggestionsFromDev();
 
   const [type, setType] = useState<UiView['type']>(view.type);
   const mocks = VIEW_MOCKS[type];
@@ -53,6 +56,9 @@ export function DevPanel() {
   const [bookingFormMockId, setBookingFormMockId] = useState(BOOKING_FORM_MOCKS[0]?.id ?? '');
   const [chatMockId, setChatMockId] = useState(CHAT_MOCKS[0]?.id ?? '');
   const [syncMockId, setSyncMockId] = useState(SYNC_EXPERIENCES_MOCKS[0]?.id ?? '');
+  const [agentSuggestionsMockId, setAgentSuggestionsMockId] = useState(
+    AGENT_SUGGESTIONS_MOCKS[0]?.id ?? ''
+  );
 
   useEffect(() => {
     setType(view.type);
@@ -124,6 +130,13 @@ export function DevPanel() {
     if (!chosen) return;
     flushSync(() => clearAddedExperiences());
     applyCommand(chosen.command);
+  };
+
+  const applyAgentSuggestions = () => {
+    const chosen =
+      AGENT_SUGGESTIONS_MOCKS.find((m) => m.id === agentSuggestionsMockId) ??
+      AGENT_SUGGESTIONS_MOCKS[0];
+    if (chosen) setAgentSuggestionsFromDev(chosen.pills);
   };
 
   const reset = () => {
@@ -361,6 +374,29 @@ export function DevPanel() {
                     Clear
                   </button>
                 </div>
+
+                <div className="mt-2 border-t border-white/20 pt-2">agent suggestions</div>
+                <label className="block">
+                  mock
+                  <select
+                    className="mt-1 w-full bg-white/10 px-1 py-0.5"
+                    value={agentSuggestionsMockId}
+                    onChange={(e) => setAgentSuggestionsMockId(e.target.value)}
+                  >
+                    {AGENT_SUGGESTIONS_MOCKS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={applyAgentSuggestions}
+                  className="w-full rounded bg-white text-black"
+                >
+                  Apply suggestions
+                </button>
 
                 {lastError && (
                   <div className="rounded bg-red-900/60 p-1">last error: {lastError.message}</div>

@@ -1,9 +1,11 @@
 import { useStore } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import { COUNTRY_CODES, type GuestInfo, makeBookingForm } from '@/lib/booking-form/guests';
 import type { BookingForm } from '@/lib/booking-form/types';
 import { toItinerarySummary } from '@/lib/itinerary-summary/from-wire';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
+import type { SuggestionPill } from '@/lib/suggestions/pills';
 import type { UiCommand } from './commands';
 import type { BookingSummary, ItineraryTab, UiHint, UiSource, UiView } from './ui-view-types';
 
@@ -18,18 +20,26 @@ interface UiViewState {
   addedExperiences: Array<{ experienceId: string; day: string }>;
   itinerarySummary: ItinerarySummary | null;
   bookingForm: BookingForm | null;
+  // Backend-driven pill override. `null` = no override, the static catalog
+  // renders. `key` identifies the delivery (correlationId, or 'dev') so the
+  // container can reset its dismissed state when fresh pills arrive.
+  agentSuggestions: { pills: SuggestionPill[]; key: string } | null;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
   setViewFromUser: (view: UiView) => void;
   setItineraryTabFromUser: (tab: ItineraryTab) => void;
   setBookingSummaryFromDev: (summary: BookingSummary | null) => void;
+  setAgentSuggestionsFromDev: (pills: SuggestionPill[] | null) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
   clearAddedExperiencesFromDev: () => void;
   setItinerarySummaryFromDev: (summary: ItinerarySummary | null) => void;
   closeItinerarySummary: () => void;
   setBookingFormFromDev: (form: BookingForm | null) => void;
   closeBookingForm: () => void;
+  updateGuestFromUser: (index: number, patch: Partial<GuestInfo>) => void;
+  setAgreedFromUser: (agreed: boolean) => void;
+  submitBookingFormFromUser: () => void;
 }
 
 const INITIAL_VIEW: UiView = { type: 'start' };
@@ -62,6 +72,7 @@ export function createUiViewStore() {
         addedExperiences: [],
         itinerarySummary: null,
         bookingForm: null,
+        agentSuggestions: null,
 
         applyCommand: (cmd) =>
           set(
@@ -71,6 +82,7 @@ export function createUiViewStore() {
                   return {
                     view: { type: 'presentation' },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -81,6 +93,7 @@ export function createUiViewStore() {
                     // always start on Overview.
                     view: { type: 'itinerary', itinerary: cmd.payload.itinerary },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -92,6 +105,7 @@ export function createUiViewStore() {
                       images: cmd.payload.images,
                     },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -99,8 +113,7 @@ export function createUiViewStore() {
                   return {
                     hint: {
                       type: 'soft_redirect',
-                      reasonCode: cmd.payload.reason_code,
-                      missing: cmd.payload.missing,
+                      reasonCode: cmd.payload.reasonCode,
                     },
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
@@ -115,6 +128,7 @@ export function createUiViewStore() {
                   return {
                     view: { type: 'cabin_selection', cabins: cmd.payload.cabins },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -200,6 +214,11 @@ export function createUiViewStore() {
                   };
                 case 'add_experience_to_basket': {
                   const { experience_id, day } = cmd.payload;
+                  // Without a day there is nothing to key the card badge on;
+                  // the sync command in the same batch is the source of truth.
+                  if (!day) {
+                    return { source: 'agent', lastCorrelationId: cmd.correlationId };
+                  }
                   const exists = state.addedExperiences.some(
                     (e) => e.experienceId === experience_id && e.day === day
                   );
@@ -231,6 +250,68 @@ export function createUiViewStore() {
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
+                case 'show_suggestions': {
+                  const { suggestions } = cmd.payload;
+                  return {
+                    // An empty list clears the override; static pills return.
+                    agentSuggestions: suggestions.length
+                      ? {
+                          pills: suggestions.map((s) => ({
+                            id: s.id,
+                            label: s.label ?? s.text,
+                            message: s.text,
+                          })),
+                          key: cmd.correlationId,
+                        }
+                      : null,
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                }
+                case 'show_booking_form':
+                  return {
+                    bookingForm: makeBookingForm(
+                      toItinerarySummary(cmd.payload.summary),
+                      cmd.payload.guest_count
+                    ),
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                case 'update_booking_form': {
+                  if (!state.bookingForm) {
+                    return { source: 'agent', lastCorrelationId: cmd.correlationId };
+                  }
+                  const guests = [...state.bookingForm.guests];
+                  for (const patch of cmd.payload.guests) {
+                    const current = guests[patch.index];
+                    // Out-of-range indices are ignored, not an error.
+                    if (!current) continue;
+                    guests[patch.index] = {
+                      firstName: patch.first_name ?? current.firstName,
+                      lastName: patch.last_name ?? current.lastName,
+                      email: patch.email ?? current.email,
+                      // Only codes the phone select can render.
+                      countryCode: (COUNTRY_CODES as readonly string[]).includes(
+                        patch.country_code ?? ''
+                      )
+                        ? (patch.country_code as string)
+                        : current.countryCode,
+                      phone: patch.phone ?? current.phone,
+                    };
+                  }
+                  // `agreed` is never touched here: consent is user-only.
+                  return {
+                    bookingForm: { ...state.bookingForm, guests },
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                }
+                case 'close_booking_form':
+                  return {
+                    bookingForm: null,
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
                 default: {
                   const _exhaustive: never = cmd;
                   void _exhaustive;
@@ -244,14 +325,27 @@ export function createUiViewStore() {
 
         setViewFromDev: (view) =>
           set(
-            { view, hint: null, source: 'dev', lastCorrelationId: null },
+            (state) => ({
+              view,
+              hint: null,
+              source: 'dev',
+              lastCorrelationId: null,
+              // Backend pills are scoped to the view they arrived on.
+              agentSuggestions: state.view.type === view.type ? state.agentSuggestions : null,
+            }),
             false,
             'setViewFromDev'
           ),
 
         setViewFromUser: (view) =>
           set(
-            { view, hint: null, source: 'user', lastCorrelationId: null },
+            (state) => ({
+              view,
+              hint: null,
+              source: 'user',
+              lastCorrelationId: null,
+              agentSuggestions: state.view.type === view.type ? state.agentSuggestions : null,
+            }),
             false,
             'setViewFromUser'
           ),
@@ -276,6 +370,17 @@ export function createUiViewStore() {
             { bookingSummary: summary, source: 'dev', lastCorrelationId: null },
             false,
             'setBookingSummaryFromDev'
+          ),
+
+        setAgentSuggestionsFromDev: (pills) =>
+          set(
+            {
+              agentSuggestions: pills ? { pills, key: 'dev' } : null,
+              source: 'dev',
+              lastCorrelationId: null,
+            },
+            false,
+            'setAgentSuggestionsFromDev'
           ),
 
         recordParseError: (err) => set({ lastError: err }, false, 'recordParseError'),
@@ -313,6 +418,53 @@ export function createUiViewStore() {
             { bookingForm: null, source: 'user', lastCorrelationId: null },
             false,
             'closeBookingForm'
+          ),
+
+        updateGuestFromUser: (index, patch) =>
+          set(
+            (state) =>
+              state.bookingForm?.guests[index]
+                ? {
+                    bookingForm: {
+                      ...state.bookingForm,
+                      guests: state.bookingForm.guests.map((g, i) =>
+                        i === index ? { ...g, ...patch } : g
+                      ),
+                    },
+                    source: 'user',
+                    lastCorrelationId: null,
+                  }
+                : {},
+            false,
+            'updateGuestFromUser'
+          ),
+
+        setAgreedFromUser: (agreed) =>
+          set(
+            (state) =>
+              state.bookingForm
+                ? {
+                    bookingForm: { ...state.bookingForm, agreed },
+                    source: 'user',
+                    lastCorrelationId: null,
+                  }
+                : {},
+            false,
+            'setAgreedFromUser'
+          ),
+
+        submitBookingFormFromUser: () =>
+          set(
+            (state) =>
+              state.bookingForm
+                ? {
+                    bookingForm: { ...state.bookingForm, status: 'submitting' },
+                    source: 'user',
+                    lastCorrelationId: null,
+                  }
+                : {},
+            false,
+            'submitBookingFormFromUser'
           ),
       }),
       { name: 'ui-view-store', enabled: DEVTOOLS_ENABLED }

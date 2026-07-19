@@ -17,9 +17,10 @@ const ShowDiscoveryCanvas = Base.extend({
 
 const SoftRedirect = Base.extend({
   type: z.literal('soft_redirect'),
+  // Matches what the backend actually emits: {reasonCode, suggestedIntent}.
+  // `suggestedIntent` is renderer steering, deliberately not modeled here.
   payload: z.object({
-    reason_code: z.string(),
-    missing: z.array(z.string()).optional(),
+    reasonCode: z.string(),
   }),
 });
 
@@ -101,14 +102,15 @@ export const BookingSummarySnapshot = z.object({
   stops: z.object({ primary: z.string(), extra: z.number().int().min(0) }).nullable(),
   duration: LabelField,
   price: LabelField,
-  slots: z
-    .array(
-      z.object({
-        label: z.string(),
-        state: z.enum(['active', 'filled', 'empty']),
-      })
-    )
-    .max(6),
+  // Uncapped: the backend emits one slot per basket experience with no limit
+  // (_booking_summary_ui.py:136-150). A length cap here would drop the whole
+  // command and silently freeze the summary.
+  slots: z.array(
+    z.object({
+      label: z.string(),
+      state: z.enum(['active', 'filled', 'empty']),
+    })
+  ),
   cta: z.object({ label: z.string(), enabled: z.boolean() }),
 });
 export type BookingSummarySnapshot = z.infer<typeof BookingSummarySnapshot>;
@@ -223,10 +225,13 @@ const AddCabinToBasket = Base.extend({
 
 const AddExperienceToBasket = Base.extend({
   type: z.literal('add_experience_to_basket'),
+  // The backend currently sends only `experience_id` (select_experience.py:193).
+  // `day` and `passenger_count` stay optional so the command parses today;
+  // sync_itinerary_experiences carries the full basket in the same batch.
   payload: z.object({
     experience_id: z.string(),
-    day: z.string(),
-    passenger_count: z.number().int(),
+    day: z.string().optional(),
+    passenger_count: z.number().int().optional(),
   }),
 });
 
@@ -245,6 +250,57 @@ const SyncItineraryExperiences = Base.extend({
   }),
 });
 
+const ShowSuggestions = Base.extend({
+  type: z.literal('show_suggestions'),
+  payload: z.object({
+    // No length cap: the container renders at most 6; the parser never drops
+    // a command over noise.
+    suggestions: z.array(
+      z.object({
+        id: z.string(),
+        /** Sent to the chat when tapped. */
+        text: z.string(),
+        /** Visible label; falls back to `text`. */
+        label: z.string().optional(),
+      })
+    ),
+  }),
+});
+
+const ShowBookingForm = Base.extend({
+  type: z.literal('show_booking_form'),
+  // Same wire as show_itinerary_summary plus how many guest blocks to render.
+  // guest_count is not floored or capped here — the reducer clamps it to the
+  // [1, 8] range.
+  payload: z.object({
+    summary: ItinerarySummaryWire,
+    guest_count: z.number().int(),
+  }),
+});
+
+const UpdateBookingForm = Base.extend({
+  type: z.literal('update_booking_form'),
+  // Voice-dictated data filling the form visibly. Deliberately NO `agreed`
+  // field: the cancellation-policy consent is only ever a user tap.
+  payload: z.object({
+    guests: z.array(
+      z.object({
+        index: z.number().int(),
+        first_name: z.string().optional(),
+        last_name: z.string().optional(),
+        email: z.string().optional(),
+        country_code: z.string().optional(),
+        phone: z.string().optional(),
+      })
+    ),
+  }),
+});
+
+const CloseBookingForm = Base.extend({
+  type: z.literal('close_booking_form'),
+  payload: z.object({}).optional(),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
@@ -260,6 +316,10 @@ export const UiCommand = z.discriminatedUnion('type', [
   AddExperienceToBasket,
   SyncItineraryExperiences,
   ShowItinerarySummary,
+  ShowSuggestions,
+  ShowBookingForm,
+  UpdateBookingForm,
+  CloseBookingForm,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
 

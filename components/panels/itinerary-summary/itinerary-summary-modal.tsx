@@ -1,3 +1,5 @@
+'use client';
+
 // Radix dialog primitives directly (matching cabin-detail-modal): the shadcn
 // Dialog wrapper hardcodes a centered max-w-lg panel with a baked-in close
 // button. This modal is a full-viewport takeover with its own chrome.
@@ -9,6 +11,7 @@ import { SummaryHeader } from '@/components/panels/itinerary-summary/summary-hea
 import { SummaryItineraryColumn } from '@/components/panels/itinerary-summary/summary-itinerary-column';
 import { SummaryPackageCard } from '@/components/panels/itinerary-summary/summary-package-card';
 import { SummaryTopBar } from '@/components/panels/itinerary-summary/summary-top-bar';
+import { useCloseItinerarySummary, useItinerarySummary } from '@/lib/agent-ui/hooks';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
 
 type ItinerarySummaryModalProps = {
@@ -55,5 +58,23 @@ export function ItinerarySummaryModal({ open, onOpenChange, data }: ItinerarySum
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
+  );
+}
+
+// Mounted at the app root (app.tsx), NOT inside the BookingSummary card: the
+// agent can open the summary by voice (review_selection) before any booking
+// summary exists, and the modal must not depend on that card being on screen.
+export function ItinerarySummaryModalContainer() {
+  const itinerarySummary = useItinerarySummary();
+  const closeItinerarySummary = useCloseItinerarySummary();
+  if (!itinerarySummary) return null;
+  return (
+    <ItinerarySummaryModal
+      open
+      onOpenChange={(open) => {
+        if (!open) closeItinerarySummary();
+      }}
+      data={itinerarySummary}
+    />
   );
 }
