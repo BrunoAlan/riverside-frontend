@@ -73,6 +73,7 @@ Booking form, ya emitidos hoy:
   email | country_code | phone`.
 - `submit_booking_form` — el usuario envió el form.
   `entities: { guests: [{ first_name, last_name, email, country_code, phone }], agreed: true }`.
+- `abandon_booking_form` — el usuario cerró el form con la X. `entities: { status: 'editing' | 'submitting' }` — si llega con `submitting`, el submit ya estaba en vuelo.
 
 ---
 
@@ -234,3 +235,6 @@ front. La cadena completa que pedimos:
    escape). Validen y confirmen por voz; si más adelante quieren una vista de
    confirmación (`show_confirmation_summary` ya existe en su código), definimos
    el payload juntos y la sumamos.
+6. **No reenvíen `show_booking_form` sobre un form abierto** — resetea todos los
+   datos tipeados y el consentimiento. Y tengan en cuenta `abandon_booking_form`:
+   si el usuario cierra el form, dejen de emitir `update_booking_form`.
