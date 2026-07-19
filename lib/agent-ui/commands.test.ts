@@ -957,3 +957,41 @@ describe('command envelope source', () => {
     expect(result.source).toBeUndefined();
   });
 });
+
+describe('show_suggestions', () => {
+  it('parses suggestions with and without a label', () => {
+    const result = UiCommand.parse({
+      type: 'show_suggestions',
+      correlationId: 's1',
+      payload: {
+        suggestions: [
+          { id: 'a', text: 'What can I do in Budapest?' },
+          { id: 'b', text: 'Tell me more about the Belvedere evening', label: 'Belvedere?' },
+        ],
+      },
+    });
+    if (result.type !== 'show_suggestions') throw new Error('discriminator failed');
+    expect(result.payload.suggestions).toHaveLength(2);
+    expect(result.payload.suggestions[0].label).toBeUndefined();
+    expect(result.payload.suggestions[1].label).toBe('Belvedere?');
+  });
+
+  it('parses an empty suggestions array', () => {
+    const result = UiCommand.parse({
+      type: 'show_suggestions',
+      correlationId: 's2',
+      payload: { suggestions: [] },
+    });
+    if (result.type !== 'show_suggestions') throw new Error('discriminator failed');
+    expect(result.payload.suggestions).toEqual([]);
+  });
+
+  it('rejects a suggestion without text', () => {
+    const result = UiCommand.safeParse({
+      type: 'show_suggestions',
+      correlationId: 's3',
+      payload: { suggestions: [{ id: 'a', label: 'No text' }] },
+    });
+    expect(result.success).toBe(false);
+  });
+});

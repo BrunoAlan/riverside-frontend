@@ -250,6 +250,23 @@ const SyncItineraryExperiences = Base.extend({
   }),
 });
 
+const ShowSuggestions = Base.extend({
+  type: z.literal('show_suggestions'),
+  payload: z.object({
+    // No length cap: the container renders at most 6; the parser never drops
+    // a command over noise.
+    suggestions: z.array(
+      z.object({
+        id: z.string(),
+        /** Sent to the chat when tapped. */
+        text: z.string(),
+        /** Visible label; falls back to `text`. */
+        label: z.string().optional(),
+      })
+    ),
+  }),
+});
+
 export const UiCommand = z.discriminatedUnion('type', [
   ShowDiscoveryCanvas,
   SoftRedirect,
@@ -265,6 +282,7 @@ export const UiCommand = z.discriminatedUnion('type', [
   AddExperienceToBasket,
   SyncItineraryExperiences,
   ShowItinerarySummary,
+  ShowSuggestions,
 ]);
 export type UiCommand = z.infer<typeof UiCommand>;
 
