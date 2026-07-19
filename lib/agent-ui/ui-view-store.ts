@@ -1,6 +1,7 @@
 import { useStore } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import { COUNTRY_CODES, type GuestInfo, makeBookingForm } from '@/lib/booking-form/guests';
 import type { BookingForm } from '@/lib/booking-form/types';
 import { toItinerarySummary } from '@/lib/itinerary-summary/from-wire';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
@@ -36,6 +37,9 @@ interface UiViewState {
   closeItinerarySummary: () => void;
   setBookingFormFromDev: (form: BookingForm | null) => void;
   closeBookingForm: () => void;
+  updateGuestFromUser: (index: number, patch: Partial<GuestInfo>) => void;
+  setAgreedFromUser: (agreed: boolean) => void;
+  submitBookingFormFromUser: () => void;
 }
 
 const INITIAL_VIEW: UiView = { type: 'start' };
@@ -264,6 +268,50 @@ export function createUiViewStore() {
                     lastCorrelationId: cmd.correlationId,
                   };
                 }
+                case 'show_booking_form':
+                  return {
+                    bookingForm: makeBookingForm(
+                      toItinerarySummary(cmd.payload.summary),
+                      cmd.payload.guest_count
+                    ),
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                case 'update_booking_form': {
+                  if (!state.bookingForm) {
+                    return { source: 'agent', lastCorrelationId: cmd.correlationId };
+                  }
+                  const guests = [...state.bookingForm.guests];
+                  for (const patch of cmd.payload.guests) {
+                    const current = guests[patch.index];
+                    // Out-of-range indices are ignored, not an error.
+                    if (!current) continue;
+                    guests[patch.index] = {
+                      firstName: patch.first_name ?? current.firstName,
+                      lastName: patch.last_name ?? current.lastName,
+                      email: patch.email ?? current.email,
+                      // Only codes the phone select can render.
+                      countryCode: (COUNTRY_CODES as readonly string[]).includes(
+                        patch.country_code ?? ''
+                      )
+                        ? (patch.country_code as string)
+                        : current.countryCode,
+                      phone: patch.phone ?? current.phone,
+                    };
+                  }
+                  // `agreed` is never touched here: consent is user-only.
+                  return {
+                    bookingForm: { ...state.bookingForm, guests },
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                }
+                case 'close_booking_form':
+                  return {
+                    bookingForm: null,
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
                 default: {
                   const _exhaustive: never = cmd;
                   void _exhaustive;
@@ -370,6 +418,53 @@ export function createUiViewStore() {
             { bookingForm: null, source: 'user', lastCorrelationId: null },
             false,
             'closeBookingForm'
+          ),
+
+        updateGuestFromUser: (index, patch) =>
+          set(
+            (state) =>
+              state.bookingForm?.guests[index]
+                ? {
+                    bookingForm: {
+                      ...state.bookingForm,
+                      guests: state.bookingForm.guests.map((g, i) =>
+                        i === index ? { ...g, ...patch } : g
+                      ),
+                    },
+                    source: 'user',
+                    lastCorrelationId: null,
+                  }
+                : {},
+            false,
+            'updateGuestFromUser'
+          ),
+
+        setAgreedFromUser: (agreed) =>
+          set(
+            (state) =>
+              state.bookingForm
+                ? {
+                    bookingForm: { ...state.bookingForm, agreed },
+                    source: 'user',
+                    lastCorrelationId: null,
+                  }
+                : {},
+            false,
+            'setAgreedFromUser'
+          ),
+
+        submitBookingFormFromUser: () =>
+          set(
+            (state) =>
+              state.bookingForm
+                ? {
+                    bookingForm: { ...state.bookingForm, status: 'submitting' },
+                    source: 'user',
+                    lastCorrelationId: null,
+                  }
+                : {},
+            false,
+            'submitBookingFormFromUser'
           ),
       }),
       { name: 'ui-view-store', enabled: DEVTOOLS_ENABLED }

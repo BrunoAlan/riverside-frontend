@@ -31,3 +31,7 @@ export const useCloseBookingForm = () => useUiViewStore((s) => s.closeBookingFor
 export const useAgentSuggestions = () => useUiViewStore((s) => s.agentSuggestions);
 export const useSetAgentSuggestionsFromDev = () =>
   useUiViewStore((s) => s.setAgentSuggestionsFromDev);
+export const useUpdateGuestFromUser = () => useUiViewStore((s) => s.updateGuestFromUser);
+export const useSetAgreedFromUser = () => useUiViewStore((s) => s.setAgreedFromUser);
+export const useSubmitBookingFormFromUser = () =>
+  useUiViewStore((s) => s.submitBookingFormFromUser);

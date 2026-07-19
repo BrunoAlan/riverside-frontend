@@ -1135,4 +1135,118 @@ describe('ui-view-store', () => {
       expect(store.getState().agentSuggestions).toBeNull();
     });
   });
+
+  describe('booking form', () => {
+    const summaryWire = {
+      header: { title: 'Danube', subtitle: null, image: null },
+      details: {
+        guests: '2 People',
+        month: null,
+        embarkation: null,
+        stops: null,
+        dates: null,
+        price_per_person: '$5,000',
+        cabin_name: null,
+      },
+      cabin: null,
+      package: { price_per_person: '$5,000', name: null, inclusions: [] },
+      itinerary: null,
+      total: '$10,000',
+    };
+
+    const openForm = (guestCount = 2) =>
+      store.getState().applyCommand({
+        type: 'show_booking_form',
+        correlationId: 'bf1',
+        payload: { summary: summaryWire, guest_count: guestCount },
+      });
+
+    it('show_booking_form opens an editing form with empty guests', () => {
+      openForm(2);
+      const form = store.getState().bookingForm;
+      expect(form?.guests).toHaveLength(2);
+      expect(form?.agreed).toBe(false);
+      expect(form?.status).toBe('editing');
+      expect(store.getState().source).toBe('agent');
+    });
+
+    it('show_booking_form clamps guest_count to at least 1', () => {
+      openForm(0);
+      expect(store.getState().bookingForm?.guests).toHaveLength(1);
+    });
+
+    it('update_booking_form patches only the named fields', () => {
+      openForm(2);
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf2',
+        payload: { guests: [{ index: 0, first_name: 'Juan', email: 'juan@example.com' }] },
+      });
+      const guests = store.getState().bookingForm?.guests;
+      expect(guests?.[0]).toMatchObject({
+        firstName: 'Juan',
+        email: 'juan@example.com',
+        lastName: '',
+      });
+      expect(guests?.[1].firstName).toBe('');
+    });
+
+    it('update_booking_form ignores out-of-range indices and unknown country codes', () => {
+      openForm(1);
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf3',
+        payload: {
+          guests: [
+            { index: 5, first_name: 'Nadie' },
+            { index: 0, country_code: 'XX', phone: '123' },
+          ],
+        },
+      });
+      const guests = store.getState().bookingForm?.guests;
+      expect(guests).toHaveLength(1);
+      expect(guests?.[0].countryCode).toBe('US');
+      expect(guests?.[0].phone).toBe('123');
+    });
+
+    it('update_booking_form without an open form only tags the correlation', () => {
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf4',
+        payload: { guests: [{ index: 0, first_name: 'Juan' }] },
+      });
+      expect(store.getState().bookingForm).toBeNull();
+      expect(store.getState().lastCorrelationId).toBe('bf4');
+    });
+
+    it('no command can set agreed', () => {
+      openForm(1);
+      store.getState().setAgreedFromUser(true);
+      store.getState().applyCommand({
+        type: 'update_booking_form',
+        correlationId: 'bf5',
+        payload: { guests: [{ index: 0, first_name: 'Juan' }] },
+      });
+      expect(store.getState().bookingForm?.agreed).toBe(true);
+    });
+
+    it('user actions edit guests, consent, and submit status', () => {
+      openForm(1);
+      store.getState().updateGuestFromUser(0, { firstName: 'Ana' });
+      store.getState().setAgreedFromUser(true);
+      store.getState().submitBookingFormFromUser();
+      const form = store.getState().bookingForm;
+      expect(form?.guests[0].firstName).toBe('Ana');
+      expect(form?.agreed).toBe(true);
+      expect(form?.status).toBe('submitting');
+      expect(store.getState().source).toBe('user');
+    });
+
+    it('close_booking_form clears the slice', () => {
+      openForm(1);
+      store.getState().submitBookingFormFromUser();
+      store.getState().applyCommand({ type: 'close_booking_form', correlationId: 'bf6' });
+      expect(store.getState().bookingForm).toBeNull();
+    });
+  });
 });
