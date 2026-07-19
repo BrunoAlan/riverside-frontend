@@ -3,18 +3,33 @@
 import { useState } from 'react';
 import { ConnectionState } from 'livekit-client';
 import { useConnectionState } from '@livekit/components-react';
-import { CHAT_DOCK_OPEN_LANE_PX, CHAT_DOCK_OPEN_STORAGE_KEY } from '@/components/chat/chat-dock';
+import { CHAT_DOCK_OPEN_LANE_PX } from '@/components/chat/chat-dock';
 import { useAppConfig } from '@/components/layout/app-config-context';
 import { useChatTranscriptionContext } from '@/components/layout/chat-transcription-context';
 import { Button } from '@/components/ui/button';
 import { useUiSource, useUiView, useVisibleBookingSummary } from '@/lib/agent-ui/hooks';
 import { viewKey } from '@/lib/agent-ui/view-key';
-import { useSessionStorageState } from '@/lib/chat/use-session-storage-state';
 import { cn } from '@/lib/shadcn/utils';
 import { type SuggestionPill, pillsForView } from '@/lib/suggestions/pills';
 
-/** Gutter between the pills and the open chat overlay. */
+/** Gutter between the pills and the chat overlay's lane. */
 const LANE_GUTTER_PX = 16;
+
+/** Below this the row would be unreadable, so it reclaims the reserved lane. */
+const MIN_ROW_WIDTH_PX = 640;
+
+/**
+ * Horizontal space reserved on BOTH sides, so the row sits in the same place
+ * whether the chat is open or not — opening the chat must not shove the pills
+ * sideways. Reserving only the left would clear the overlay with less wasted
+ * width, but the row would visibly jump every time the chat is toggled.
+ *
+ * Narrow viewports cannot afford the full lane, so the reserve shrinks to keep
+ * the row at least `MIN_ROW_WIDTH_PX` wide, never going below the base `px-18`.
+ * There the chat can overlap the pills — unavoidable at that width, and the row
+ * still paints above it.
+ */
+const RESERVED_LANE = `min(${CHAT_DOCK_OPEN_LANE_PX + LANE_GUTTER_PX}px, max(4.5rem, (100% - ${MIN_ROW_WIDTH_PX}px) / 2))`;
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
@@ -54,7 +69,6 @@ export function SuggestionPillsContainer() {
   const connectionState = useConnectionState();
   const source = useUiSource();
   const { sendMessage } = useChatTranscriptionContext();
-  const [isChatOpen] = useSessionStorageState<boolean>(CHAT_DOCK_OPEN_STORAGE_KEY, false);
   const [dismissedAt, setDismissedAt] = useState<string | null>(null);
 
   const { suggestionPills } = useAppConfig();
@@ -73,12 +87,12 @@ export function SuggestionPillsContainer() {
   if (dismissedAt === currentKey) return null;
 
   return (
-    // `z-30` keeps the row above the chat dock (`z-20`), so the row must clear
-    // the overlay's lane itself — but only while the overlay exists, and only on
-    // the left, so narrow viewports keep the full remaining width.
+    // `z-30` keeps the row above the chat dock (`z-20`), so the row clears the
+    // overlay's lane itself — unconditionally, so toggling the chat never moves
+    // the pills. See `RESERVED_LANE`.
     <div
       className="pointer-events-none relative z-30 flex justify-center px-18 pb-4"
-      style={isChatOpen ? { paddingLeft: CHAT_DOCK_OPEN_LANE_PX + LANE_GUTTER_PX } : undefined}
+      style={{ paddingInline: RESERVED_LANE }}
     >
       <SuggestionPills
         pills={pills}
