@@ -5,6 +5,7 @@ import { LogLevel } from 'livekit-client';
 import { useSession } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
 import { BookingSummaryContainer } from '@/components/agent-ui/booking-summary';
+import { SuggestionPillsContainer } from '@/components/agent-ui/suggestion-pills';
 import { ChatDock } from '@/components/chat/chat-dock';
 import { AppConfigProvider } from '@/components/layout/app-config-context';
 import { ViewController } from '@/components/layout/view-controller';
@@ -66,6 +67,7 @@ export function App({ appConfig }: AppProps) {
           <div className="relative min-h-0 flex-1">
             <ViewController />
           </div>
+          <SuggestionPillsContainer />
           <BookingSummaryContainer />
           <ChatDockContainer />
         </div>
