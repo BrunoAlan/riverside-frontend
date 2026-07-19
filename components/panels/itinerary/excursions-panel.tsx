@@ -69,12 +69,15 @@ export function ExcursionsPanel({ itinerary, detailExperienceId }: ExcursionsPan
   return (
     // pt-20 clears the tab pill bar, which ItineraryPanel floats at top-6 with a
     // ~44px height — cards would otherwise slide under it as the grid scrolls.
-    <div className="pointer-events-none absolute inset-0 px-6 pt-20 pb-6">
+    <div className="pointer-events-none absolute inset-0 pt-20 pr-6 pb-6 pl-18">
+      {/* pl-18 clears the chat controls column at the bottom-left (left-4 inset +
+          size-10 buttons + gutter), same clearance the pills row and booking
+          summary use. Left-only: the dock never occupies the right edge. */}
       <div
         className={`pointer-events-none absolute top-20 right-0 left-0 z-1 h-[60px] bg-gradient-to-b from-[#E7DCD3] transition-opacity duration-200 ${showTopFade ? 'opacity-100' : 'opacity-0'} `}
       />
       <div
-        className="scrollbar-hide flex h-full flex-wrap content-start items-start gap-3 overflow-y-auto"
+        className="scrollbar-hide pointer-events-auto flex h-full flex-wrap content-start items-start gap-3 overflow-y-auto"
         ref={scrollRef}
       >
         {items.map(({ experience, dayOptions }) => (
