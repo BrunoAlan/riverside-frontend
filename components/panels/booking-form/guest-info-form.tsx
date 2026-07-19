@@ -32,12 +32,19 @@ export function GuestInfoForm({
   /** A field the user finished editing: blur after typing, or a select pick. */
   onCommit: (index: number, field: GuestField, value: string) => void;
 }) {
-  // Fields touched by the keyboard since their last commit. Agent-driven
-  // updates re-render values but never mark dirty, so they never re-emit.
-  const dirty = useRef(new Set<string>());
-  const markDirty = (i: number, field: GuestField) => dirty.current.add(`${i}.${field}`);
+  // Fields touched by the keyboard since their last commit, keyed to the last
+  // value the user typed. Agent-driven updates re-render values but never mark
+  // dirty, so they never re-emit. If an agent write lands between a keystroke
+  // and the blur, the store value at blur no longer matches what the user
+  // typed — commit nothing rather than echo the agent's own write back to it.
+  const dirty = useRef(new Map<string, string>());
+  const markDirty = (i: number, field: GuestField, value: string) =>
+    dirty.current.set(`${i}.${field}`, value);
   const commitIfDirty = (i: number, field: GuestField, value: string) => {
-    if (!dirty.current.delete(`${i}.${field}`)) return;
+    const key = `${i}.${field}`;
+    const typed = dirty.current.get(key);
+    dirty.current.delete(key);
+    if (typed === undefined || typed !== value) return;
     onCommit(i, field, value);
   };
 
@@ -53,7 +60,7 @@ export function GuestInfoForm({
             <Input
               value={guest.firstName}
               onChange={(e) => {
-                markDirty(i, 'first_name');
+                markDirty(i, 'first_name', e.target.value);
                 onChange(i, { firstName: e.target.value });
               }}
               onBlur={(e) => commitIfDirty(i, 'first_name', e.target.value)}
@@ -63,7 +70,7 @@ export function GuestInfoForm({
             <Input
               value={guest.lastName}
               onChange={(e) => {
-                markDirty(i, 'last_name');
+                markDirty(i, 'last_name', e.target.value);
                 onChange(i, { lastName: e.target.value });
               }}
               onBlur={(e) => commitIfDirty(i, 'last_name', e.target.value)}
@@ -75,7 +82,7 @@ export function GuestInfoForm({
               placeholder={BOOKING_FORM_COPY.emailPlaceholder}
               value={guest.email}
               onChange={(e) => {
-                markDirty(i, 'email');
+                markDirty(i, 'email', e.target.value);
                 onChange(i, { email: e.target.value });
               }}
               onBlur={(e) => commitIfDirty(i, 'email', e.target.value)}
@@ -107,7 +114,7 @@ export function GuestInfoForm({
                 placeholder={BOOKING_FORM_COPY.phonePlaceholder}
                 value={guest.phone}
                 onChange={(e) => {
-                  markDirty(i, 'phone');
+                  markDirty(i, 'phone', e.target.value);
                   onChange(i, { phone: e.target.value });
                 }}
                 onBlur={(e) => commitIfDirty(i, 'phone', e.target.value)}
