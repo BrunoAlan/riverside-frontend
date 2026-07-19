@@ -333,7 +333,7 @@ línea en el contenedor. El componente no se toca: ya recibe las pills por prop.
 | 4 | Agregar por voz + marcador de origen | Lo del punto 3 + propagar `source` | ✅ El schema acepta `source`; decisión de producto: sin distinción visual, el card marcado como agregado alcanza |
 | 5 | Volver a Overview | Cubierto por el punto 2 | ✅ Cubierto por el punto 2 |
 | 6 | `view_itinerary` deja de ser no-op | Escribir estado | **Ya lo mandamos** |
-| 7 | Command `show_suggestions` (pills) | Command nuevo + generación | ✅ Hecho — schema, store, contenedor y mock. `suggestions: []` limpia y vuelve el fallback estático; el front limpia además al cambiar de vista; se renderizan máx. 6 |
+| 7 | Command `show_suggestions` (pills) | Command nuevo + generación | ✅ Hecho — schema, store, contenedor y mock. `suggestions: []` limpia y vuelve el fallback estático; el front limpia además al cambiar de vista; se renderizan máx. 6 **Orden en el batch:** mandar `show_suggestions` después del command de vista en el mismo batch — un command de vista limpia las pills. |
 
 ---
 
@@ -361,7 +361,7 @@ Sumado a esto: `sync_itinerary_experiences` **suprime el command cuando la lista
 vacía** (`select_experience.py:186-190`, `review_selection.py:43-47`), así que una lista
 vacía nunca se transmite — lo que refuerza el mismo agujero.
 
-### B. Dos commands se descartan en silencio
+### B. Dos commands se descartaban en silencio (resuelto)
 
 **Resuelto del lado del frontend (2026-07-19):** el schema del front ahora acepta
 lo que el backend manda hoy.
