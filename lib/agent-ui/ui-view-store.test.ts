@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { UiCommand } from './commands';
 import { createUiViewStore } from './ui-view-store';
 
 describe('ui-view-store', () => {
@@ -1007,6 +1008,128 @@ describe('ui-view-store', () => {
       const { view } = store.getState();
       if (view.type !== 'itinerary') throw new Error('expected itinerary view');
       expect(view.activeTab).toBe('excursions');
+    });
+  });
+
+  describe('agent suggestions', () => {
+    const suggestionsCommand = (
+      correlationId: string
+    ): Extract<UiCommand, { type: 'show_suggestions' }> => ({
+      type: 'show_suggestions',
+      correlationId,
+      payload: {
+        suggestions: [
+          { id: 'a', text: 'What can I do in Budapest?' },
+          { id: 'b', text: 'Tell me more about Belvedere', label: 'Belvedere?' },
+        ],
+      },
+    });
+
+    const itinerary = {
+      id: 'danube_legends',
+      name: 'Danube Legends',
+      duration: { days: 12, nights: 11 },
+      match_score: 0.6667,
+      departure_dates: ['2026-04-22'],
+      center: [16.57, 48.15] as [number, number],
+      zoom: 6,
+      cities: [
+        {
+          id: 'budapest',
+          name: 'Budapest',
+          country: 'Hungary',
+          image: 'https://res.cloudinary.com/demo/image/upload/budapest.jpg',
+          days: 'Days 1, 2, 6 & 7',
+          lon: 19.0402,
+          lat: 47.4979,
+        },
+      ],
+    };
+
+    it('initializes with agentSuggestions null', () => {
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('show_suggestions maps wire pills, keyed by correlationId', () => {
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      expect(store.getState().agentSuggestions).toEqual({
+        key: 's1',
+        pills: [
+          { id: 'a', label: 'What can I do in Budapest?', message: 'What can I do in Budapest?' },
+          { id: 'b', label: 'Belvedere?', message: 'Tell me more about Belvedere' },
+        ],
+      });
+      expect(store.getState().source).toBe('agent');
+    });
+
+    it('show_suggestions with an empty list clears the override', () => {
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().applyCommand({
+        type: 'show_suggestions',
+        correlationId: 's2',
+        payload: { suggestions: [] },
+      });
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('a view-replacing command clears the override', () => {
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c2',
+        payload: { itinerary },
+      });
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('field-level commands keep the override', () => {
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c1',
+        payload: { itinerary },
+      });
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().applyCommand({
+        type: 'show_itinerary_tab',
+        correlationId: 'c2',
+        payload: { tab: 'excursions' },
+      });
+      expect(store.getState().agentSuggestions?.key).toBe('s1');
+    });
+
+    it('setViewFromUser keeps the override for the same view type', () => {
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c1',
+        payload: { itinerary },
+      });
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().setViewFromUser({ type: 'itinerary', itinerary, activeTab: 'excursions' });
+      expect(store.getState().agentSuggestions?.key).toBe('s1');
+    });
+
+    it('setViewFromUser clears the override when the view type changes', () => {
+      store.getState().applyCommand({
+        type: 'show_itinerary_options',
+        correlationId: 'c1',
+        payload: { itinerary },
+      });
+      store.getState().applyCommand(suggestionsCommand('s1'));
+      store.getState().setViewFromUser({ type: 'start' });
+      expect(store.getState().agentSuggestions).toBeNull();
+    });
+
+    it('setAgentSuggestionsFromDev sets and clears the override with source dev', () => {
+      store
+        .getState()
+        .setAgentSuggestionsFromDev([{ id: 'd1', label: 'Dev pill', message: 'Dev pill' }]);
+      expect(store.getState().agentSuggestions).toEqual({
+        key: 'dev',
+        pills: [{ id: 'd1', label: 'Dev pill', message: 'Dev pill' }],
+      });
+      expect(store.getState().source).toBe('dev');
+      store.getState().setAgentSuggestionsFromDev(null);
+      expect(store.getState().agentSuggestions).toBeNull();
     });
   });
 });

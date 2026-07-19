@@ -4,6 +4,7 @@ import { createStore } from 'zustand/vanilla';
 import type { BookingForm } from '@/lib/booking-form/types';
 import { toItinerarySummary } from '@/lib/itinerary-summary/from-wire';
 import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
+import type { SuggestionPill } from '@/lib/suggestions/pills';
 import type { UiCommand } from './commands';
 import type { BookingSummary, ItineraryTab, UiHint, UiSource, UiView } from './ui-view-types';
 
@@ -18,12 +19,17 @@ interface UiViewState {
   addedExperiences: Array<{ experienceId: string; day: string }>;
   itinerarySummary: ItinerarySummary | null;
   bookingForm: BookingForm | null;
+  // Backend-driven pill override. `null` = no override, the static catalog
+  // renders. `key` identifies the delivery (correlationId, or 'dev') so the
+  // container can reset its dismissed state when fresh pills arrive.
+  agentSuggestions: { pills: SuggestionPill[]; key: string } | null;
 
   applyCommand: (cmd: UiCommand) => void;
   setViewFromDev: (view: UiView) => void;
   setViewFromUser: (view: UiView) => void;
   setItineraryTabFromUser: (tab: ItineraryTab) => void;
   setBookingSummaryFromDev: (summary: BookingSummary | null) => void;
+  setAgentSuggestionsFromDev: (pills: SuggestionPill[] | null) => void;
   recordParseError: (err: { correlationId?: string; message: string }) => void;
   clearAddedExperiencesFromDev: () => void;
   setItinerarySummaryFromDev: (summary: ItinerarySummary | null) => void;
@@ -62,6 +68,7 @@ export function createUiViewStore() {
         addedExperiences: [],
         itinerarySummary: null,
         bookingForm: null,
+        agentSuggestions: null,
 
         applyCommand: (cmd) =>
           set(
@@ -71,6 +78,7 @@ export function createUiViewStore() {
                   return {
                     view: { type: 'presentation' },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -81,6 +89,7 @@ export function createUiViewStore() {
                     // always start on Overview.
                     view: { type: 'itinerary', itinerary: cmd.payload.itinerary },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -92,6 +101,7 @@ export function createUiViewStore() {
                       images: cmd.payload.images,
                     },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -114,6 +124,7 @@ export function createUiViewStore() {
                   return {
                     view: { type: 'cabin_selection', cabins: cmd.payload.cabins },
                     hint: null,
+                    agentSuggestions: null,
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
@@ -235,6 +246,24 @@ export function createUiViewStore() {
                     source: 'agent',
                     lastCorrelationId: cmd.correlationId,
                   };
+                case 'show_suggestions': {
+                  const { suggestions } = cmd.payload;
+                  return {
+                    // An empty list clears the override; static pills return.
+                    agentSuggestions: suggestions.length
+                      ? {
+                          pills: suggestions.map((s) => ({
+                            id: s.id,
+                            label: s.label ?? s.text,
+                            message: s.text,
+                          })),
+                          key: cmd.correlationId,
+                        }
+                      : null,
+                    source: 'agent',
+                    lastCorrelationId: cmd.correlationId,
+                  };
+                }
                 default: {
                   const _exhaustive: never = cmd;
                   void _exhaustive;
@@ -248,14 +277,27 @@ export function createUiViewStore() {
 
         setViewFromDev: (view) =>
           set(
-            { view, hint: null, source: 'dev', lastCorrelationId: null },
+            (state) => ({
+              view,
+              hint: null,
+              source: 'dev',
+              lastCorrelationId: null,
+              // Backend pills are scoped to the view they arrived on.
+              agentSuggestions: state.view.type === view.type ? state.agentSuggestions : null,
+            }),
             false,
             'setViewFromDev'
           ),
 
         setViewFromUser: (view) =>
           set(
-            { view, hint: null, source: 'user', lastCorrelationId: null },
+            (state) => ({
+              view,
+              hint: null,
+              source: 'user',
+              lastCorrelationId: null,
+              agentSuggestions: state.view.type === view.type ? state.agentSuggestions : null,
+            }),
             false,
             'setViewFromUser'
           ),
@@ -280,6 +322,17 @@ export function createUiViewStore() {
             { bookingSummary: summary, source: 'dev', lastCorrelationId: null },
             false,
             'setBookingSummaryFromDev'
+          ),
+
+        setAgentSuggestionsFromDev: (pills) =>
+          set(
+            {
+              agentSuggestions: pills ? { pills, key: 'dev' } : null,
+              source: 'dev',
+              lastCorrelationId: null,
+            },
+            false,
+            'setAgentSuggestionsFromDev'
           ),
 
         recordParseError: (err) => set({ lastError: err }, false, 'recordParseError'),
