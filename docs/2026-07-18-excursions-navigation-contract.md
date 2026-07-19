@@ -5,8 +5,11 @@ sincronizados en la vista de itinerario, ahora que tiene dos tabs.
 
 La vista de itinerario hoy tiene **dos tabs**: `Overview` (el mapa con las ciudades) y
 `Excursions` (la grilla de excursiones). El agente **no sabe en cuál está parado el
-usuario, y no puede cambiarlo**. Este documento detalla las seis acciones que faltan,
+usuario, y no puede cambiarlo**. Este documento detalla las siete acciones que faltan,
 qué existe de cada una, y de qué lado está el trabajo.
+
+La sección 7 (pills de sugerencias) es independiente del resto: no toca la navegación por
+tabs, pero comparte el mismo canal de commands, así que la documentamos acá.
 
 Todo lo que sigue está verificado contra el código de ambos repos, con citas a
 `archivo:línea`. Donde algo no existe, se dice explícitamente — no se asume.
@@ -166,11 +169,22 @@ La buena noticia: **el backend ya sabe el origen internamente.** Existe
 `source = "frontend-intent" if request.frontend_intent else "classifier"`
 (`app/orchestration/turn_handler.py:143`), con el campo declarado en
 `domain/actions/base.py:25`, y ya se usa en `explore_destination.py:35,38,93`.
-**Solo falta propagarlo al envelope del command**, que hoy es
-`{version, type, payload, timestamp, correlationId}` sin ningún campo de origen
-(`domain/ui_commands/contract.py:6-13`).
+**Solo falta propagarlo al envelope del command**, que hoy no tiene ningún campo de
+origen. El envelope real se arma en `livekit_modules/ui_command_publisher.py:59-75` y
+es un **batch**, no un command suelto:
+
+```ts
+{ version: 'v1', topic: 'ui-commands', correlationId, timestamp, sessionId,
+  commands: [{ type, payload, correlationId, timestamp }] }
+```
 
 Con eso alcanza — no hace falta un command nuevo.
+
+> **Corrección respecto de versiones anteriores de este documento:** el envelope no está
+> en `domain/ui_commands/contract.py`. Ese archivo es **código muerto**: `make_command()`
+> (`:6-13`) no se importa desde ningún lado, y `composer.compose_for_state()`
+> (`composer.py:9-11`) devuelve `[]` y tampoco se usa. La única fuente de verdad del
+> formato de salida es `ui_command_publisher.py`. Ver también el anexo C.
 
 ---
 
@@ -224,6 +238,90 @@ pidió.
 
 ---
 
+## 7) Las pills de sugerencias las decide el agente
+
+**Dirección:** Agente → Frontend (`ui-commands`), y después Frontend → Agente (`lk.chat`)
+**Estado:** el frontend ya las muestra, pero son estáticas y viven en código del front.
+En el backend **no existe nada**.
+
+Las "pills" son sugerencias tappeables que flotan sobre la booking summary. Al tocar
+una, su texto se manda al agente **como si el usuario lo hubiera escrito**. Hoy el
+catálogo es un array hardcodeado en `lib/suggestions/pills.ts`, con scoping por vista.
+Funciona, pero no puede referirse al itinerario concreto que el usuario está mirando:
+si las pills nombran ciudades, se rompen apenas cambia el itinerario.
+
+Buscamos en el backend `suggest|prompt|quick_repl|follow_up|chip|pill|starter|recommend`
+sobre `src/**/*.py` y `docs/**/*.md`: **no hay ningún concepto de sugerencias de prompt.**
+Los únicos hits son falsos positivos — `suggestedIntent` dentro de `soft_redirect`
+(`domain/actions/handlers/explore_destination.py:53`) es un nombre canónico de intent que
+consume el renderer como steering, nunca texto que se le muestre al usuario; y
+`services/recommendation/` recomienda itinerarios, no prompts. Lo más parecido
+estructuralmente es el `cta` de `set_booking_summary`
+(`domain/actions/handlers/_booking_summary_ui.py:174`), que es **un** label de botón.
+
+**Lo que pedimos:**
+
+```ts
+type: 'show_suggestions'
+payload: { suggestions: [{ id: string, text: string }] }
+```
+
+`text` es lo que se manda al chat al tocar la pill. Si quieren que el label visible y el
+mensaje enviado difieran (una pill corta que expande a un prompt largo), agreguen
+`label` opcional — el frontend ya soporta esa distinción hoy.
+
+**Sí pueden hacerlas específicas del itinerario.** En el momento de emitir commands, el
+handler tiene `context.state.options.selected` con el array `cities`, y cada ciudad trae
+`id`, `name`, `country`, `days` y un `experiences` opcional
+(`domain/actions/handlers/_itinerary_ui.py:194-206`). Ya hay handlers que lo leen así
+(`explore_destination.py:63-73`, `walkthrough_itinerary.py:182-188`). También están
+disponibles `traveler_profile`, `shown_destinations` y `experience_state`
+(`domain/session/session_state.py:16-23`), si quieren personalizar más.
+
+**Dónde cae el trabajo del lado de ustedes.** No hay unión, enum ni registry de tipos de
+command: `type` es un `str` pelado (`domain/actions/base.py:12`, `UICommand = dict[str, Any]`)
+y los 20 tipos existentes son literales inline en los handlers. El patrón a seguir es el
+de `show_itinerary_summary`: un builder puro del payload
+(`_itinerary_summary_payload.py:66`) y un handler que devuelve
+`ActionResult(ui_commands=[...])` (`view_itinerary_summary.py:19-29`). La generación
+tiene que vivir en el handler, **no** en el publisher: `ui_command_publisher.py:3-6`
+declara explícitamente que ahí no va lógica de LLM.
+
+**Tres decisiones de diseño que hay que cerrar antes de escribir código:**
+
+1. **Ciclo de vida.** Hoy ningún command limpia estado de UI previo. Si mandan pills
+   junto al itinerario y después el usuario se va a cabinas, ¿quién las borra? O las
+   reenvían en cada cambio de vista, o definimos que un `show_suggestions` con
+   `suggestions: []` las limpia. Nos sirve cualquiera de las dos, pero hay que elegir.
+2. **¿Reemplazan o se suman a las estáticas?** Nuestra recomendación es **híbrido**: las
+   del backend pisan a las estáticas cuando llegan, y si no llega nada queda el fallback
+   local. Así pueden shippear gradualmente sin que la UI quede vacía.
+3. **Cuántas.** El row wrappea, pero más de 5 o 6 se vuelve ruido visual.
+
+**Un detalle que conviene tener presente:** esto sería **el primer round-trip
+backend → frontend → backend de texto** del sistema. Hoy todo el texto que emite el
+backend es terminal — `soft_redirect.message`, `show_welcome_canvas.message`
+(`start_conversation.py:26-29`), y la respuesta hablada del renderer. Nada vuelve.
+
+La buena noticia es que el retorno no necesita nada nuevo: la pill se manda por `lk.chat`,
+que entra por `register_text_stream_handler("lk.chat", _on_text_stream)`
+(`livekit_modules/agent_app.py:546`) y termina en `runtime.on_user_text` igual que
+cualquier mensaje tipeado. **Un tap de pill es indistinguible de que el usuario escriba
+ese texto** — el kwarg `source="chat_text"` de `agent_app.py:362` sólo se usa en logs y
+nunca llega a `on_user_text` (`runtime.py:97-104`), y `turn_handler.py:143` deriva su
+`source` únicamente de si vino un `frontend_intent`. Si en algún momento quieren
+distinguir "esto lo tocó de una pill" de "esto lo escribió", **avísennos**: hoy no se
+puede, y tendríamos que mandarlo como `frontend-intent` en vez de como chat.
+
+**Trabajo del lado nuestro:** el schema Zod del command, un slice `suggestions` en el
+store (estado paralelo a `view`, como ya lo son `bookingSummary` e `itinerarySummary` —
+no es un `UiView` nuevo), el `case` en el reducer, un mock en `lib/dev/mocks.ts`, y una
+línea en el contenedor. El componente no se toca: ya recibe las pills por prop.
+
+**No depende de la sección 0** ni de ninguna otra de este documento.
+
+---
+
 ## Resumen del trabajo
 
 | # | Acción | Backend | Frontend |
@@ -235,6 +333,7 @@ pidió.
 | 4 | Agregar por voz + marcador de origen | Lo del punto 3 + propagar `source` | Mostrar el origen |
 | 5 | Volver a Overview | Cubierto por el punto 2 | Cubierto por el punto 2 |
 | 6 | `view_itinerary` deja de ser no-op | Escribir estado | **Ya lo mandamos** |
+| 7 | Command `show_suggestions` (pills) | Command nuevo + generación | Schema, store y mock |
 
 ---
 
