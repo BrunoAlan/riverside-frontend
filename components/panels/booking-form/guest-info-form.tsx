@@ -8,9 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { BOOKING_FORM_COPY } from '@/lib/booking-form/copy';
-import type { GuestInfo } from '@/lib/booking-form/guests';
-
-const COUNTRY_CODES = ['US', 'GB', 'DE', 'FR', 'ES'] as const;
+import { COUNTRY_CODES, type GuestInfo } from '@/lib/booking-form/guests';
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

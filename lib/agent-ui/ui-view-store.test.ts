@@ -753,7 +753,10 @@ describe('ui-view-store', () => {
       total: null,
     },
     guestCount: 2,
-  } as const;
+    guests: [],
+    agreed: false,
+    status: 'editing' as const,
+  };
 
   it('setBookingFormFromDev fills the slice with source dev', () => {
     store.getState().setBookingFormFromDev(SAMPLE_BOOKING_FORM);

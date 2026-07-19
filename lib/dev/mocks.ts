@@ -6,6 +6,7 @@ import type {
   PackageOption,
   UiView,
 } from '@/lib/agent-ui/ui-view-types';
+import { makeBookingForm } from '@/lib/booking-form/guests';
 import { BOOKING_FORM_MOCK } from '@/lib/booking-form/mock';
 import type { BookingForm } from '@/lib/booking-form/types';
 import { ITINERARY_SUMMARY_MOCK } from '@/lib/itinerary-summary/mock';
@@ -648,6 +649,6 @@ export const BOOKING_FORM_MOCKS: readonly BookingFormMock[] = [
   {
     id: 'single_empty',
     label: '1 guest, empty summary',
-    form: { summary: EMPTY_ITINERARY_SUMMARY, guestCount: 1 },
+    form: makeBookingForm(EMPTY_ITINERARY_SUMMARY, 1),
   },
 ];

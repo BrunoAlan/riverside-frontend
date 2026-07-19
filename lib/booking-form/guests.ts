@@ -1,3 +1,6 @@
+import type { BookingForm } from '@/lib/booking-form/types';
+import type { ItinerarySummary } from '@/lib/itinerary-summary/types';
+
 export type GuestInfo = {
   firstName: string;
   lastName: string;
@@ -14,4 +17,18 @@ export function makeEmptyGuests(count: number): GuestInfo[] {
     countryCode: 'US',
     phone: '',
   }));
+}
+
+/** The only codes the phone country select can render. */
+export const COUNTRY_CODES = ['US', 'GB', 'DE', 'FR', 'ES'] as const;
+
+export function makeBookingForm(summary: ItinerarySummary, guestCount: number): BookingForm {
+  const count = Math.max(1, guestCount);
+  return {
+    summary,
+    guestCount: count,
+    guests: makeEmptyGuests(count),
+    agreed: false,
+    status: 'editing',
+  };
 }
