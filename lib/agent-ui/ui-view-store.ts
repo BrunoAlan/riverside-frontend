@@ -199,6 +199,11 @@ export function createUiViewStore() {
                   };
                 case 'add_experience_to_basket': {
                   const { experience_id, day } = cmd.payload;
+                  // Without a day there is nothing to key the card badge on;
+                  // the sync command in the same batch is the source of truth.
+                  if (!day) {
+                    return { source: 'agent', lastCorrelationId: cmd.correlationId };
+                  }
                   const exists = state.addedExperiences.some(
                     (e) => e.experienceId === experience_id && e.day === day
                   );

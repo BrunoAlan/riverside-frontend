@@ -224,10 +224,13 @@ const AddCabinToBasket = Base.extend({
 
 const AddExperienceToBasket = Base.extend({
   type: z.literal('add_experience_to_basket'),
+  // The backend currently sends only `experience_id` (select_experience.py:193).
+  // `day` and `passenger_count` stay optional so the command parses today;
+  // sync_itinerary_experiences carries the full basket in the same batch.
   payload: z.object({
     experience_id: z.string(),
-    day: z.string(),
-    passenger_count: z.number().int(),
+    day: z.string().optional(),
+    passenger_count: z.number().int().optional(),
   }),
 });
 

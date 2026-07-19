@@ -529,6 +529,18 @@ describe('ui-view-store', () => {
     ]);
   });
 
+  it('applyCommand(add_experience_to_basket) without a day records nothing', () => {
+    store.getState().applyCommand({
+      type: 'add_experience_to_basket',
+      correlationId: 'e9',
+      payload: { experience_id: 'belvedere' },
+    });
+    const s = store.getState();
+    expect(s.addedExperiences).toEqual([]);
+    expect(s.source).toBe('agent');
+    expect(s.lastCorrelationId).toBe('e9');
+  });
+
   it('applyCommand(sync_itinerary_experiences) merges new entries', () => {
     store.getState().applyCommand({
       type: 'sync_itinerary_experiences',

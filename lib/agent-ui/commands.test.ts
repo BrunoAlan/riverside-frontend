@@ -789,6 +789,17 @@ describe('add_experience_to_basket', () => {
     expect(result.payload.day).toBe('Day 3');
     expect(result.payload.passenger_count).toBe(2);
   });
+
+  it('parses the minimal backend payload (experience_id only)', () => {
+    const result = UiCommand.parse({
+      type: 'add_experience_to_basket',
+      correlationId: 'e2',
+      payload: { experience_id: 'signature_vienna_belvedere_palace' },
+    });
+    if (result.type !== 'add_experience_to_basket') throw new Error('discriminator failed');
+    expect(result.payload.experience_id).toBe('signature_vienna_belvedere_palace');
+    expect(result.payload.day).toBeUndefined();
+  });
 });
 
 describe('show_cabin_options', () => {
