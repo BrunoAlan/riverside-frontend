@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ConnectionState } from 'livekit-client';
 import { useConnectionState } from '@livekit/components-react';
 import { CHAT_DOCK_OPEN_LANE_PX } from '@/components/chat/chat-dock';
-import { useAppConfig } from '@/components/layout/app-config-context';
 import { useChatTranscriptionContext } from '@/components/layout/chat-transcription-context';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +14,7 @@ import {
 } from '@/lib/agent-ui/hooks';
 import { viewKey } from '@/lib/agent-ui/view-key';
 import { cn } from '@/lib/shadcn/utils';
-import { type SuggestionPill, pillsForView } from '@/lib/suggestions/pills';
+import { type SuggestionPill } from '@/lib/suggestions/pills';
 
 /** Gutter between the pills and the chat overlay's lane. */
 const LANE_GUTTER_PX = 16;
@@ -79,17 +78,12 @@ export function SuggestionPillsContainer() {
   const { sendMessage } = useChatTranscriptionContext();
   const [dismissedAt, setDismissedAt] = useState<string | null>(null);
 
-  const { suggestionPills } = useAppConfig();
-
   const agentSuggestions = useAgentSuggestions();
 
-  // Backend pills override the static catalog when present (hybrid model).
-  // The dismissal key tracks the delivery, so a fresh show_suggestions
-  // un-dismisses the row even on the same view.
-  const pills = (agentSuggestions?.pills ?? pillsForView(view.type, suggestionPills)).slice(
-    0,
-    MAX_PILLS
-  );
+  // Pills are entirely agent-driven — the row simply hides when there's no
+  // override. The dismissal key tracks the delivery, so a fresh
+  // show_suggestions un-dismisses the row even on the same view.
+  const pills = (agentSuggestions?.pills ?? []).slice(0, MAX_PILLS);
   const currentKey = agentSuggestions ? `agent:${agentSuggestions.key}` : viewKey(view);
 
   // Sending text needs a connected room, so a pill tapped before the session is

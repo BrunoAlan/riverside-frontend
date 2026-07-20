@@ -599,7 +599,7 @@ export const SYNC_EXPERIENCES_MOCKS: readonly SyncExperiencesMock[] = [
 export interface AgentSuggestionsMock {
   id: string;
   label: string;
-  /** `null` clears the override so the static catalog returns. */
+  /** `null` clears the override, hiding the row. */
   pills: SuggestionPill[] | null;
 }
 
@@ -634,7 +634,7 @@ export const AGENT_SUGGESTIONS_MOCKS: readonly AgentSuggestionsMock[] = [
       message: `Suggestion ${i + 1}`,
     })),
   },
-  { id: 'clear', label: 'Clear (static fallback)', pills: null },
+  { id: 'clear', label: 'Clear (hide row)', pills: null },
 ];
 
 export interface BookingFormMock {
