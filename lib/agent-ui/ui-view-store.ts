@@ -20,8 +20,8 @@ interface UiViewState {
   addedExperiences: Array<{ experienceId: string; day: string }>;
   itinerarySummary: ItinerarySummary | null;
   bookingForm: BookingForm | null;
-  // Backend-driven pill override. `null` = no override, the static catalog
-  // renders. `key` identifies the delivery (correlationId, or 'dev') so the
+  // Backend-driven pill override. `null` = no override, the row hides.
+  // `key` identifies the delivery (correlationId, or 'dev') so the
   // container can reset its dismissed state when fresh pills arrive.
   agentSuggestions: { pills: SuggestionPill[]; key: string } | null;
 
