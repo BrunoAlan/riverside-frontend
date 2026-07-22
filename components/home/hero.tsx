@@ -6,7 +6,8 @@ import { PoweredByFooter } from '@/components/layout/powered-by-footer';
 
 export function Hero() {
   return (
-    <section className="flex min-h-screen w-full flex-col bg-white">
+    // `h-screen` (not `min-h-screen`): the image container needs a definite height to resolve `h-full`.
+    <section className="flex h-screen w-full flex-col bg-white">
       <TopUtilityBar />
       <PrimaryNav />
 
