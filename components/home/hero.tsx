@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { FloatingActions } from '@/components/home/floating-actions';
 import { PrimaryNav } from '@/components/home/primary-nav';
 import { TopUtilityBar } from '@/components/home/top-utility-bar';
+import { PoweredByFooter } from '@/components/layout/powered-by-footer';
 
 export function Hero() {
   return (
@@ -9,8 +10,8 @@ export function Hero() {
       <TopUtilityBar />
       <PrimaryNav />
 
-      <div className="px-4 pb-4 md:px-20 md:pb-10">
-        <div className="relative h-[calc(100vh-12rem)] w-full overflow-hidden">
+      <div className="min-h-0 flex-1 px-4 pb-4 md:px-20 md:pb-10">
+        <div className="relative h-full min-h-[24rem] w-full overflow-hidden">
           <Image
             src="/hero-image.jpg"
             alt=""
@@ -31,6 +32,7 @@ export function Hero() {
         </div>
         <FloatingActions />
       </div>
+      <PoweredByFooter />
     </section>
   );
 }
