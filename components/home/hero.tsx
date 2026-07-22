@@ -2,15 +2,17 @@ import Image from 'next/image';
 import { FloatingActions } from '@/components/home/floating-actions';
 import { PrimaryNav } from '@/components/home/primary-nav';
 import { TopUtilityBar } from '@/components/home/top-utility-bar';
+import { PoweredByFooter } from '@/components/layout/powered-by-footer';
 
 export function Hero() {
   return (
-    <section className="flex min-h-screen w-full flex-col bg-white">
+    // `h-screen` (not `min-h-screen`): the image container needs a definite height to resolve `h-full`.
+    <section className="flex h-screen w-full flex-col bg-white">
       <TopUtilityBar />
       <PrimaryNav />
 
-      <div className="px-4 pb-4 md:px-20 md:pb-10">
-        <div className="relative h-[calc(100vh-12rem)] w-full overflow-hidden">
+      <div className="min-h-0 flex-1 px-4 pb-4 md:px-20 md:pb-10">
+        <div className="relative h-full min-h-[24rem] w-full overflow-hidden">
           <Image
             src="/hero-image.jpg"
             alt=""
@@ -31,6 +33,7 @@ export function Hero() {
         </div>
         <FloatingActions />
       </div>
+      <PoweredByFooter />
     </section>
   );
 }
