@@ -12,6 +12,7 @@ import {
   ChatTranscriptionProvider,
   useChatTranscriptionContext,
 } from '@/components/layout/chat-transcription-context';
+import { PoweredByFooter } from '@/components/layout/powered-by-footer';
 import { ViewController } from '@/components/layout/view-controller';
 import { AgentSessionProvider } from '@/components/livekit/agent-session-provider';
 import { StartAudioButton } from '@/components/livekit/start-audio-button';
@@ -75,6 +76,7 @@ export function App({ appConfig }: AppProps) {
             <SuggestionPillsContainer />
             <BookingSummaryContainer />
             <ChatDockContainer />
+            <PoweredByFooter />
           </div>
         </ChatTranscriptionProvider>
         <ItinerarySummaryModalContainer />
